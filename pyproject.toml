@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "climber-legged-rl"
+version = "0.1.0"
+description = "Isaac Lab reinforcement learning workspace for the Climber wheeled-legged robot"
+requires-python = ">=3.10,<3.12"
+dependencies = []
+
+[tool.setuptools.packages.find]
+where = ["source"]

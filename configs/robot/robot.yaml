@@ -1,0 +1,201 @@
+# Fill this from the actual Climber robot. Units are SI unless stated otherwise.
+robot:
+  name: Climber
+  model_file: assets/robot/climber.usdc
+  source_usdz: assets/robot/source/climber_openusd.usdz
+  mjcf_model_file: sim2sim/climber_mjcf/robot.xml
+  mechanical_measurements_file: configs/robot/mechanical_measurements.yaml
+  total_mass_kg: 15.0 # latest mechanical screenshot confirms complete model, excluding screws; MJCF not reconciled
+  base_link: null # TODO
+  bilateral_symmetry_confirmed: true # user: physical left/right mechanisms mirror
+  expected_wheel_joint_names:
+    left: "left_link 3_joint" # exact wheel joint in replacement MJCF, confirmed by video
+    right: "right_link 3_joint" # exact wheel joint in replacement MJCF, confirmed by video
+  wheel_links: ["left_link 3", "right_link 3"] # wheel bodies confirmed by video
+  wheel_joint_names:
+    left: "left_link 3_joint" # physical wheel rotation joint; no motor actuator in export
+    right: "right_link 3_joint" # physical wheel rotation joint; no motor actuator in export
+  wheel_radius_m: 0.055 # loaded effective radius for planned kinematics; mesh unchanged
+  wheel_nominal_radius_m: 0.056 # earlier user-provided nominal radius
+  wheel_loaded_effective_radius_m: 0.055 # mechanical document final summary
+  wheel_track_m: 0.4216 # twice document summary half-track 0.21080 m
+  leg_link_lengths_m: [0.210, 0.250]
+  leg_length_total_m: 0.460
+  nominal_standing_pose_measurements: configs/robot/mechanical_measurements.yaml#geometry.nominal_standing_pose
+  actuated_joints:
+    # Position actuators in the latest MJCF export, not the confirmed motor map.
+    - left_link1_joint
+    - left_link_rear_1_joint
+    - left_link_rear3_joint
+    - base_linkother_joint
+    - right_link1_joint
+    - right_link2_joint
+    - right_rear_link1_joint
+    - "right_other 1_joint"
+  passive_joints: [] # TODO
+  closed_chain: true
+  has_springs: true
+  motor_mapping_evidence:
+    source_notes: docs/机械笔记核对.md
+    known_leg_motor_joints:
+      - left_link1_joint
+      - left_link_rear_1_joint
+      - right_link1_joint
+      - right_rear_link1_joint
+    leg_roles:
+      left: {front: left_link1_joint, rear_chain: left_link_rear_1_joint}
+      right: {front: right_link1_joint, rear_chain: right_rear_link1_joint}
+    source_update: docs/机械数据核对.md # user link1/linkrear1 normalized to actual MJCF names
+    mapping_complete: false # wheel joints now confirmed; actuator mapping/physics still incomplete
+  legacy_2025_joint_calibration_reference:
+    # Historical firmware only: same 8009P motors, changed chassis/geometry.
+    # Do not apply these offsets as the new MJCF zero pose or nominal standing pose.
+    source_header: /home/lsx/下载/climber_wheel_legged_robot_chassis(zyh_v1)（高校联盟赛）/Chassis/chassis_task.h
+    source_transform: /home/lsx/下载/climber_wheel_legged_robot_chassis(zyh_v1)（高校联盟赛）/Chassis/chassis_task.c
+    transform: 'wrap_to_pi((motor_feedback_position_rad + historical_offset_rad) * historical_direction)'
+    feedback_reduction_ratio_in_legacy_motor_init: 1 # verify present-day feedback definition
+    channels:
+      - {role: left_front, model_joint: left_link1_joint, can: 1, motor_id: 1, historical_direction: -1, historical_offset_rad: 3.05894819099}
+      - {role: left_rear_chain, model_joint: left_link_rear_1_joint, can: 1, motor_id: 2, historical_direction: -1, historical_offset_rad: 0.0385427475}
+      - {role: right_front, model_joint: right_link1_joint, can: 1, motor_id: 3, historical_direction: 1, historical_offset_rad: 3.11455598669}
+      - {role: right_rear_chain, model_joint: right_rear_link1_joint, can: 1, motor_id: 4, historical_direction: 1, historical_offset_rad: 2.49064732}
+    validated_against_current_mjcf: false
+    current_standing_joint_positions_rad: null
+    current_hard_stop_ranges_rad: null
+  mjcf_revision: local_mv8374xu_dbbsu0_mjcf_stl_2026-10-19
+  mjcf_has_floating_base: false # replacement MJCF has no freejoint; must be fixed before locomotion training
+
+actuators:
+  # User-confirmed roles: 8009P drives leg joints; 3508 drives wheels.
+  # Left and right wheels each use one 3508; all other active drives use 8009P.
+  # User confirmed two 8009P per side, including one chain-driven channel per side.
+  # Leg assignments and chain ratio confirmed; direction/zero calibration is pending.
+  leg_joint_motor:
+    model: 8009P
+    count: 4
+    count_per_side: 2
+    chain_driven_count_per_side: 1
+    reduction_ratio: 9.0
+    rated_torque_Nm: 20.0
+    torque_reference: null # TODO: motor shaft or gearbox output
+    torque_limit_Nm: null # TODO: confirm usable continuous/peak limits
+    chain_transmission:
+      # Ratios below refer to the additional chain AFTER the 9:1 gearbox.
+      # i_chain = driven_teeth / driver_teeth; positive magnitude, direction separate.
+      parameters_same_left_right: null # physical symmetry confirmed; verify gearing/calibration
+      driver_sprocket_teeth: 20
+      driven_sprocket_teeth: 20
+      reduction_ratio: 1.0
+      rotor_to_driven_joint_reduction_ratio: 9.0 # 9:1 gearbox followed by 20:20 chain
+      driven_joint_names: {left: left_link_rear_1_joint, right: right_rear_link1_joint}
+      direction_sign: {left: null, right: null} # +1/-1 in model joint coordinates
+      efficiency: null
+      backlash_rad_at_driven_joint: null
+      encoder_reference: null # rotor / gearbox_output / driven_joint
+  wheel_motor:
+    model: 3508
+    count: 2
+    driven_wheel_sides: [left, right]
+    gearbox_ratio_numerator: 268.0
+    gearbox_ratio_denominator: 17.0
+    gearbox_reduction_ratio: 15.7647058824
+    torque_limit_Nm: null # TODO: motor/gearbox output torque and peak limit
+    speed_limit_rad_s: null # TODO
+
+springs:
+  type: gas_spring # user-confirmed; no runtime force model implemented yet
+  count: null # TODO
+  reported_specification_string: "15*6/95*65*450N" # preserve user's notation pending length convention
+  reported_dimensions_m: [0.015, 0.006] # provisional: cylinder outer diameter x rod diameter
+  reported_length_values_mm: [95, 65] # meanings/order not yet confirmed
+  reported_diameter_m: 0.015
+  diameter_reference: cylinder_outer_diameter # interpreted from 15*6 notation; confirm if notation differs
+  rod_diameter_m: 0.006 # interpreted from 15*6 notation; confirm if notation differs
+  nominal_force_N: 450.0 # reported rating; reference stroke/temperature unknown
+  force_direction: null # TODO: extension push / retraction pull
+  extended_mount_center_distance_m: null
+  stroke_m: null
+  mounting_points: null # TODO: endpoint body names and local xyz, both sides
+  diagram_evidence:
+    # User screenshot: design names, not resolved runtime MJCF references.
+    left_assembly_links: [base_splink, base_spring_link2]
+    left_link2_side:
+      design_link: base_spring_link2
+      design_joint: base_spring_link2_joint
+      parent_link: left_link2
+      candidate_mjcf_link: left_link_spring1 # same parent; identity still to verify
+      candidate_mjcf_joint: left_link_spring1_joint
+    design_closure: closure_008
+    candidate_mjcf_closure: closure_004
+    mapping_verified: false # topology evidence only; no attachment coordinate/length validation
+  force_length_curve: null # TODO: manufacturer curve or measured samples
+  damping: null # TODO: measured model and units; do not substitute PD Kd
+  force_model_status: pending # 450 N is not stiffness in N/m
+
+export_metadata:
+  coordinate_frame: z_up_x_forward
+  rpy_unit: radian
+  body_count: 22
+  joint_count: 22
+  actuator_count: 8
+  equality_constraint_count: 6
+  unassigned_cad_parts: 73
+  warnings:
+    - "73 CAD parts were not assigned to any exported link."
+    - "Closed-chain constraints are represented as MJCF equality constraints."
+    - "Both wheel rotation joints exist and are identified; neither has an exported motor actuator."
+    - "The latest MJCF has no freejoint; the base is fixed to the world."
+
+control:
+  # Proposed nominal simulation settings, not measured hardware parameters.
+  baseline_status: proposed_not_physics_validated
+  policy_frequency_hz: 100
+  simulation_frequency_hz: 500
+  control_decimation: 5
+  hardware_low_level_target_frequency_hz: 1000 # target; verify CAN/CPU budget
+  action_type: mixed_leg_position_wheel_velocity
+  action_clip: [-1.0, 1.0]
+  action_scale:
+    leg_position_rad: 0.25
+    wheel_velocity_rad_s: 10.0
+  action_offset:
+    leg_default_positions_rad: null # TODO: verified nominal standing pose
+    wheel_velocity_rad_s: 0.0
+  low_level_controller:
+    architecture: output_joint_pd_to_torque
+    simulation_update_frequency_hz: 500
+    hardware_execution_target: STM32 # proposal; actual driver mode pending
+    leg_kp_Nm_per_rad: 20.0 # simulation trial, not measured motor gain
+    leg_kd_Nm_s_per_rad: 1.0 # feedback gain, not physical viscous friction
+    wheel_kp_Nm_per_rad: 0.0
+    wheel_kd_Nm_s_per_rad: 0.2 # velocity-error to output torque gain
+    hardware_command_mode: null # TODO: torque/current/embedded PD support
+  delays:
+    nominal_observation_s: 0.0
+    nominal_action_s: 0.0
+    randomization_enabled: false
+    measured_end_to_end_s: null # TODO: do not substitute another robot's delay
+
+frames:
+  # Canonical interface convention; adapters must convert actual sensor frames.
+  base_axes: {x: forward, y: left, z: up}
+  quaternion_order: wxyz
+  quaternion_rotation: body_to_world
+  gravity_axis: negative_z
+  imu_frame: null # TODO: physical mounting frame
+  base_frame: null # TODO: actual model link name
+  imu_to_base_rotation: null # TODO: mounting rotation
+
+deployment:
+  platform: STM32
+  inference_runtime: STM32Cube.AI
+  mcu_part_number: STM32H723VGTX # user-confirmed
+  ram_bytes: null # TODO: firmware-available budget, not total chip capacity
+  flash_bytes: null # TODO: firmware-available budget, not total chip capacity
+  inference_precision: float32 # first parity check; quantize only after evaluation
+  interchange_format: ONNX # planned; verify installed Cube.AI operator support
+  policy_frequency_hz: 100
+
+# Latest user confirmations/mechanical data override conflicting legacy firmware values.
+# TODO: reconcile confirmed mass/radius with model; verify COM, link inertias, joint limits,
+# actuator torque/speed limits, friction and damping after model inspection.

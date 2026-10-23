@@ -1,0 +1,27 @@
+algorithm: PPO
+seed: 42
+device: null # TODO: e.g. cuda:0 after environment setup
+max_iterations: 5000 # initial budget; evaluate learning curves
+num_steps_per_env: 24
+
+policy:
+  type: MLP # Initial baseline; revisit only after baseline evaluation.
+  actor_hidden_dims: [128, 64, 32] # small actor for STM32; benchmark on target MCU
+  critic_hidden_dims: [256, 128, 64] # training only
+  activation: relu # simple export candidate; Cube.AI conversion still unverified
+  init_noise_std: 0.5
+  empirical_normalization: false # use the fixed observation scales in flat.yaml
+
+ppo:
+  learning_rate: 0.0003
+  gamma: 0.99
+  lam: 0.95
+  entropy_coef: 0.005
+  desired_kl: 0.01
+  num_learning_epochs: 5
+  num_mini_batches: 4
+  clip_param: 0.2
+  value_loss_coef: 1.0
+  use_clipped_value_loss: true
+  max_grad_norm: 1.0
+  schedule: adaptive

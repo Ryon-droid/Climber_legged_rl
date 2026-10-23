@@ -1,0 +1,54 @@
+# First task should be flat-ground standing and commanded velocity tracking.
+task:
+  id: Climber-Flat-v0
+  terrain: plane
+  num_envs: null # TODO: select based on GPU memory after smoke test
+  episode_length_s: 20.0
+  sim_dt: 0.002 # proposed 500 Hz; validate closed-chain solver stability
+  control_decimation: 5 # policy 100 Hz
+
+observations:
+  # User confirmed L=4 leg motors: N=L+2=6 actions, 12+3*L=24 observations.
+  # Planned model channel order below; hardware signs/zeros remain unresolved.
+  expected_dimension: 24
+  terms:
+    - {name: base_ang_vel, size: 3, frame: base, unit: rad/s, scale: 0.25}
+    - {name: projected_gravity, size: 3, frame: base, unit: dimensionless, scale: 1.0}
+    - {name: commands, fields: [forward_velocity_m_s, yaw_rate_rad_s], scales: [2.0, 0.25]}
+    - {name: leg_position_error, joints: leg_active_order, unit: rad, scale: 1.0}
+    - {name: active_joint_velocity, joints: action_order, unit: rad/s, scale: 0.05}
+    - {name: previous_action, joints: action_order, unit: dimensionless, scale: 1.0}
+  history_length: 1
+  clip_after_scaling: [-10.0, 10.0]
+  noise_enabled: false # enable after nominal validation; later calibrate from logs
+
+actions:
+  # Do not use the unverified exported actuator list as the policy order.
+  expected_dimension: 6
+  terms:
+    - {name: leg_position, joints: leg_active_order, scale_rad: 0.25, offset: nominal_standing_pose}
+    - {name: wheel_velocity, sides: [left, right], scale_rad_s: 10.0, offset: 0.0}
+  # Planned policy order: left front/rear, right front/rear, then left/right wheel.
+  # Hardware CAN/encoder order must be adapted explicitly to this order.
+  leg_active_order: [left_link1_joint, left_link_rear_1_joint, right_link1_joint, right_rear_link1_joint]
+  wheel_joint_names: {left: "left_link 3_joint", right: "right_link 3_joint"} # wheel axes confirmed by user video; motor actuators still absent
+  clip: [-1.0, 1.0]
+
+commands:
+  # Proposed low-speed task envelope, not motor speed limits.
+  ranges:
+    forward_velocity_m_s: [-0.3, 0.3]
+    yaw_rate_rad_s: [-0.5, 0.5]
+  resampling_time_s: [3.0, 5.0]
+
+rewards:
+  # TODO: begin with tracking, posture/height, action smoothness and limits.
+  terms: {}
+
+terminations:
+  # TODO: define fall, unsafe attitude, joint-limit and timeout handling.
+  terms: {}
+
+randomization:
+  enabled: false # Turn on only after nominal model behavior is verified.
+  terms: {}

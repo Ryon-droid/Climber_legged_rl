@@ -1,0 +1,1264 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mujoco model="generated_robot">
+  <compiler angle="radian" eulerseq="xyz" autolimits="true" balanceinertia="true" boundinertia="1e-8" />
+  <asset>
+    <mesh name="part_001_solid_001" file="meshes/part_001_solid_001.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_002_solid_002" file="meshes/part_002_solid_002.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_003_solid_003" file="meshes/part_003_solid_003.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_004_solid_004" file="meshes/part_004_solid_004.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_005_solid_005" file="meshes/part_005_solid_005.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_006_solid_006" file="meshes/part_006_solid_006.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_007_solid_007" file="meshes/part_007_solid_007.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_008_solid_008" file="meshes/part_008_solid_008.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_009_solid_009" file="meshes/part_009_solid_009.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_010_solid_010" file="meshes/part_010_solid_010.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_011_solid_011" file="meshes/part_011_solid_011.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_012_solid_012" file="meshes/part_012_solid_012.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_013_solid_013" file="meshes/part_013_solid_013.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_014_solid_014" file="meshes/part_014_solid_014.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_015_solid_015" file="meshes/part_015_solid_015.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_016_solid_016" file="meshes/part_016_solid_016.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_017_solid_017" file="meshes/part_017_solid_017.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_018_solid_018" file="meshes/part_018_solid_018.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_019_solid_019" file="meshes/part_019_solid_019.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_020_solid_020" file="meshes/part_020_solid_020.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_021_solid_021" file="meshes/part_021_solid_021.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_022_solid_022" file="meshes/part_022_solid_022.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_023_solid_023" file="meshes/part_023_solid_023.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_024_solid_024" file="meshes/part_024_solid_024.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_025_solid_025" file="meshes/part_025_solid_025.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_026_solid_026" file="meshes/part_026_solid_026.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_027_solid_027" file="meshes/part_027_solid_027.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_028_solid_028" file="meshes/part_028_solid_028.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_029_solid_029" file="meshes/part_029_solid_029.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_030_solid_030" file="meshes/part_030_solid_030.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_031_solid_031" file="meshes/part_031_solid_031.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_032_solid_032" file="meshes/part_032_solid_032.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_033_solid_033" file="meshes/part_033_solid_033.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_034_solid_034" file="meshes/part_034_solid_034.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_035_solid_035" file="meshes/part_035_solid_035.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_036_solid_036" file="meshes/part_036_solid_036.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_037_solid_037" file="meshes/part_037_solid_037.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_038_solid_038" file="meshes/part_038_solid_038.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_039_solid_039" file="meshes/part_039_solid_039.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_040_solid_040" file="meshes/part_040_solid_040.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_041_solid_041" file="meshes/part_041_solid_041.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_042_solid_042" file="meshes/part_042_solid_042.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_043_solid_043" file="meshes/part_043_solid_043.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_044_solid_044" file="meshes/part_044_solid_044.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_045_solid_045" file="meshes/part_045_solid_045.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_046_solid_046" file="meshes/part_046_solid_046.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_047_solid_047" file="meshes/part_047_solid_047.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_048_solid_048" file="meshes/part_048_solid_048.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_049_solid_049" file="meshes/part_049_solid_049.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_050_solid_050" file="meshes/part_050_solid_050.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_051_solid_051" file="meshes/part_051_solid_051.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_052_solid_052" file="meshes/part_052_solid_052.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_053_solid_053" file="meshes/part_053_solid_053.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_054_solid_054" file="meshes/part_054_solid_054.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_055_solid_055" file="meshes/part_055_solid_055.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_056_solid_056" file="meshes/part_056_solid_056.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_057_solid_057" file="meshes/part_057_solid_057.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_058_solid_058" file="meshes/part_058_solid_058.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_059_solid_059" file="meshes/part_059_solid_059.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_060_solid_060" file="meshes/part_060_solid_060.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_061_solid_061" file="meshes/part_061_solid_061.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_062_solid_062" file="meshes/part_062_solid_062.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_063_solid_063" file="meshes/part_063_solid_063.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_064_solid_064" file="meshes/part_064_solid_064.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_065_solid_065" file="meshes/part_065_solid_065.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_066_solid_066" file="meshes/part_066_solid_066.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_067_solid_067" file="meshes/part_067_solid_067.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_068_solid_068" file="meshes/part_068_solid_068.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_069_solid_069" file="meshes/part_069_solid_069.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_070_solid_070" file="meshes/part_070_solid_070.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_071_solid_071" file="meshes/part_071_solid_071.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_072_solid_072" file="meshes/part_072_solid_072.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_073_solid_073" file="meshes/part_073_solid_073.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_074_solid_074" file="meshes/part_074_solid_074.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_075_solid_075" file="meshes/part_075_solid_075.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_076_solid_076" file="meshes/part_076_solid_076.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_077_solid_077" file="meshes/part_077_solid_077.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_078_solid_078" file="meshes/part_078_solid_078.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_079_solid_079" file="meshes/part_079_solid_079.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_080_solid_080" file="meshes/part_080_solid_080.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_081_solid_081" file="meshes/part_081_solid_081.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_082_solid_082" file="meshes/part_082_solid_082.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_083_solid_083" file="meshes/part_083_solid_083.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_084_solid_084" file="meshes/part_084_solid_084.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_085_solid_085" file="meshes/part_085_solid_085.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_086_solid_086" file="meshes/part_086_solid_086.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_087_solid_087" file="meshes/part_087_solid_087.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_088_solid_088" file="meshes/part_088_solid_088.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_089_solid_089" file="meshes/part_089_solid_089.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_090_solid_090" file="meshes/part_090_solid_090.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_091_solid_091" file="meshes/part_091_solid_091.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_092_solid_092" file="meshes/part_092_solid_092.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_093_solid_093" file="meshes/part_093_solid_093.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_094_solid_094" file="meshes/part_094_solid_094.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_095_solid_095" file="meshes/part_095_solid_095.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_096_solid_096" file="meshes/part_096_solid_096.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_097_solid_097" file="meshes/part_097_solid_097.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_098_solid_098" file="meshes/part_098_solid_098.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_099_solid_099" file="meshes/part_099_solid_099.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_100_solid_100" file="meshes/part_100_solid_100.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_101_solid_101" file="meshes/part_101_solid_101.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_102_solid_102" file="meshes/part_102_solid_102.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_103_solid_103" file="meshes/part_103_solid_103.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_104_solid_104" file="meshes/part_104_solid_104.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_106_solid_106" file="meshes/part_106_solid_106.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_107_solid_107" file="meshes/part_107_solid_107.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_108_solid_108" file="meshes/part_108_solid_108.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_109_solid_109" file="meshes/part_109_solid_109.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_110_solid_110" file="meshes/part_110_solid_110.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_112_solid_112" file="meshes/part_112_solid_112.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_113_solid_113" file="meshes/part_113_solid_113.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_115_solid_115" file="meshes/part_115_solid_115.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_116_solid_116" file="meshes/part_116_solid_116.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_117_solid_117" file="meshes/part_117_solid_117.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_118_solid_118" file="meshes/part_118_solid_118.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_119_solid_119" file="meshes/part_119_solid_119.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_120_solid_120" file="meshes/part_120_solid_120.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_121_solid_121" file="meshes/part_121_solid_121.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_123_solid_123" file="meshes/part_123_solid_123.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_124_solid_124" file="meshes/part_124_solid_124.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_125_solid_125" file="meshes/part_125_solid_125.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_126_solid_126" file="meshes/part_126_solid_126.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_127_solid_127" file="meshes/part_127_solid_127.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_128_solid_128" file="meshes/part_128_solid_128.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_130_solid_130" file="meshes/part_130_solid_130.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_131_solid_131" file="meshes/part_131_solid_131.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_132_solid_132" file="meshes/part_132_solid_132.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_133_solid_133" file="meshes/part_133_solid_133.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_134_solid_134" file="meshes/part_134_solid_134.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_135_solid_135" file="meshes/part_135_solid_135.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_136_solid_136" file="meshes/part_136_solid_136.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_137_solid_137" file="meshes/part_137_solid_137.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_138_solid_138" file="meshes/part_138_solid_138.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_139_solid_139" file="meshes/part_139_solid_139.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_140_solid_140" file="meshes/part_140_solid_140.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_141_solid_141" file="meshes/part_141_solid_141.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_142_solid_142" file="meshes/part_142_solid_142.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_143_solid_143" file="meshes/part_143_solid_143.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_144_solid_144" file="meshes/part_144_solid_144.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_145_solid_145" file="meshes/part_145_solid_145.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_146_solid_146" file="meshes/part_146_solid_146.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_147_solid_147" file="meshes/part_147_solid_147.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_148_solid_148" file="meshes/part_148_solid_148.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_149_solid_149" file="meshes/part_149_solid_149.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_150_solid_150" file="meshes/part_150_solid_150.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_151_solid_151" file="meshes/part_151_solid_151.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_152_solid_152" file="meshes/part_152_solid_152.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_153_solid_153" file="meshes/part_153_solid_153.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_154_solid_154" file="meshes/part_154_solid_154.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_155_solid_155" file="meshes/part_155_solid_155.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_156_solid_156" file="meshes/part_156_solid_156.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_157_solid_157" file="meshes/part_157_solid_157.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_158_solid_158" file="meshes/part_158_solid_158.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_159_solid_159" file="meshes/part_159_solid_159.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_160_solid_160" file="meshes/part_160_solid_160.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_161_solid_161" file="meshes/part_161_solid_161.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_162_solid_162" file="meshes/part_162_solid_162.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_163_solid_163" file="meshes/part_163_solid_163.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_164_solid_164" file="meshes/part_164_solid_164.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_165_solid_165" file="meshes/part_165_solid_165.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_166_solid_166" file="meshes/part_166_solid_166.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_167_solid_167" file="meshes/part_167_solid_167.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_168_solid_168" file="meshes/part_168_solid_168.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_169_solid_169" file="meshes/part_169_solid_169.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_170_solid_170" file="meshes/part_170_solid_170.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_171_solid_171" file="meshes/part_171_solid_171.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_172_solid_172" file="meshes/part_172_solid_172.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_173_solid_173" file="meshes/part_173_solid_173.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_174_solid_174" file="meshes/part_174_solid_174.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_175_solid_175" file="meshes/part_175_solid_175.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_176_solid_176" file="meshes/part_176_solid_176.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_177_solid_177" file="meshes/part_177_solid_177.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_178_solid_178" file="meshes/part_178_solid_178.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_179_solid_179" file="meshes/part_179_solid_179.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_180_solid_180" file="meshes/part_180_solid_180.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_181_solid_181" file="meshes/part_181_solid_181.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_182_solid_182" file="meshes/part_182_solid_182.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_183_solid_183" file="meshes/part_183_solid_183.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_184_solid_184" file="meshes/part_184_solid_184.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_185_solid_185" file="meshes/part_185_solid_185.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_186_solid_186" file="meshes/part_186_solid_186.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_187_solid_187" file="meshes/part_187_solid_187.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_188_solid_188" file="meshes/part_188_solid_188.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_189_solid_189" file="meshes/part_189_solid_189.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_190_solid_190" file="meshes/part_190_solid_190.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_191_solid_191" file="meshes/part_191_solid_191.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_192_solid_192" file="meshes/part_192_solid_192.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_193_solid_193" file="meshes/part_193_solid_193.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_194_solid_194" file="meshes/part_194_solid_194.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_195_solid_195" file="meshes/part_195_solid_195.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_196_solid_196" file="meshes/part_196_solid_196.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_197_solid_197" file="meshes/part_197_solid_197.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_198_solid_198" file="meshes/part_198_solid_198.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_199_solid_199" file="meshes/part_199_solid_199.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_200_solid_200" file="meshes/part_200_solid_200.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_201_solid_201" file="meshes/part_201_solid_201.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_202_solid_202" file="meshes/part_202_solid_202.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_203_solid_203" file="meshes/part_203_solid_203.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_204_solid_204" file="meshes/part_204_solid_204.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_205_solid_205" file="meshes/part_205_solid_205.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_206_solid_206" file="meshes/part_206_solid_206.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_207_solid_207" file="meshes/part_207_solid_207.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_208_solid_208" file="meshes/part_208_solid_208.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_209_solid_209" file="meshes/part_209_solid_209.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_210_solid_210" file="meshes/part_210_solid_210.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_211_solid_211" file="meshes/part_211_solid_211.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_212_solid_212" file="meshes/part_212_solid_212.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_213_solid_213" file="meshes/part_213_solid_213.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_214_solid_214" file="meshes/part_214_solid_214.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_215_solid_215" file="meshes/part_215_solid_215.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_216_solid_216" file="meshes/part_216_solid_216.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_217_solid_217" file="meshes/part_217_solid_217.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_218_surface_shell_218" file="meshes/part_218_surface_shell_218.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_219_surface_shell_219" file="meshes/part_219_surface_shell_219.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_220_surface_shell_220" file="meshes/part_220_surface_shell_220.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_221_surface_shell_221" file="meshes/part_221_surface_shell_221.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_222_surface_shell_222" file="meshes/part_222_surface_shell_222.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_223_surface_shell_223" file="meshes/part_223_surface_shell_223.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_224_surface_shell_224" file="meshes/part_224_surface_shell_224.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_225_surface_shell_225" file="meshes/part_225_surface_shell_225.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_226_surface_shell_226" file="meshes/part_226_surface_shell_226.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_227_surface_shell_227" file="meshes/part_227_surface_shell_227.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_228_surface_shell_228" file="meshes/part_228_surface_shell_228.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_229_surface_shell_229" file="meshes/part_229_surface_shell_229.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_230_surface_shell_230" file="meshes/part_230_surface_shell_230.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_231_surface_shell_231" file="meshes/part_231_surface_shell_231.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_232_surface_shell_232" file="meshes/part_232_surface_shell_232.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_233_surface_shell_233" file="meshes/part_233_surface_shell_233.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_234_surface_shell_234" file="meshes/part_234_surface_shell_234.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_235_surface_shell_235" file="meshes/part_235_surface_shell_235.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_236_surface_shell_236" file="meshes/part_236_surface_shell_236.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_237_surface_shell_237" file="meshes/part_237_surface_shell_237.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_238_surface_shell_238" file="meshes/part_238_surface_shell_238.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_239_surface_shell_239" file="meshes/part_239_surface_shell_239.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_240_surface_shell_240" file="meshes/part_240_surface_shell_240.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_241_surface_shell_241" file="meshes/part_241_surface_shell_241.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_242_surface_shell_242" file="meshes/part_242_surface_shell_242.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_243_surface_shell_243" file="meshes/part_243_surface_shell_243.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_244_surface_shell_244" file="meshes/part_244_surface_shell_244.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_245_surface_shell_245" file="meshes/part_245_surface_shell_245.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_246_surface_shell_246" file="meshes/part_246_surface_shell_246.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_247_surface_shell_247" file="meshes/part_247_surface_shell_247.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_249_surface_shell_249" file="meshes/part_249_surface_shell_249.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_250_solid_250" file="meshes/part_250_solid_250.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_251_solid_251" file="meshes/part_251_solid_251.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_252_solid_252" file="meshes/part_252_solid_252.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_253_solid_253" file="meshes/part_253_solid_253.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_254_surface_shell_254" file="meshes/part_254_surface_shell_254.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_255_surface_shell_255" file="meshes/part_255_surface_shell_255.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_256_surface_shell_256" file="meshes/part_256_surface_shell_256.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_257_surface_shell_257" file="meshes/part_257_surface_shell_257.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_258_surface_shell_258" file="meshes/part_258_surface_shell_258.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_259_surface_shell_259" file="meshes/part_259_surface_shell_259.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_260_surface_shell_260" file="meshes/part_260_surface_shell_260.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_261_surface_shell_261" file="meshes/part_261_surface_shell_261.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_262_surface_shell_262" file="meshes/part_262_surface_shell_262.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_263_surface_shell_263" file="meshes/part_263_surface_shell_263.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_264_surface_shell_264" file="meshes/part_264_surface_shell_264.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_265_solid_265" file="meshes/part_265_solid_265.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_266_solid_266" file="meshes/part_266_solid_266.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_267_solid_267" file="meshes/part_267_solid_267.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_268_solid_268" file="meshes/part_268_solid_268.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_269_surface_shell_269" file="meshes/part_269_surface_shell_269.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_270_surface_shell_270" file="meshes/part_270_surface_shell_270.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_271_surface_shell_271" file="meshes/part_271_surface_shell_271.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_272_surface_shell_272" file="meshes/part_272_surface_shell_272.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_273_surface_shell_273" file="meshes/part_273_surface_shell_273.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_274_surface_shell_274" file="meshes/part_274_surface_shell_274.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_275_surface_shell_275" file="meshes/part_275_surface_shell_275.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_276_surface_shell_276" file="meshes/part_276_surface_shell_276.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_277_solid_277" file="meshes/part_277_solid_277.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_278_solid_278" file="meshes/part_278_solid_278.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_279_surface_shell_279" file="meshes/part_279_surface_shell_279.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_280_surface_shell_280" file="meshes/part_280_surface_shell_280.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_281_surface_shell_281" file="meshes/part_281_surface_shell_281.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_282_surface_shell_282" file="meshes/part_282_surface_shell_282.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_283_surface_shell_283" file="meshes/part_283_surface_shell_283.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_284_surface_shell_284" file="meshes/part_284_surface_shell_284.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_285_surface_shell_285" file="meshes/part_285_surface_shell_285.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_286_surface_shell_286" file="meshes/part_286_surface_shell_286.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_287_solid_287" file="meshes/part_287_solid_287.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_288_solid_288" file="meshes/part_288_solid_288.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_290_solid_290" file="meshes/part_290_solid_290.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_291_solid_291" file="meshes/part_291_solid_291.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_292_solid_292" file="meshes/part_292_solid_292.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_325_solid_325" file="meshes/part_325_solid_325.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_326_solid_326" file="meshes/part_326_solid_326.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_327_solid_327" file="meshes/part_327_solid_327.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_328_solid_328" file="meshes/part_328_solid_328.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_329_solid_329" file="meshes/part_329_solid_329.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_330_solid_330" file="meshes/part_330_solid_330.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_438_surface_shell_438" file="meshes/part_438_surface_shell_438.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_439_surface_shell_439" file="meshes/part_439_surface_shell_439.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_448_surface_shell_448" file="meshes/part_448_surface_shell_448.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_449_surface_shell_449" file="meshes/part_449_surface_shell_449.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_494_solid_494" file="meshes/part_494_solid_494.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_496_solid_496" file="meshes/part_496_solid_496.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_497_solid_497" file="meshes/part_497_solid_497.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_498_solid_498" file="meshes/part_498_solid_498.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_499_solid_499" file="meshes/part_499_solid_499.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_289_solid_289" file="meshes/part_289_solid_289.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_460_solid_460" file="meshes/part_460_solid_460.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_111_solid_111" file="meshes/part_111_solid_111.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_457_solid_457" file="meshes/part_457_solid_457.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_458_solid_458" file="meshes/part_458_solid_458.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_436_solid_436" file="meshes/part_436_solid_436.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_456_solid_456" file="meshes/part_456_solid_456.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_446_solid_446" file="meshes/part_446_solid_446.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_437_solid_437" file="meshes/part_437_solid_437.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_447_solid_447" file="meshes/part_447_solid_447.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_391_solid_391" file="meshes/part_391_solid_391.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_374_solid_374" file="meshes/part_374_solid_374.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_375_solid_375" file="meshes/part_375_solid_375.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_405_solid_405" file="meshes/part_405_solid_405.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_376_solid_376" file="meshes/part_376_solid_376.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_406_solid_406" file="meshes/part_406_solid_406.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_395_solid_395" file="meshes/part_395_solid_395.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_396_solid_396" file="meshes/part_396_solid_396.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_386_solid_386" file="meshes/part_386_solid_386.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_385_solid_385" file="meshes/part_385_solid_385.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_398_solid_398" file="meshes/part_398_solid_398.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_404_solid_404" file="meshes/part_404_solid_404.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_397_solid_397" file="meshes/part_397_solid_397.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_403_solid_403" file="meshes/part_403_solid_403.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_394_solid_394" file="meshes/part_394_solid_394.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_393_solid_393" file="meshes/part_393_solid_393.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_534_solid_534" file="meshes/part_534_solid_534.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_524_solid_524" file="meshes/part_524_solid_524.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_544_solid_544" file="meshes/part_544_solid_544.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_539_solid_539" file="meshes/part_539_solid_539.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_535_solid_535" file="meshes/part_535_solid_535.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_531_solid_531" file="meshes/part_531_solid_531.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_554_solid_554" file="meshes/part_554_solid_554.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_495_solid_495" file="meshes/part_495_solid_495.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_553_solid_553" file="meshes/part_553_solid_553.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_537_solid_537" file="meshes/part_537_solid_537.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_548_solid_548" file="meshes/part_548_solid_548.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_530_solid_530" file="meshes/part_530_solid_530.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_533_solid_533" file="meshes/part_533_solid_533.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_532_solid_532" file="meshes/part_532_solid_532.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_536_solid_536" file="meshes/part_536_solid_536.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_545_solid_545" file="meshes/part_545_solid_545.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_523_solid_523" file="meshes/part_523_solid_523.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_522_solid_522" file="meshes/part_522_solid_522.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_392_solid_392" file="meshes/part_392_solid_392.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_399_solid_399" file="meshes/part_399_solid_399.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_402_solid_402" file="meshes/part_402_solid_402.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_387_solid_387" file="meshes/part_387_solid_387.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_382_solid_382" file="meshes/part_382_solid_382.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_383_solid_383" file="meshes/part_383_solid_383.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_390_solid_390" file="meshes/part_390_solid_390.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_388_solid_388" file="meshes/part_388_solid_388.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_384_solid_384" file="meshes/part_384_solid_384.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_550_solid_550" file="meshes/part_550_solid_550.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_546_solid_546" file="meshes/part_546_solid_546.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_538_solid_538" file="meshes/part_538_solid_538.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_552_solid_552" file="meshes/part_552_solid_552.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_541_solid_541" file="meshes/part_541_solid_541.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_543_solid_543" file="meshes/part_543_solid_543.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_540_solid_540" file="meshes/part_540_solid_540.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_549_solid_549" file="meshes/part_549_solid_549.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_551_solid_551" file="meshes/part_551_solid_551.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_466_solid_466" file="meshes/part_466_solid_466.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_486_solid_486" file="meshes/part_486_solid_486.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_492_solid_492" file="meshes/part_492_solid_492.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_490_solid_490" file="meshes/part_490_solid_490.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_491_solid_491" file="meshes/part_491_solid_491.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_489_solid_489" file="meshes/part_489_solid_489.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_579_solid_579" file="meshes/part_579_solid_579.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_488_solid_488" file="meshes/part_488_solid_488.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_487_solid_487" file="meshes/part_487_solid_487.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_465_solid_465" file="meshes/part_465_solid_465.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_464_solid_464" file="meshes/part_464_solid_464.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_463_solid_463" file="meshes/part_463_solid_463.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_483_solid_483" file="meshes/part_483_solid_483.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_485_solid_485" file="meshes/part_485_solid_485.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_484_solid_484" file="meshes/part_484_solid_484.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_493_solid_493" file="meshes/part_493_solid_493.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_562_surface_shell_562" file="meshes/part_562_surface_shell_562.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_563_surface_shell_563" file="meshes/part_563_surface_shell_563.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_557_surface_shell_557" file="meshes/part_557_surface_shell_557.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_556_surface_shell_556" file="meshes/part_556_surface_shell_556.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_560_surface_shell_560" file="meshes/part_560_surface_shell_560.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_559_surface_shell_559" file="meshes/part_559_surface_shell_559.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_558_surface_shell_558" file="meshes/part_558_surface_shell_558.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_578_surface_shell_578" file="meshes/part_578_surface_shell_578.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_555_surface_shell_555" file="meshes/part_555_surface_shell_555.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_510_solid_510" file="meshes/part_510_solid_510.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_467_solid_467" file="meshes/part_467_solid_467.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_462_solid_462" file="meshes/part_462_solid_462.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_469_solid_469" file="meshes/part_469_solid_469.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_525_solid_525" file="meshes/part_525_solid_525.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_468_solid_468" file="meshes/part_468_solid_468.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_470_solid_470" file="meshes/part_470_solid_470.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_471_solid_471" file="meshes/part_471_solid_471.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_473_solid_473" file="meshes/part_473_solid_473.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_477_solid_477" file="meshes/part_477_solid_477.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_476_solid_476" file="meshes/part_476_solid_476.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_478_solid_478" file="meshes/part_478_solid_478.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_480_solid_480" file="meshes/part_480_solid_480.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_472_solid_472" file="meshes/part_472_solid_472.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_481_solid_481" file="meshes/part_481_solid_481.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_527_solid_527" file="meshes/part_527_solid_527.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_529_solid_529" file="meshes/part_529_solid_529.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_479_solid_479" file="meshes/part_479_solid_479.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_526_solid_526" file="meshes/part_526_solid_526.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_528_solid_528" file="meshes/part_528_solid_528.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_583_solid_583" file="meshes/part_583_solid_583.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_294_solid_294" file="meshes/part_294_solid_294.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_431_solid_431" file="meshes/part_431_solid_431.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_317_solid_317" file="meshes/part_317_solid_317.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_322_solid_322" file="meshes/part_322_solid_322.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_321_solid_321" file="meshes/part_321_solid_321.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_323_solid_323" file="meshes/part_323_solid_323.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_320_solid_320" file="meshes/part_320_solid_320.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_297_solid_297" file="meshes/part_297_solid_297.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_296_solid_296" file="meshes/part_296_solid_296.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_295_solid_295" file="meshes/part_295_solid_295.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_414_surface_shell_414" file="meshes/part_414_surface_shell_414.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_412_surface_shell_412" file="meshes/part_412_surface_shell_412.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_415_surface_shell_415" file="meshes/part_415_surface_shell_415.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_409_surface_shell_409" file="meshes/part_409_surface_shell_409.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_408_surface_shell_408" file="meshes/part_408_surface_shell_408.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_407_surface_shell_407" file="meshes/part_407_surface_shell_407.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_430_surface_shell_430" file="meshes/part_430_surface_shell_430.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_410_surface_shell_410" file="meshes/part_410_surface_shell_410.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_411_surface_shell_411" file="meshes/part_411_surface_shell_411.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_340_solid_340" file="meshes/part_340_solid_340.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_334_solid_334" file="meshes/part_334_solid_334.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_335_solid_335" file="meshes/part_335_solid_335.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_336_solid_336" file="meshes/part_336_solid_336.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_337_solid_337" file="meshes/part_337_solid_337.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_338_solid_338" file="meshes/part_338_solid_338.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_417_surface_shell_417" file="meshes/part_417_surface_shell_417.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_416_surface_shell_416" file="meshes/part_416_surface_shell_416.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_314_solid_314" file="meshes/part_314_solid_314.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_315_solid_315" file="meshes/part_315_solid_315.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_316_solid_316" file="meshes/part_316_solid_316.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_324_solid_324" file="meshes/part_324_solid_324.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_293_solid_293" file="meshes/part_293_solid_293.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_298_solid_298" file="meshes/part_298_solid_298.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_300_solid_300" file="meshes/part_300_solid_300.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_377_solid_377" file="meshes/part_377_solid_377.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_299_solid_299" file="meshes/part_299_solid_299.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_302_solid_302" file="meshes/part_302_solid_302.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_305_solid_305" file="meshes/part_305_solid_305.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_304_solid_304" file="meshes/part_304_solid_304.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_303_solid_303" file="meshes/part_303_solid_303.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_308_solid_308" file="meshes/part_308_solid_308.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_379_solid_379" file="meshes/part_379_solid_379.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_307_solid_307" file="meshes/part_307_solid_307.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_309_solid_309" file="meshes/part_309_solid_309.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_310_solid_310" file="meshes/part_310_solid_310.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_381_solid_381" file="meshes/part_381_solid_381.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_312_solid_312" file="meshes/part_312_solid_312.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_311_solid_311" file="meshes/part_311_solid_311.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_380_solid_380" file="meshes/part_380_solid_380.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_378_solid_378" file="meshes/part_378_solid_378.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_432_solid_432" file="meshes/part_432_solid_432.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_434_solid_434" file="meshes/part_434_solid_434.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_435_solid_435" file="meshes/part_435_solid_435.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_515_solid_515" file="meshes/part_515_solid_515.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_516_solid_516" file="meshes/part_516_solid_516.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_519_solid_519" file="meshes/part_519_solid_519.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_517_solid_517" file="meshes/part_517_solid_517.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_520_solid_520" file="meshes/part_520_solid_520.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_509_solid_509" file="meshes/part_509_solid_509.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_508_solid_508" file="meshes/part_508_solid_508.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_513_solid_513" file="meshes/part_513_solid_513.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_514_solid_514" file="meshes/part_514_solid_514.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_512_solid_512" file="meshes/part_512_solid_512.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_503_solid_503" file="meshes/part_503_solid_503.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_505_solid_505" file="meshes/part_505_solid_505.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_504_solid_504" file="meshes/part_504_solid_504.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_518_solid_518" file="meshes/part_518_solid_518.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_506_solid_506" file="meshes/part_506_solid_506.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_507_solid_507" file="meshes/part_507_solid_507.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_511_solid_511" file="meshes/part_511_solid_511.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_346_solid_346" file="meshes/part_346_solid_346.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_347_solid_347" file="meshes/part_347_solid_347.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_353_solid_353" file="meshes/part_353_solid_353.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_352_solid_352" file="meshes/part_352_solid_352.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_361_solid_361" file="meshes/part_361_solid_361.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_366_solid_366" file="meshes/part_366_solid_366.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_371_solid_371" file="meshes/part_371_solid_371.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_372_solid_372" file="meshes/part_372_solid_372.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_358_solid_358" file="meshes/part_358_solid_358.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_360_solid_360" file="meshes/part_360_solid_360.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_359_solid_359" file="meshes/part_359_solid_359.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_370_solid_370" file="meshes/part_370_solid_370.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_365_solid_365" file="meshes/part_365_solid_365.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_369_solid_369" file="meshes/part_369_solid_369.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_364_solid_364" file="meshes/part_364_solid_364.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_368_solid_368" file="meshes/part_368_solid_368.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_363_solid_363" file="meshes/part_363_solid_363.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_355_solid_355" file="meshes/part_355_solid_355.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_354_solid_354" file="meshes/part_354_solid_354.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_367_solid_367" file="meshes/part_367_solid_367.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_362_solid_362" file="meshes/part_362_solid_362.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_345_solid_345" file="meshes/part_345_solid_345.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_341_solid_341" file="meshes/part_341_solid_341.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_342_solid_342" file="meshes/part_342_solid_342.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_343_solid_343" file="meshes/part_343_solid_343.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_356_solid_356" file="meshes/part_356_solid_356.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_344_solid_344" file="meshes/part_344_solid_344.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_357_solid_357" file="meshes/part_357_solid_357.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_339_solid_339" file="meshes/part_339_solid_339.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_582_solid_582" file="meshes/part_582_solid_582.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_581_solid_581" file="meshes/part_581_solid_581.stl" scale="0.001 0.001 0.001" />
+    <mesh name="part_580_solid_580" file="meshes/part_580_solid_580.stl" scale="0.001 0.001 0.001" />
+  </asset>
+  <worldbody>
+    <body name="base" pos="0 0 0">
+      <inertial pos="-0.025734018 -0.016158064 0.018928793" mass="5.7224249" quat="0.98108389 0.026692455 0.19034884 0.023004956" diaginertia="0.20619444 0.097285537 0.13578557" />
+      <geom name="base_mesh_1" type="mesh" mesh="part_001_solid_001" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_2" type="mesh" mesh="part_002_solid_002" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_3" type="mesh" mesh="part_003_solid_003" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_4" type="mesh" mesh="part_004_solid_004" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_5" type="mesh" mesh="part_005_solid_005" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_6" type="mesh" mesh="part_006_solid_006" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_7" type="mesh" mesh="part_007_solid_007" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_8" type="mesh" mesh="part_008_solid_008" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_9" type="mesh" mesh="part_009_solid_009" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_10" type="mesh" mesh="part_010_solid_010" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_11" type="mesh" mesh="part_011_solid_011" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_12" type="mesh" mesh="part_012_solid_012" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_13" type="mesh" mesh="part_013_solid_013" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_14" type="mesh" mesh="part_014_solid_014" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_15" type="mesh" mesh="part_015_solid_015" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_16" type="mesh" mesh="part_016_solid_016" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_17" type="mesh" mesh="part_017_solid_017" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_18" type="mesh" mesh="part_018_solid_018" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_19" type="mesh" mesh="part_019_solid_019" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_20" type="mesh" mesh="part_020_solid_020" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_21" type="mesh" mesh="part_021_solid_021" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_22" type="mesh" mesh="part_022_solid_022" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_23" type="mesh" mesh="part_023_solid_023" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_24" type="mesh" mesh="part_024_solid_024" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_25" type="mesh" mesh="part_025_solid_025" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_26" type="mesh" mesh="part_026_solid_026" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_27" type="mesh" mesh="part_027_solid_027" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_28" type="mesh" mesh="part_028_solid_028" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_29" type="mesh" mesh="part_029_solid_029" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_30" type="mesh" mesh="part_030_solid_030" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_31" type="mesh" mesh="part_031_solid_031" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_32" type="mesh" mesh="part_032_solid_032" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_33" type="mesh" mesh="part_033_solid_033" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_34" type="mesh" mesh="part_034_solid_034" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_35" type="mesh" mesh="part_035_solid_035" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_36" type="mesh" mesh="part_036_solid_036" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_37" type="mesh" mesh="part_037_solid_037" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_38" type="mesh" mesh="part_038_solid_038" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_39" type="mesh" mesh="part_039_solid_039" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_40" type="mesh" mesh="part_040_solid_040" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_41" type="mesh" mesh="part_041_solid_041" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_42" type="mesh" mesh="part_042_solid_042" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_43" type="mesh" mesh="part_043_solid_043" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_44" type="mesh" mesh="part_044_solid_044" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_45" type="mesh" mesh="part_045_solid_045" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_46" type="mesh" mesh="part_046_solid_046" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_47" type="mesh" mesh="part_047_solid_047" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_48" type="mesh" mesh="part_048_solid_048" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_49" type="mesh" mesh="part_049_solid_049" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_50" type="mesh" mesh="part_050_solid_050" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_51" type="mesh" mesh="part_051_solid_051" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_52" type="mesh" mesh="part_052_solid_052" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_53" type="mesh" mesh="part_053_solid_053" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_54" type="mesh" mesh="part_054_solid_054" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_55" type="mesh" mesh="part_055_solid_055" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_56" type="mesh" mesh="part_056_solid_056" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_57" type="mesh" mesh="part_057_solid_057" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_58" type="mesh" mesh="part_058_solid_058" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_59" type="mesh" mesh="part_059_solid_059" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_60" type="mesh" mesh="part_060_solid_060" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_61" type="mesh" mesh="part_061_solid_061" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_62" type="mesh" mesh="part_062_solid_062" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_63" type="mesh" mesh="part_063_solid_063" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_64" type="mesh" mesh="part_064_solid_064" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_65" type="mesh" mesh="part_065_solid_065" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_66" type="mesh" mesh="part_066_solid_066" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_67" type="mesh" mesh="part_067_solid_067" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_68" type="mesh" mesh="part_068_solid_068" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_69" type="mesh" mesh="part_069_solid_069" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_70" type="mesh" mesh="part_070_solid_070" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_71" type="mesh" mesh="part_071_solid_071" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_72" type="mesh" mesh="part_072_solid_072" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_73" type="mesh" mesh="part_073_solid_073" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_74" type="mesh" mesh="part_074_solid_074" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_75" type="mesh" mesh="part_075_solid_075" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_76" type="mesh" mesh="part_076_solid_076" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_77" type="mesh" mesh="part_077_solid_077" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_78" type="mesh" mesh="part_078_solid_078" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_79" type="mesh" mesh="part_079_solid_079" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_80" type="mesh" mesh="part_080_solid_080" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_81" type="mesh" mesh="part_081_solid_081" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_82" type="mesh" mesh="part_082_solid_082" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_83" type="mesh" mesh="part_083_solid_083" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_84" type="mesh" mesh="part_084_solid_084" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_85" type="mesh" mesh="part_085_solid_085" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_86" type="mesh" mesh="part_086_solid_086" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_87" type="mesh" mesh="part_087_solid_087" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_88" type="mesh" mesh="part_088_solid_088" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_89" type="mesh" mesh="part_089_solid_089" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_90" type="mesh" mesh="part_090_solid_090" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_91" type="mesh" mesh="part_091_solid_091" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_92" type="mesh" mesh="part_092_solid_092" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_93" type="mesh" mesh="part_093_solid_093" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_94" type="mesh" mesh="part_094_solid_094" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_95" type="mesh" mesh="part_095_solid_095" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_96" type="mesh" mesh="part_096_solid_096" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_97" type="mesh" mesh="part_097_solid_097" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_98" type="mesh" mesh="part_098_solid_098" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_99" type="mesh" mesh="part_099_solid_099" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_100" type="mesh" mesh="part_100_solid_100" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_101" type="mesh" mesh="part_101_solid_101" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_102" type="mesh" mesh="part_102_solid_102" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_103" type="mesh" mesh="part_103_solid_103" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_104" type="mesh" mesh="part_104_solid_104" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_105" type="mesh" mesh="part_106_solid_106" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_106" type="mesh" mesh="part_107_solid_107" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_107" type="mesh" mesh="part_108_solid_108" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_108" type="mesh" mesh="part_109_solid_109" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_109" type="mesh" mesh="part_110_solid_110" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_110" type="mesh" mesh="part_112_solid_112" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_111" type="mesh" mesh="part_113_solid_113" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_112" type="mesh" mesh="part_115_solid_115" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_113" type="mesh" mesh="part_116_solid_116" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_114" type="mesh" mesh="part_117_solid_117" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_115" type="mesh" mesh="part_118_solid_118" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_116" type="mesh" mesh="part_119_solid_119" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_117" type="mesh" mesh="part_120_solid_120" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_118" type="mesh" mesh="part_121_solid_121" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_119" type="mesh" mesh="part_123_solid_123" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_120" type="mesh" mesh="part_124_solid_124" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_121" type="mesh" mesh="part_125_solid_125" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_122" type="mesh" mesh="part_126_solid_126" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_123" type="mesh" mesh="part_127_solid_127" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_124" type="mesh" mesh="part_128_solid_128" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_125" type="mesh" mesh="part_130_solid_130" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_126" type="mesh" mesh="part_131_solid_131" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_127" type="mesh" mesh="part_132_solid_132" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_128" type="mesh" mesh="part_133_solid_133" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_129" type="mesh" mesh="part_134_solid_134" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_130" type="mesh" mesh="part_135_solid_135" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_131" type="mesh" mesh="part_136_solid_136" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_132" type="mesh" mesh="part_137_solid_137" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_133" type="mesh" mesh="part_138_solid_138" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_134" type="mesh" mesh="part_139_solid_139" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_135" type="mesh" mesh="part_140_solid_140" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_136" type="mesh" mesh="part_141_solid_141" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_137" type="mesh" mesh="part_142_solid_142" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_138" type="mesh" mesh="part_143_solid_143" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_139" type="mesh" mesh="part_144_solid_144" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_140" type="mesh" mesh="part_145_solid_145" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_141" type="mesh" mesh="part_146_solid_146" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_142" type="mesh" mesh="part_147_solid_147" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_143" type="mesh" mesh="part_148_solid_148" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_144" type="mesh" mesh="part_149_solid_149" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_145" type="mesh" mesh="part_150_solid_150" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_146" type="mesh" mesh="part_151_solid_151" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_147" type="mesh" mesh="part_152_solid_152" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_148" type="mesh" mesh="part_153_solid_153" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_149" type="mesh" mesh="part_154_solid_154" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_150" type="mesh" mesh="part_155_solid_155" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_151" type="mesh" mesh="part_156_solid_156" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_152" type="mesh" mesh="part_157_solid_157" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_153" type="mesh" mesh="part_158_solid_158" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_154" type="mesh" mesh="part_159_solid_159" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_155" type="mesh" mesh="part_160_solid_160" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_156" type="mesh" mesh="part_161_solid_161" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_157" type="mesh" mesh="part_162_solid_162" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_158" type="mesh" mesh="part_163_solid_163" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_159" type="mesh" mesh="part_164_solid_164" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_160" type="mesh" mesh="part_165_solid_165" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_161" type="mesh" mesh="part_166_solid_166" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_162" type="mesh" mesh="part_167_solid_167" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_163" type="mesh" mesh="part_168_solid_168" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_164" type="mesh" mesh="part_169_solid_169" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_165" type="mesh" mesh="part_170_solid_170" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_166" type="mesh" mesh="part_171_solid_171" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_167" type="mesh" mesh="part_172_solid_172" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_168" type="mesh" mesh="part_173_solid_173" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_169" type="mesh" mesh="part_174_solid_174" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_170" type="mesh" mesh="part_175_solid_175" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_171" type="mesh" mesh="part_176_solid_176" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_172" type="mesh" mesh="part_177_solid_177" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_173" type="mesh" mesh="part_178_solid_178" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_174" type="mesh" mesh="part_179_solid_179" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_175" type="mesh" mesh="part_180_solid_180" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_176" type="mesh" mesh="part_181_solid_181" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_177" type="mesh" mesh="part_182_solid_182" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_178" type="mesh" mesh="part_183_solid_183" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_179" type="mesh" mesh="part_184_solid_184" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_180" type="mesh" mesh="part_185_solid_185" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_181" type="mesh" mesh="part_186_solid_186" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_182" type="mesh" mesh="part_187_solid_187" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_183" type="mesh" mesh="part_188_solid_188" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_184" type="mesh" mesh="part_189_solid_189" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_185" type="mesh" mesh="part_190_solid_190" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_186" type="mesh" mesh="part_191_solid_191" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_187" type="mesh" mesh="part_192_solid_192" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_188" type="mesh" mesh="part_193_solid_193" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_189" type="mesh" mesh="part_194_solid_194" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_190" type="mesh" mesh="part_195_solid_195" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_191" type="mesh" mesh="part_196_solid_196" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_192" type="mesh" mesh="part_197_solid_197" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_193" type="mesh" mesh="part_198_solid_198" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_194" type="mesh" mesh="part_199_solid_199" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_195" type="mesh" mesh="part_200_solid_200" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_196" type="mesh" mesh="part_201_solid_201" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_197" type="mesh" mesh="part_202_solid_202" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_198" type="mesh" mesh="part_203_solid_203" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_199" type="mesh" mesh="part_204_solid_204" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_200" type="mesh" mesh="part_205_solid_205" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_201" type="mesh" mesh="part_206_solid_206" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_202" type="mesh" mesh="part_207_solid_207" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_203" type="mesh" mesh="part_208_solid_208" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_204" type="mesh" mesh="part_209_solid_209" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_205" type="mesh" mesh="part_210_solid_210" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_206" type="mesh" mesh="part_211_solid_211" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_207" type="mesh" mesh="part_212_solid_212" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_208" type="mesh" mesh="part_213_solid_213" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_209" type="mesh" mesh="part_214_solid_214" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_210" type="mesh" mesh="part_215_solid_215" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_211" type="mesh" mesh="part_216_solid_216" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_212" type="mesh" mesh="part_217_solid_217" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_213" type="mesh" mesh="part_218_surface_shell_218" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_214" type="mesh" mesh="part_219_surface_shell_219" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_215" type="mesh" mesh="part_220_surface_shell_220" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_216" type="mesh" mesh="part_221_surface_shell_221" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_217" type="mesh" mesh="part_222_surface_shell_222" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_218" type="mesh" mesh="part_223_surface_shell_223" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_219" type="mesh" mesh="part_224_surface_shell_224" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_220" type="mesh" mesh="part_225_surface_shell_225" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_221" type="mesh" mesh="part_226_surface_shell_226" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_222" type="mesh" mesh="part_227_surface_shell_227" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_223" type="mesh" mesh="part_228_surface_shell_228" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_224" type="mesh" mesh="part_229_surface_shell_229" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_225" type="mesh" mesh="part_230_surface_shell_230" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_226" type="mesh" mesh="part_231_surface_shell_231" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_227" type="mesh" mesh="part_232_surface_shell_232" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_228" type="mesh" mesh="part_233_surface_shell_233" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_229" type="mesh" mesh="part_234_surface_shell_234" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_230" type="mesh" mesh="part_235_surface_shell_235" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_231" type="mesh" mesh="part_236_surface_shell_236" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_232" type="mesh" mesh="part_237_surface_shell_237" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_233" type="mesh" mesh="part_238_surface_shell_238" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_234" type="mesh" mesh="part_239_surface_shell_239" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_235" type="mesh" mesh="part_240_surface_shell_240" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_236" type="mesh" mesh="part_241_surface_shell_241" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_237" type="mesh" mesh="part_242_surface_shell_242" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_238" type="mesh" mesh="part_243_surface_shell_243" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_239" type="mesh" mesh="part_244_surface_shell_244" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_240" type="mesh" mesh="part_245_surface_shell_245" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_241" type="mesh" mesh="part_246_surface_shell_246" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_242" type="mesh" mesh="part_247_surface_shell_247" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_243" type="mesh" mesh="part_249_surface_shell_249" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_244" type="mesh" mesh="part_250_solid_250" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_245" type="mesh" mesh="part_251_solid_251" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_246" type="mesh" mesh="part_252_solid_252" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_247" type="mesh" mesh="part_253_solid_253" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_248" type="mesh" mesh="part_254_surface_shell_254" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_249" type="mesh" mesh="part_255_surface_shell_255" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_250" type="mesh" mesh="part_256_surface_shell_256" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_251" type="mesh" mesh="part_257_surface_shell_257" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_252" type="mesh" mesh="part_258_surface_shell_258" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_253" type="mesh" mesh="part_259_surface_shell_259" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_254" type="mesh" mesh="part_260_surface_shell_260" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_255" type="mesh" mesh="part_261_surface_shell_261" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_256" type="mesh" mesh="part_262_surface_shell_262" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_257" type="mesh" mesh="part_263_surface_shell_263" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_258" type="mesh" mesh="part_264_surface_shell_264" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_259" type="mesh" mesh="part_265_solid_265" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_260" type="mesh" mesh="part_266_solid_266" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_261" type="mesh" mesh="part_267_solid_267" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_262" type="mesh" mesh="part_268_solid_268" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_263" type="mesh" mesh="part_269_surface_shell_269" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_264" type="mesh" mesh="part_270_surface_shell_270" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_265" type="mesh" mesh="part_271_surface_shell_271" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_266" type="mesh" mesh="part_272_surface_shell_272" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_267" type="mesh" mesh="part_273_surface_shell_273" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_268" type="mesh" mesh="part_274_surface_shell_274" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_269" type="mesh" mesh="part_275_surface_shell_275" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_270" type="mesh" mesh="part_276_surface_shell_276" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_271" type="mesh" mesh="part_277_solid_277" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_272" type="mesh" mesh="part_278_solid_278" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_273" type="mesh" mesh="part_279_surface_shell_279" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_274" type="mesh" mesh="part_280_surface_shell_280" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_275" type="mesh" mesh="part_281_surface_shell_281" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_276" type="mesh" mesh="part_282_surface_shell_282" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_277" type="mesh" mesh="part_283_surface_shell_283" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_278" type="mesh" mesh="part_284_surface_shell_284" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_279" type="mesh" mesh="part_285_surface_shell_285" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_280" type="mesh" mesh="part_286_surface_shell_286" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_281" type="mesh" mesh="part_287_solid_287" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_282" type="mesh" mesh="part_288_solid_288" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_283" type="mesh" mesh="part_290_solid_290" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_284" type="mesh" mesh="part_291_solid_291" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_285" type="mesh" mesh="part_292_solid_292" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_286" type="mesh" mesh="part_325_solid_325" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_287" type="mesh" mesh="part_326_solid_326" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_288" type="mesh" mesh="part_327_solid_327" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_289" type="mesh" mesh="part_328_solid_328" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_290" type="mesh" mesh="part_329_solid_329" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_291" type="mesh" mesh="part_330_solid_330" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_292" type="mesh" mesh="part_438_surface_shell_438" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_293" type="mesh" mesh="part_439_surface_shell_439" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_294" type="mesh" mesh="part_448_surface_shell_448" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_295" type="mesh" mesh="part_449_surface_shell_449" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_296" type="mesh" mesh="part_494_solid_494" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_297" type="mesh" mesh="part_496_solid_496" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_298" type="mesh" mesh="part_497_solid_497" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_299" type="mesh" mesh="part_498_solid_498" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_300" type="mesh" mesh="part_499_solid_499" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_301" type="mesh" mesh="part_289_solid_289" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_302" type="mesh" mesh="part_460_solid_460" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_303" type="mesh" mesh="part_111_solid_111" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_304" type="mesh" mesh="part_457_solid_457" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_305" type="mesh" mesh="part_458_solid_458" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_306" type="mesh" mesh="part_436_solid_436" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_307" type="mesh" mesh="part_456_solid_456" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_308" type="mesh" mesh="part_446_solid_446" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_309" type="mesh" mesh="part_437_solid_437" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_310" type="mesh" mesh="part_447_solid_447" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_311" type="mesh" mesh="part_391_solid_391" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_312" type="mesh" mesh="part_374_solid_374" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_313" type="mesh" mesh="part_375_solid_375" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_314" type="mesh" mesh="part_405_solid_405" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_315" type="mesh" mesh="part_376_solid_376" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_316" type="mesh" mesh="part_406_solid_406" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_317" type="mesh" mesh="part_395_solid_395" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_318" type="mesh" mesh="part_396_solid_396" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_319" type="mesh" mesh="part_386_solid_386" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_320" type="mesh" mesh="part_385_solid_385" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_321" type="mesh" mesh="part_398_solid_398" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_322" type="mesh" mesh="part_404_solid_404" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_323" type="mesh" mesh="part_397_solid_397" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_324" type="mesh" mesh="part_403_solid_403" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_325" type="mesh" mesh="part_394_solid_394" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_326" type="mesh" mesh="part_393_solid_393" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_327" type="mesh" mesh="part_534_solid_534" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_328" type="mesh" mesh="part_524_solid_524" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_329" type="mesh" mesh="part_544_solid_544" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_330" type="mesh" mesh="part_539_solid_539" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_331" type="mesh" mesh="part_535_solid_535" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_332" type="mesh" mesh="part_531_solid_531" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_333" type="mesh" mesh="part_554_solid_554" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_334" type="mesh" mesh="part_495_solid_495" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_335" type="mesh" mesh="part_553_solid_553" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_336" type="mesh" mesh="part_537_solid_537" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_337" type="mesh" mesh="part_548_solid_548" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_338" type="mesh" mesh="part_530_solid_530" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_339" type="mesh" mesh="part_533_solid_533" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_340" type="mesh" mesh="part_532_solid_532" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_341" type="mesh" mesh="part_536_solid_536" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_342" type="mesh" mesh="part_545_solid_545" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_343" type="mesh" mesh="part_523_solid_523" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_344" type="mesh" mesh="part_522_solid_522" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_345" type="mesh" mesh="part_392_solid_392" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_346" type="mesh" mesh="part_399_solid_399" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_347" type="mesh" mesh="part_402_solid_402" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_348" type="mesh" mesh="part_387_solid_387" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_349" type="mesh" mesh="part_382_solid_382" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_350" type="mesh" mesh="part_383_solid_383" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_351" type="mesh" mesh="part_390_solid_390" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_352" type="mesh" mesh="part_388_solid_388" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_353" type="mesh" mesh="part_384_solid_384" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_354" type="mesh" mesh="part_550_solid_550" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_355" type="mesh" mesh="part_546_solid_546" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_356" type="mesh" mesh="part_538_solid_538" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_357" type="mesh" mesh="part_552_solid_552" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_358" type="mesh" mesh="part_541_solid_541" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_359" type="mesh" mesh="part_543_solid_543" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_360" type="mesh" mesh="part_540_solid_540" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_361" type="mesh" mesh="part_549_solid_549" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <geom name="base_mesh_362" type="mesh" mesh="part_551_solid_551" pos="0.12301682 -1.1520832 0.0031168365" euler="0 0 0" group="1" />
+      <body name="left_link1" pos="-0.046928958 -0.13050423 0.039617917" euler="-1.5707963 0 0">
+        <joint name="left_link1_joint" type="hinge" pos="0 0 0" axis="0 0 1" range="-1.57 1.57" limited="true" damping="0.05" armature="0.0001" actuatorfrcrange="-10 10" actuatorfrclimited="true" />
+        <inertial pos="0.065948575 -0.086697289 -0.039798904" mass="0.21906973" quat="0.94327347 0.015214951 -0.0081709784 0.33156735" diaginertia="0.0016477185 9.5476589e-05 0.0017151126" />
+        <geom name="left_link1_mesh_1" type="mesh" mesh="part_466_solid_466" pos="0.16994578 0.03650108 -1.021579" euler="1.5707963 0 0" group="1" />
+        <geom name="left_link1_mesh_2" type="mesh" mesh="part_486_solid_486" pos="0.16994578 0.03650108 -1.021579" euler="1.5707963 0 0" group="1" />
+        <geom name="left_link1_mesh_3" type="mesh" mesh="part_492_solid_492" pos="0.16994578 0.03650108 -1.021579" euler="1.5707963 0 0" group="1" />
+        <geom name="left_link1_mesh_4" type="mesh" mesh="part_490_solid_490" pos="0.16994578 0.03650108 -1.021579" euler="1.5707963 0 0" group="1" />
+        <geom name="left_link1_mesh_5" type="mesh" mesh="part_491_solid_491" pos="0.16994578 0.03650108 -1.021579" euler="1.5707963 0 0" group="1" />
+        <geom name="left_link1_mesh_6" type="mesh" mesh="part_489_solid_489" pos="0.16994578 0.03650108 -1.021579" euler="1.5707963 0 0" group="1" />
+        <geom name="left_link1_mesh_7" type="mesh" mesh="part_579_solid_579" pos="0.16994578 0.03650108 -1.021579" euler="1.5707963 0 0" group="1" />
+        <geom name="left_link1_mesh_8" type="mesh" mesh="part_488_solid_488" pos="0.16994578 0.03650108 -1.021579" euler="1.5707963 0 0" group="1" />
+        <geom name="left_link1_mesh_9" type="mesh" mesh="part_487_solid_487" pos="0.16994578 0.03650108 -1.021579" euler="1.5707963 0 0" group="1" />
+        <geom name="left_link1_mesh_10" type="mesh" mesh="part_465_solid_465" pos="0.16994578 0.03650108 -1.021579" euler="1.5707963 0 0" group="1" />
+        <geom name="left_link1_mesh_11" type="mesh" mesh="part_464_solid_464" pos="0.16994578 0.03650108 -1.021579" euler="1.5707963 0 0" group="1" />
+        <geom name="left_link1_mesh_12" type="mesh" mesh="part_463_solid_463" pos="0.16994578 0.03650108 -1.021579" euler="1.5707963 0 0" group="1" />
+        <body name="left_link2" pos="0.13155133 -0.16368948 -0.0395">
+          <joint name="left_link2_joint" type="hinge" pos="0 0 0" axis="0 0 1" range="-1.57 1.57" limited="true" damping="0.05" armature="0.0001" actuatorfrcrange="-10 10" actuatorfrclimited="true" />
+          <inertial pos="-0.024472172 0.11200189 -0.015484612" mass="0.18835822" quat="0.98984724 0.0076850743 -0.10912318 0.090749724" diaginertia="0.0018316726 0.00013328417 0.0018019069" />
+          <geom name="left_link2_mesh_1" type="mesh" mesh="part_483_solid_483" pos="0.038394448 0.20019056 -0.982079" euler="1.5707963 0 0" group="1" />
+          <geom name="left_link2_mesh_2" type="mesh" mesh="part_485_solid_485" pos="0.038394448 0.20019056 -0.982079" euler="1.5707963 0 0" group="1" />
+          <geom name="left_link2_mesh_3" type="mesh" mesh="part_484_solid_484" pos="0.038394448 0.20019056 -0.982079" euler="1.5707963 0 0" group="1" />
+          <geom name="left_link2_mesh_4" type="mesh" mesh="part_493_solid_493" pos="0.038394448 0.20019056 -0.982079" euler="1.5707963 0 0" group="1" />
+          <geom name="left_link2_mesh_5" type="mesh" mesh="part_562_surface_shell_562" pos="0.038394448 0.20019056 -0.982079" euler="1.5707963 0 0" group="1" />
+          <geom name="left_link2_mesh_6" type="mesh" mesh="part_563_surface_shell_563" pos="0.038394448 0.20019056 -0.982079" euler="1.5707963 0 0" group="1" />
+          <geom name="left_link2_mesh_7" type="mesh" mesh="part_557_surface_shell_557" pos="0.038394448 0.20019056 -0.982079" euler="1.5707963 0 0" group="1" />
+          <geom name="left_link2_mesh_8" type="mesh" mesh="part_556_surface_shell_556" pos="0.038394448 0.20019056 -0.982079" euler="1.5707963 0 0" group="1" />
+          <geom name="left_link2_mesh_9" type="mesh" mesh="part_560_surface_shell_560" pos="0.038394448 0.20019056 -0.982079" euler="1.5707963 0 0" group="1" />
+          <geom name="left_link2_mesh_10" type="mesh" mesh="part_559_surface_shell_559" pos="0.038394448 0.20019056 -0.982079" euler="1.5707963 0 0" group="1" />
+          <geom name="left_link2_mesh_11" type="mesh" mesh="part_558_surface_shell_558" pos="0.038394448 0.20019056 -0.982079" euler="1.5707963 0 0" group="1" />
+          <geom name="left_link2_mesh_12" type="mesh" mesh="part_578_surface_shell_578" pos="0.038394448 0.20019056 -0.982079" euler="1.5707963 0 0" group="1" />
+          <geom name="left_link2_mesh_13" type="mesh" mesh="part_555_surface_shell_555" pos="0.038394448 0.20019056 -0.982079" euler="1.5707963 0 0" group="1" />
+          <geom name="left_link2_mesh_14" type="mesh" mesh="part_510_solid_510" pos="0.038394448 0.20019056 -0.982079" euler="1.5707963 0 0" group="1" />
+          <body name="base_linkother2" pos="-0.0036015978 -0.064900142 -0.0030000173">
+            <joint name="base_linkother2_joint" type="hinge" pos="0 0 0" axis="0 0 1" range="-1.57 1.57" limited="true" damping="0.05" armature="0.0001" actuatorfrcrange="-10 10" actuatorfrclimited="true" />
+            <inertial pos="-1.4969825e-09 -1.467748e-09 -0.0089430495" mass="0.0020385006" quat="1 0 0 0" diaginertia="1.8065836e-07 1.8065836e-07 2.3923827e-08" />
+            <site name="closure_003_b_site" type="sphere" pos="-0.036176615 0.045014618 -0.016999999" quat="0.70710678 0.70710678 -0 -0" size="0.003" rgba="0.2 0.8 1 0" group="3" />
+            <geom name="base_linkother2_mesh_1" type="mesh" mesh="part_528_solid_528" pos="0.041996046 0.26509071 -0.97907898" euler="1.5707963 0 0" group="1" />
+          </body>
+          <body name="left_link 3" pos="-0.051225064 0.24469571 -0.04705" euler="3.1415927 0 0">
+            <joint name="left_link 3_joint" type="hinge" pos="0 0 0" axis="0 0 1" actuatorfrcrange="-10 10" actuatorfrclimited="true" />
+            <inertial pos="3.8167314e-05 6.8318166e-05 -0.0088219581" mass="0.22381262" quat="0.98977234 -0.050308902 -0.11920568 0.060081016" diaginertia="0.00020301583 0.00020082751 0.00022258424" />
+            <geom name="left_link 3_mesh_1" type="mesh" mesh="part_515_solid_515" pos="0.089619511 0.044505152 0.935029" euler="-1.5707963 0 0" group="1" />
+            <geom name="left_link 3_mesh_2" type="mesh" mesh="part_516_solid_516" pos="0.089619511 0.044505152 0.935029" euler="-1.5707963 0 0" group="1" />
+            <geom name="left_link 3_mesh_3" type="mesh" mesh="part_519_solid_519" pos="0.089619511 0.044505152 0.935029" euler="-1.5707963 0 0" group="1" />
+            <geom name="left_link 3_mesh_4" type="mesh" mesh="part_517_solid_517" pos="0.089619511 0.044505152 0.935029" euler="-1.5707963 0 0" group="1" />
+            <geom name="left_link 3_mesh_5" type="mesh" mesh="part_520_solid_520" pos="0.089619511 0.044505152 0.935029" euler="-1.5707963 0 0" group="1" />
+            <geom name="left_link 3_mesh_6" type="mesh" mesh="part_509_solid_509" pos="0.089619511 0.044505152 0.935029" euler="-1.5707963 0 0" group="1" />
+            <geom name="left_link 3_mesh_7" type="mesh" mesh="part_508_solid_508" pos="0.089619511 0.044505152 0.935029" euler="-1.5707963 0 0" group="1" />
+            <geom name="left_link 3_mesh_8" type="mesh" mesh="part_513_solid_513" pos="0.089619511 0.044505152 0.935029" euler="-1.5707963 0 0" group="1" />
+            <geom name="left_link 3_mesh_9" type="mesh" mesh="part_514_solid_514" pos="0.089619511 0.044505152 0.935029" euler="-1.5707963 0 0" group="1" />
+            <geom name="left_link 3_mesh_10" type="mesh" mesh="part_512_solid_512" pos="0.089619511 0.044505152 0.935029" euler="-1.5707963 0 0" group="1" />
+            <geom name="left_link 3_mesh_11" type="mesh" mesh="part_503_solid_503" pos="0.089619511 0.044505152 0.935029" euler="-1.5707963 0 0" group="1" />
+            <geom name="left_link 3_mesh_12" type="mesh" mesh="part_505_solid_505" pos="0.089619511 0.044505152 0.935029" euler="-1.5707963 0 0" group="1" />
+            <geom name="left_link 3_mesh_13" type="mesh" mesh="part_504_solid_504" pos="0.089619511 0.044505152 0.935029" euler="-1.5707963 0 0" group="1" />
+            <geom name="left_link 3_mesh_14" type="mesh" mesh="part_518_solid_518" pos="0.089619511 0.044505152 0.935029" euler="-1.5707963 0 0" group="1" />
+            <geom name="left_link 3_mesh_15" type="mesh" mesh="part_506_solid_506" pos="0.089619511 0.044505152 0.935029" euler="-1.5707963 0 0" group="1" />
+            <geom name="left_link 3_mesh_16" type="mesh" mesh="part_507_solid_507" pos="0.089619511 0.044505152 0.935029" euler="-1.5707963 0 0" group="1" />
+            <geom name="left_link 3_mesh_17" type="mesh" mesh="part_511_solid_511" pos="0.089619511 0.044505152 0.935029" euler="-1.5707963 0 0" group="1" />
+          </body>
+          <body name="base_spring link 2" pos="-0.010306483 0.049232778 -0.007" euler="3.1415927 0 0">
+            <joint name="base_spring link 2_joint" type="hinge" pos="0 0 0" axis="0 0 1" range="-1.57 1.57" limited="true" damping="0.05" armature="0.0001" actuatorfrcrange="-10 10" actuatorfrclimited="true" />
+            <inertial pos="-0.035036332 -0.057713137 -0.003375003" mass="0.0224386" quat="0.96301896 -0.0002297747 -0.00082135612 -0.26943229" diaginertia="2.74874e-05 5.8579026e-07 2.7532094e-05" />
+            <site name="closure_008_b_site" type="sphere" pos="-0.066664081 -0.1098115 -0.003375" quat="0.70710678 -0.70710678 -0 0" size="0.003" rgba="0.2 0.8 1 0" group="3" />
+            <geom name="base_spring link 2_mesh_1" type="mesh" mesh="part_582_solid_582" pos="0.048700931 -0.15095779 0.975079" euler="-1.5707963 0 0" group="1" />
+            <geom name="base_spring link 2_mesh_2" type="mesh" mesh="part_581_solid_581" pos="0.048700931 -0.15095779 0.975079" euler="-1.5707963 0 0" group="1" />
+            <geom name="base_spring link 2_mesh_3" type="mesh" mesh="part_580_solid_580" pos="0.048700931 -0.15095779 0.975079" euler="-1.5707963 0 0" group="1" />
+          </body>
+        </body>
+        <body name="left_link_rear3" pos="0.0591981 -0.073660267 -0.06" euler="3.1415927 0 0">
+          <joint name="left_link_rear3_joint" type="hinge" pos="0 0 0" axis="0 0 1" range="-1.57 1.57" limited="true" damping="0.05" armature="0.0001" actuatorfrcrange="-10 10" actuatorfrclimited="true" />
+          <inertial pos="-0.0063962606 -0.011845194 -0.005009526" mass="0.038610441" quat="0.99837061 -5.6417086e-06 0.00026048549 -0.057061818" diaginertia="0.00011337652 4.6028789e-06 0.00011692638" />
+          <geom name="left_link_rear3_mesh_1" type="mesh" mesh="part_477_solid_477" pos="0.11074768 -0.11016135 0.961579" euler="-1.5707963 0 0" group="1" />
+          <geom name="left_link_rear3_mesh_2" type="mesh" mesh="part_476_solid_476" pos="0.11074768 -0.11016135 0.961579" euler="-1.5707963 0 0" group="1" />
+          <geom name="left_link_rear3_mesh_3" type="mesh" mesh="part_478_solid_478" pos="0.11074768 -0.11016135 0.961579" euler="-1.5707963 0 0" group="1" />
+          <geom name="left_link_rear3_mesh_4" type="mesh" mesh="part_480_solid_480" pos="0.11074768 -0.11016135 0.961579" euler="-1.5707963 0 0" group="1" />
+          <geom name="left_link_rear3_mesh_5" type="mesh" mesh="part_472_solid_472" pos="0.11074768 -0.11016135 0.961579" euler="-1.5707963 0 0" group="1" />
+          <geom name="left_link_rear3_mesh_6" type="mesh" mesh="part_481_solid_481" pos="0.11074768 -0.11016135 0.961579" euler="-1.5707963 0 0" group="1" />
+          <geom name="left_link_rear3_mesh_7" type="mesh" mesh="part_527_solid_527" pos="0.11074768 -0.11016135 0.961579" euler="-1.5707963 0 0" group="1" />
+          <body name="left_link_rear4" pos="-0.0036015978 0.064900142 0">
+            <joint name="left_link_rear4_joint" type="hinge" pos="0 0 0" axis="0 0 1" range="-1.57 1.57" limited="true" damping="0.05" armature="0.0001" actuatorfrcrange="-10 10" actuatorfrclimited="true" />
+            <inertial pos="0.032663646 0.040643406 0.0058292124" mass="0.020992497" quat="0.94311852 0.016257396 -0.0057237719 -0.33200963" diaginertia="3.8305279e-05 1.2250613e-06 3.8430319e-05" />
+            <site name="closure_003_a_site" type="sphere" pos="0.036176618 0.045014598 -0.0004999833" quat="0.70710678 -0.70710678 -0 0" size="0.003" rgba="0.2 0.8 1 0" group="3" />
+            <geom name="left_link_rear4_mesh_1" type="mesh" mesh="part_529_solid_529" pos="0.11434928 -0.17506149 0.961579" euler="-1.5707963 0 0" group="1" />
+            <geom name="left_link_rear4_mesh_2" type="mesh" mesh="part_479_solid_479" pos="0.11434928 -0.17506149 0.961579" euler="-1.5707963 0 0" group="1" />
+          </body>
+          <body name="base_linkother" pos="-0.023051279 -0.11011307 0" euler="-3.1415927 0 0">
+            <joint name="base_linkother_joint" type="hinge" pos="0 0 0" axis="0 0 1" range="-1.57 1.57" limited="true" damping="0.05" armature="0.0001" actuatorfrcrange="-10 10" actuatorfrclimited="true" />
+            <inertial pos="-4.2092271e-10 -1.8403559e-10 0.0049430275" mass="0.0020384995" quat="1 0 0 0" diaginertia="1.806582e-07 1.806582e-07 2.3923818e-08" />
+            <site name="closure_001_a_site" type="sphere" pos="-1.77e-09 -9.9999997e-12 0.0094999833" quat="0.70710678 0.70710678 -0 -0" size="0.003" rgba="0.2 0.8 1 0" group="3" />
+            <geom name="base_linkother_mesh_1" type="mesh" mesh="part_526_solid_526" pos="0.13379896 4.827594e-05 -0.961579" euler="1.5707963 0 0" group="1" />
+          </body>
+        </body>
+        <body name="base_splink" pos="0.04134787 0.017152514 -0.0315" euler="3.1415927 0 0">
+          <joint name="base_splink_joint" type="hinge" pos="0 0 0" axis="0 0 1" range="-1.57 1.57" limited="true" damping="0.05" armature="0.0001" actuatorfrcrange="-10 10" actuatorfrclimited="true" />
+          <inertial pos="0.0059337381 0.0097742682 0.011624998" mass="0.0033459835" quat="0.95430468 0.036164693 0.12926197 -0.26699446" diaginertia="4.907153e-07 8.3671231e-08 5.3541006e-07" />
+          <site name="closure_008_a_site" type="sphere" pos="0.0132329 0.021797715 0.011625" quat="0.70710678 -0.70710678 -0 0" size="0.003" rgba="0.2 0.8 1 0" group="3" />
+          <geom name="base_splink_mesh_1" type="mesh" mesh="part_583_solid_583" pos="0.12859791 -0.019348567 0.990079" euler="-1.5707963 0 0" group="1" />
+        </body>
+      </body>
+      <body name="left_link_rear_1" pos="-0.046928958 -0.13050423 0.039617917" euler="-1.5707963 0 0">
+        <joint name="left_link_rear_1_joint" type="hinge" pos="0 0 0" axis="0 0 1" range="-1.57 1.57" limited="true" damping="0.05" armature="0.0001" actuatorfrcrange="-10 10" actuatorfrclimited="true" />
+        <inertial pos="-0.0099382017 0.0078494592 -0.034254193" mass="0.11271452" quat="0.9321087 -0.053188428 -0.15348875 -0.32370599" diaginertia="5.3394424e-05 0.00015501204 0.00015088402" />
+        <geom name="left_link_rear_1_mesh_1" type="mesh" mesh="part_467_solid_467" pos="0.16994578 0.03650108 -1.021579" euler="1.5707963 0 0" group="1" />
+        <geom name="left_link_rear_1_mesh_2" type="mesh" mesh="part_462_solid_462" pos="0.16994578 0.03650108 -1.021579" euler="1.5707963 0 0" group="1" />
+        <geom name="left_link_rear_1_mesh_3" type="mesh" mesh="part_469_solid_469" pos="0.16994578 0.03650108 -1.021579" euler="1.5707963 0 0" group="1" />
+        <geom name="left_link_rear_1_mesh_4" type="mesh" mesh="part_525_solid_525" pos="0.16994578 0.03650108 -1.021579" euler="1.5707963 0 0" group="1" />
+        <geom name="left_link_rear_1_mesh_5" type="mesh" mesh="part_468_solid_468" pos="0.16994578 0.03650108 -1.021579" euler="1.5707963 0 0" group="1" />
+        <geom name="left_link_rear_1_mesh_6" type="mesh" mesh="part_470_solid_470" pos="0.16994578 0.03650108 -1.021579" euler="1.5707963 0 0" group="1" />
+        <body name="left_link_reear2" pos="-0.074156642 0.058575101 -0.05775" euler="3.1415927 0 0">
+          <joint name="left_link_reear2_joint" type="hinge" pos="0 0 0" axis="0 0 1" range="-1.57 1.57" limited="true" damping="0.05" armature="0.0001" actuatorfrcrange="-10 10" actuatorfrclimited="true" />
+          <inertial pos="0.0602644 0.012086537 -0.013981587" mass="0.022900199" quat="0.99504407 0.001109708 -0.011176252 0.098798549" diaginertia="1.1129923e-06 4.0576468e-05 4.1105411e-05" />
+          <site name="closure_001_b_site" type="sphere" pos="0.11030346 0.022122297 -0.0072499833" quat="0.70710678 -0.70710678 -0 0" size="0.003" rgba="0.2 0.8 1 0" group="3" />
+          <geom name="left_link_reear2_mesh_1" type="mesh" mesh="part_471_solid_471" pos="0.24410242 0.022074021 0.963829" euler="-1.5707963 0 0" group="1" />
+          <geom name="left_link_reear2_mesh_2" type="mesh" mesh="part_473_solid_473" pos="0.24410242 0.022074021 0.963829" euler="-1.5707963 0 0" group="1" />
+        </body>
+      </body>
+      <body name="right_link1" pos="-0.046928958 0.13400417 0.039617917" euler="-1.5707963 0 0">
+        <joint name="right_link1_joint" type="hinge" pos="0 0 0" axis="0 0 1" range="-1.57 1.57" limited="true" damping="0.05" armature="0.0001" actuatorfrcrange="-10 10" actuatorfrclimited="true" />
+        <inertial pos="0.06483569 -0.085391194 0.036224738" mass="0.23426443" quat="0.94339594 -0.015035581 0.0083979848 0.33122124" diaginertia="0.0017491173 0.00010239197 0.0018224676" />
+        <geom name="right_link1_mesh_1" type="mesh" mesh="part_294_solid_294" pos="0.16994578 0.03650108 -1.2860874" euler="1.5707963 0 0" group="1" />
+        <geom name="right_link1_mesh_2" type="mesh" mesh="part_431_solid_431" pos="0.16994578 0.03650108 -1.2860874" euler="1.5707963 0 0" group="1" />
+        <geom name="right_link1_mesh_3" type="mesh" mesh="part_317_solid_317" pos="0.16994578 0.03650108 -1.2860874" euler="1.5707963 0 0" group="1" />
+        <geom name="right_link1_mesh_4" type="mesh" mesh="part_322_solid_322" pos="0.16994578 0.03650108 -1.2860874" euler="1.5707963 0 0" group="1" />
+        <geom name="right_link1_mesh_5" type="mesh" mesh="part_321_solid_321" pos="0.16994578 0.03650108 -1.2860874" euler="1.5707963 0 0" group="1" />
+        <geom name="right_link1_mesh_6" type="mesh" mesh="part_323_solid_323" pos="0.16994578 0.03650108 -1.2860874" euler="1.5707963 0 0" group="1" />
+        <geom name="right_link1_mesh_7" type="mesh" mesh="part_320_solid_320" pos="0.16994578 0.03650108 -1.2860874" euler="1.5707963 0 0" group="1" />
+        <geom name="right_link1_mesh_8" type="mesh" mesh="part_297_solid_297" pos="0.16994578 0.03650108 -1.2860874" euler="1.5707963 0 0" group="1" />
+        <geom name="right_link1_mesh_9" type="mesh" mesh="part_296_solid_296" pos="0.16994578 0.03650108 -1.2860874" euler="1.5707963 0 0" group="1" />
+        <geom name="right_link1_mesh_10" type="mesh" mesh="part_295_solid_295" pos="0.16994578 0.03650108 -1.2860874" euler="1.5707963 0 0" group="1" />
+        <body name="right_link2" pos="0.13155133 -0.16368948 0.043">
+          <joint name="right_link2_joint" type="hinge" pos="0 0 0" axis="0 0 1" range="-1.57 1.57" limited="true" damping="0.05" armature="0.0001" actuatorfrcrange="-10 10" actuatorfrclimited="true" />
+          <inertial pos="-0.02456541 0.1125433 0.006242926" mass="0.44103483" quat="0.99465145 0.0061725558 -0.048882644 0.090779289" diaginertia="0.0044166045 0.00042382549 0.0042374268" />
+          <geom name="right_link2_mesh_1" type="mesh" mesh="part_414_surface_shell_414" pos="0.038394448 0.20019056 -1.3290874" euler="1.5707963 0 0" group="1" />
+          <geom name="right_link2_mesh_2" type="mesh" mesh="part_412_surface_shell_412" pos="0.038394448 0.20019056 -1.3290874" euler="1.5707963 0 0" group="1" />
+          <geom name="right_link2_mesh_3" type="mesh" mesh="part_415_surface_shell_415" pos="0.038394448 0.20019056 -1.3290874" euler="1.5707963 0 0" group="1" />
+          <geom name="right_link2_mesh_4" type="mesh" mesh="part_409_surface_shell_409" pos="0.038394448 0.20019056 -1.3290874" euler="1.5707963 0 0" group="1" />
+          <geom name="right_link2_mesh_5" type="mesh" mesh="part_408_surface_shell_408" pos="0.038394448 0.20019056 -1.3290874" euler="1.5707963 0 0" group="1" />
+          <geom name="right_link2_mesh_6" type="mesh" mesh="part_407_surface_shell_407" pos="0.038394448 0.20019056 -1.3290874" euler="1.5707963 0 0" group="1" />
+          <geom name="right_link2_mesh_7" type="mesh" mesh="part_430_surface_shell_430" pos="0.038394448 0.20019056 -1.3290874" euler="1.5707963 0 0" group="1" />
+          <geom name="right_link2_mesh_8" type="mesh" mesh="part_410_surface_shell_410" pos="0.038394448 0.20019056 -1.3290874" euler="1.5707963 0 0" group="1" />
+          <geom name="right_link2_mesh_9" type="mesh" mesh="part_411_surface_shell_411" pos="0.038394448 0.20019056 -1.3290874" euler="1.5707963 0 0" group="1" />
+          <geom name="right_link2_mesh_10" type="mesh" mesh="part_340_solid_340" pos="0.038394448 0.20019056 -1.3290874" euler="1.5707963 0 0" group="1" />
+          <geom name="right_link2_mesh_11" type="mesh" mesh="part_334_solid_334" pos="0.038394448 0.20019056 -1.3290874" euler="1.5707963 0 0" group="1" />
+          <geom name="right_link2_mesh_12" type="mesh" mesh="part_335_solid_335" pos="0.038394448 0.20019056 -1.3290874" euler="1.5707963 0 0" group="1" />
+          <geom name="right_link2_mesh_13" type="mesh" mesh="part_336_solid_336" pos="0.038394448 0.20019056 -1.3290874" euler="1.5707963 0 0" group="1" />
+          <geom name="right_link2_mesh_14" type="mesh" mesh="part_337_solid_337" pos="0.038394448 0.20019056 -1.3290874" euler="1.5707963 0 0" group="1" />
+          <geom name="right_link2_mesh_15" type="mesh" mesh="part_338_solid_338" pos="0.038394448 0.20019056 -1.3290874" euler="1.5707963 0 0" group="1" />
+          <geom name="right_link2_mesh_16" type="mesh" mesh="part_417_surface_shell_417" pos="0.038394448 0.20019056 -1.3290874" euler="1.5707963 0 0" group="1" />
+          <geom name="right_link2_mesh_17" type="mesh" mesh="part_416_surface_shell_416" pos="0.038394448 0.20019056 -1.3290874" euler="1.5707963 0 0" group="1" />
+          <geom name="right_link2_mesh_18" type="mesh" mesh="part_314_solid_314" pos="0.038394448 0.20019056 -1.3290874" euler="1.5707963 0 0" group="1" />
+          <geom name="right_link2_mesh_19" type="mesh" mesh="part_315_solid_315" pos="0.038394448 0.20019056 -1.3290874" euler="1.5707963 0 0" group="1" />
+          <geom name="right_link2_mesh_20" type="mesh" mesh="part_316_solid_316" pos="0.038394448 0.20019056 -1.3290874" euler="1.5707963 0 0" group="1" />
+          <geom name="right_link2_mesh_21" type="mesh" mesh="part_324_solid_324" pos="0.038394448 0.20019056 -1.3290874" euler="1.5707963 0 0" group="1" />
+          <body name="right_other 2_link" pos="-0.0036015978 -0.064900142 0" euler="3.1415927 0 0">
+            <joint name="right_other 1_joint" type="hinge" pos="0 0 0" axis="0 0 1" range="-1.57 1.57" limited="true" damping="0.05" armature="0.0001" actuatorfrcrange="-10 10" actuatorfrclimited="true" />
+            <inertial pos="-1.4970013e-09 1.4678603e-09 -0.0049430574" mass="0.0020385006" quat="1 0 0 0" diaginertia="1.8065836e-07 1.8065836e-07 2.3923827e-08" />
+            <site name="closure_r_005_a_site" type="sphere" pos="-3.55e-10 8.035e-09 -0.0095000073" quat="0.70710678 -0.70710678 -0 0" size="0.003" rgba="0.2 0.8 1 0" group="3" />
+            <geom name="right_other 2_link_mesh_1" type="mesh" mesh="part_380_solid_380" pos="0.041996046 -0.26509071 1.3290874" euler="-1.5707963 0 0" group="1" />
+          </body>
+          <body name="right_link 3" pos="-0.051225064 0.24469571 0.03105">
+            <joint name="right_link 3_joint" type="hinge" pos="0 0 0" axis="0 0 1" actuatorfrcrange="-10 10" actuatorfrclimited="true" />
+            <inertial pos="0.0024770253 -0.0026948019 -0.04279867" mass="0.25660037" quat="0.99069132 -0.026936547 -0.028339908 0.13039165" diaginertia="0.0056569228 0.005653001 0.0002319316" />
+            <geom name="right_link 3_mesh_1" type="mesh" mesh="part_346_solid_346" pos="0.089619511 -0.044505152 -1.3601374" euler="1.5707963 0 0" group="1" />
+            <geom name="right_link 3_mesh_2" type="mesh" mesh="part_347_solid_347" pos="0.089619511 -0.044505152 -1.3601374" euler="1.5707963 0 0" group="1" />
+            <geom name="right_link 3_mesh_3" type="mesh" mesh="part_353_solid_353" pos="0.089619511 -0.044505152 -1.3601374" euler="1.5707963 0 0" group="1" />
+            <geom name="right_link 3_mesh_4" type="mesh" mesh="part_352_solid_352" pos="0.089619511 -0.044505152 -1.3601374" euler="1.5707963 0 0" group="1" />
+            <geom name="right_link 3_mesh_5" type="mesh" mesh="part_361_solid_361" pos="0.089619511 -0.044505152 -1.3601374" euler="1.5707963 0 0" group="1" />
+            <geom name="right_link 3_mesh_6" type="mesh" mesh="part_366_solid_366" pos="0.089619511 -0.044505152 -1.3601374" euler="1.5707963 0 0" group="1" />
+            <geom name="right_link 3_mesh_7" type="mesh" mesh="part_371_solid_371" pos="0.089619511 -0.044505152 -1.3601374" euler="1.5707963 0 0" group="1" />
+            <geom name="right_link 3_mesh_8" type="mesh" mesh="part_372_solid_372" pos="0.089619511 -0.044505152 -1.3601374" euler="1.5707963 0 0" group="1" />
+            <geom name="right_link 3_mesh_9" type="mesh" mesh="part_358_solid_358" pos="0.089619511 -0.044505152 -1.3601374" euler="1.5707963 0 0" group="1" />
+            <geom name="right_link 3_mesh_10" type="mesh" mesh="part_360_solid_360" pos="0.089619511 -0.044505152 -1.3601374" euler="1.5707963 0 0" group="1" />
+            <geom name="right_link 3_mesh_11" type="mesh" mesh="part_359_solid_359" pos="0.089619511 -0.044505152 -1.3601374" euler="1.5707963 0 0" group="1" />
+            <geom name="right_link 3_mesh_12" type="mesh" mesh="part_370_solid_370" pos="0.089619511 -0.044505152 -1.3601374" euler="1.5707963 0 0" group="1" />
+            <geom name="right_link 3_mesh_13" type="mesh" mesh="part_365_solid_365" pos="0.089619511 -0.044505152 -1.3601374" euler="1.5707963 0 0" group="1" />
+            <geom name="right_link 3_mesh_14" type="mesh" mesh="part_369_solid_369" pos="0.089619511 -0.044505152 -1.3601374" euler="1.5707963 0 0" group="1" />
+            <geom name="right_link 3_mesh_15" type="mesh" mesh="part_364_solid_364" pos="0.089619511 -0.044505152 -1.3601374" euler="1.5707963 0 0" group="1" />
+            <geom name="right_link 3_mesh_16" type="mesh" mesh="part_368_solid_368" pos="0.089619511 -0.044505152 -1.3601374" euler="1.5707963 0 0" group="1" />
+            <geom name="right_link 3_mesh_17" type="mesh" mesh="part_363_solid_363" pos="0.089619511 -0.044505152 -1.3601374" euler="1.5707963 0 0" group="1" />
+            <geom name="right_link 3_mesh_18" type="mesh" mesh="part_355_solid_355" pos="0.089619511 -0.044505152 -1.3601374" euler="1.5707963 0 0" group="1" />
+            <geom name="right_link 3_mesh_19" type="mesh" mesh="part_354_solid_354" pos="0.089619511 -0.044505152 -1.3601374" euler="1.5707963 0 0" group="1" />
+            <geom name="right_link 3_mesh_20" type="mesh" mesh="part_367_solid_367" pos="0.089619511 -0.044505152 -1.3601374" euler="1.5707963 0 0" group="1" />
+            <geom name="right_link 3_mesh_21" type="mesh" mesh="part_362_solid_362" pos="0.089619511 -0.044505152 -1.3601374" euler="1.5707963 0 0" group="1" />
+            <geom name="right_link 3_mesh_22" type="mesh" mesh="part_345_solid_345" pos="0.089619511 -0.044505152 -1.3601374" euler="1.5707963 0 0" group="1" />
+            <geom name="right_link 3_mesh_23" type="mesh" mesh="part_341_solid_341" pos="0.089619511 -0.044505152 -1.3601374" euler="1.5707963 0 0" group="1" />
+            <geom name="right_link 3_mesh_24" type="mesh" mesh="part_342_solid_342" pos="0.089619511 -0.044505152 -1.3601374" euler="1.5707963 0 0" group="1" />
+            <geom name="right_link 3_mesh_25" type="mesh" mesh="part_343_solid_343" pos="0.089619511 -0.044505152 -1.3601374" euler="1.5707963 0 0" group="1" />
+            <geom name="right_link 3_mesh_26" type="mesh" mesh="part_356_solid_356" pos="0.089619511 -0.044505152 -1.3601374" euler="1.5707963 0 0" group="1" />
+            <geom name="right_link 3_mesh_27" type="mesh" mesh="part_344_solid_344" pos="0.089619511 -0.044505152 -1.3601374" euler="1.5707963 0 0" group="1" />
+            <geom name="right_link 3_mesh_28" type="mesh" mesh="part_357_solid_357" pos="0.089619511 -0.044505152 -1.3601374" euler="1.5707963 0 0" group="1" />
+            <geom name="right_link 3_mesh_29" type="mesh" mesh="part_339_solid_339" pos="0.089619511 -0.044505152 -1.3601374" euler="1.5707963 0 0" group="1" />
+          </body>
+        </body>
+        <body name="right_rear_link3" pos="0.0591981 -0.073660267 0.0465">
+          <joint name="right_rear_link3_joint" type="hinge" pos="0 0 0" axis="0 0 1" range="-1.57 1.57" limited="true" damping="0.05" armature="0.0001" actuatorfrcrange="-10 10" actuatorfrclimited="true" />
+          <inertial pos="-0.0066628323 0.019165619 0.0049895544" mass="0.037109242" quat="0.99777474 2.5416386e-05 0.00022510917 0.066674648" diaginertia="9.6509321e-05 4.5155674e-06 0.00010003619" />
+          <geom name="right_rear_link3_mesh_1" type="mesh" mesh="part_303_solid_303" pos="0.11074768 0.11016135 -1.3325874" euler="1.5707963 0 0" group="1" />
+          <geom name="right_rear_link3_mesh_2" type="mesh" mesh="part_308_solid_308" pos="0.11074768 0.11016135 -1.3325874" euler="1.5707963 0 0" group="1" />
+          <geom name="right_rear_link3_mesh_3" type="mesh" mesh="part_379_solid_379" pos="0.11074768 0.11016135 -1.3325874" euler="1.5707963 0 0" group="1" />
+          <geom name="right_rear_link3_mesh_4" type="mesh" mesh="part_307_solid_307" pos="0.11074768 0.11016135 -1.3325874" euler="1.5707963 0 0" group="1" />
+          <geom name="right_rear_link3_mesh_5" type="mesh" mesh="part_309_solid_309" pos="0.11074768 0.11016135 -1.3325874" euler="1.5707963 0 0" group="1" />
+          <body name="right_rear_link 4" pos="-0.0036015978 -0.064900142 0.0055">
+            <joint name="right_rear_link 4_joint" type="hinge" pos="0 0 0" axis="0 0 1" range="-1.57 1.57" limited="true" damping="0.05" armature="0.0001" actuatorfrcrange="-10 10" actuatorfrclimited="true" />
+            <inertial pos="0.027950677 -0.034779054 0.008766681" mass="0.024532196" quat="0.94274436 -0.031145143 -0.010961686 0.33187782" diaginertia="4.7053747e-05 1.5846849e-06 4.7015468e-05" />
+            <site name="closure_r_005_b_site" type="sphere" pos="0.072353233 -0.090029223 0.00050000731" quat="0.70710678 0.70710678 -0 -0" size="0.003" rgba="0.2 0.8 1 0" group="3" />
+            <geom name="right_rear_link 4_mesh_1" type="mesh" mesh="part_310_solid_310" pos="0.11434928 0.17506149 -1.3380874" euler="1.5707963 0 0" group="1" />
+            <geom name="right_rear_link 4_mesh_2" type="mesh" mesh="part_381_solid_381" pos="0.11434928 0.17506149 -1.3380874" euler="1.5707963 0 0" group="1" />
+            <geom name="right_rear_link 4_mesh_3" type="mesh" mesh="part_312_solid_312" pos="0.11434928 0.17506149 -1.3380874" euler="1.5707963 0 0" group="1" />
+            <geom name="right_rear_link 4_mesh_4" type="mesh" mesh="part_311_solid_311" pos="0.11434928 0.17506149 -1.3380874" euler="1.5707963 0 0" group="1" />
+          </body>
+          <body name="right_other 1_link" pos="-0.023051279 0.11011307 0">
+            <joint name="right_other 1_joint_2" type="hinge" pos="0 0 0" axis="0 0 1" range="-1.57 1.57" limited="true" damping="0.05" armature="0.0001" actuatorfrcrange="-10 10" actuatorfrclimited="true" />
+            <inertial pos="-4.2092324e-10 -1.8403604e-10 0.0050569631" mass="0.0020384995" quat="1 0 0 0" diaginertia="1.806582e-07 1.806582e-07 2.3923818e-08" />
+            <site name="closure_t_006_a_site" type="sphere" pos="1.0000008e-11 0 -0.002" quat="0.70710678 0.70710678 -0 -0" size="0.003" rgba="0.2 0.8 1 0" group="3" />
+            <geom name="right_other 1_link_mesh_1" type="mesh" mesh="part_378_solid_378" pos="0.13379896 4.827594e-05 -1.3325874" euler="1.5707963 0 0" group="1" />
+          </body>
+        </body>
+        <body name="right_spring_link1" pos="0.12160754 -0.11949434 0.043">
+          <joint name="right_spring_link1_joint" type="hinge" pos="0 0 0" axis="0 0 1" range="-1.57 1.57" limited="true" damping="0.05" armature="0.0001" actuatorfrcrange="-10 10" actuatorfrclimited="true" />
+          <inertial pos="-0.0062964428 0.014811916 -0.0033749901" mass="0.0033459829" quat="0.96301896 -0.00022952574 0.00082047128 0.26943229" diaginertia="4.9071515e-07 8.3671171e-08 5.3540985e-07" />
+          <site name="closure_007_a_site" type="sphere" pos="-0.010357235 0.02811731 -0.0033749927" quat="0.70710678 0.70710678 -0 -0" size="0.003" rgba="0.2 0.8 1 0" group="3" />
+          <geom name="right_spring_link1_mesh_1" type="mesh" mesh="part_432_solid_432" pos="0.048338237 0.15599542 -1.3290874" euler="1.5707963 0 0" group="1" />
+        </body>
+        <body name="right_spring_link2" pos="0.04134787 0.017152514 0.033">
+          <joint name="right_spring_link2_joint" type="hinge" pos="0 0 0" axis="0 0 1" range="-1.57 1.57" limited="true" damping="0.05" armature="0.0001" actuatorfrcrange="-10 10" actuatorfrclimited="true" />
+          <inertial pos="0.033220469 -0.054721982 0.0066249935" mass="0.019490246" quat="0.95452211 -0.035712824 0.12764686 0.26705508" diaginertia="2.3943559e-05 5.731181e-07 2.3988253e-05" />
+          <site name="closure_007_b_site" type="sphere" pos="0.069902439 -0.10852954 0.0066250073" quat="0.70710678 0.70710678 -0 -0" size="0.003" rgba="0.2 0.8 1 0" group="3" />
+          <geom name="right_spring_link2_mesh_1" type="mesh" mesh="part_434_solid_434" pos="0.12859791 0.019348567 -1.3190874" euler="1.5707963 0 0" group="1" />
+          <geom name="right_spring_link2_mesh_2" type="mesh" mesh="part_435_solid_435" pos="0.12859791 0.019348567 -1.3190874" euler="1.5707963 0 0" group="1" />
+        </body>
+      </body>
+      <body name="right_rear_link1" pos="-0.046928958 0.13400417 0.039617917" euler="-1.5707963 0 0">
+        <joint name="right_rear_link1_joint" type="hinge" pos="0 0 0" axis="0 0 1" range="-1.57 1.57" limited="true" damping="0.05" armature="0.0001" actuatorfrcrange="-10 10" actuatorfrclimited="true" />
+        <inertial pos="-0.0099176916 0.0078332584 0.030749739" mass="0.11267844" quat="0.93207839 0.053252199 0.1536729 -0.32369541" diaginertia="5.3387764e-05 0.00015476324 0.00015064092" />
+        <geom name="right_rear_link1_mesh_1" type="mesh" mesh="part_293_solid_293" pos="0.16994578 0.03650108 -1.2860874" euler="1.5707963 0 0" group="1" />
+        <geom name="right_rear_link1_mesh_2" type="mesh" mesh="part_298_solid_298" pos="0.16994578 0.03650108 -1.2860874" euler="1.5707963 0 0" group="1" />
+        <geom name="right_rear_link1_mesh_3" type="mesh" mesh="part_300_solid_300" pos="0.16994578 0.03650108 -1.2860874" euler="1.5707963 0 0" group="1" />
+        <geom name="right_rear_link1_mesh_4" type="mesh" mesh="part_377_solid_377" pos="0.16994578 0.03650108 -1.2860874" euler="1.5707963 0 0" group="1" />
+        <geom name="right_rear_link1_mesh_5" type="mesh" mesh="part_299_solid_299" pos="0.16994578 0.03650108 -1.2860874" euler="1.5707963 0 0" group="1" />
+        <body name="right_rear_link2" pos="-0.074156642 0.058575101 0.0465" euler="3.1415927 0 0">
+          <joint name="right_rear_link2_joint" type="hinge" pos="0 0 0" axis="0 0 1" range="-1.57 1.57" limited="true" damping="0.05" armature="0.0001" actuatorfrcrange="-10 10" actuatorfrclimited="true" />
+          <inertial pos="0.064509579 0.012937944 0.0049638978" mass="0.020861699" quat="0.9947559 -0.0026238755 0.02642573 0.098769938" diaginertia="1.2555757e-06 3.8463565e-05 3.8675021e-05" />
+          <site name="closure_t_006_b_site" type="sphere" pos="0.11030346 0.022122297 0.002" quat="0.70710678 -0.70710678 -0 0" size="0.003" rgba="0.2 0.8 1 0" group="3" />
+          <geom name="right_rear_link2_mesh_1" type="mesh" mesh="part_302_solid_302" pos="0.24410242 0.022074021 1.3325874" euler="-1.5707963 0 0" group="1" />
+          <geom name="right_rear_link2_mesh_2" type="mesh" mesh="part_305_solid_305" pos="0.24410242 0.022074021 1.3325874" euler="-1.5707963 0 0" group="1" />
+          <geom name="right_rear_link2_mesh_3" type="mesh" mesh="part_304_solid_304" pos="0.24410242 0.022074021 1.3325874" euler="-1.5707963 0 0" group="1" />
+        </body>
+      </body>
+    </body>
+  </worldbody>
+  <contact>
+    <exclude body1="base" body2="base_linkother" />
+    <exclude body1="base" body2="base_linkother2" />
+    <exclude body1="base" body2="base_splink" />
+    <exclude body1="base" body2="base_spring link 2" />
+    <exclude body1="base" body2="left_link1" />
+    <exclude body1="base" body2="left_link2" />
+    <exclude body1="base" body2="left_link_rear3" />
+    <exclude body1="base" body2="left_link_rear4" />
+    <exclude body1="base" body2="left_link_rear_1" />
+    <exclude body1="base" body2="left_link_reear2" />
+    <exclude body1="base" body2="right_link1" />
+    <exclude body1="base" body2="right_link2" />
+    <exclude body1="base" body2="right_other 1_link" />
+    <exclude body1="base" body2="right_other 2_link" />
+    <exclude body1="base" body2="right_rear_link 4" />
+    <exclude body1="base" body2="right_rear_link1" />
+    <exclude body1="base" body2="right_rear_link2" />
+    <exclude body1="base" body2="right_rear_link3" />
+    <exclude body1="base" body2="right_spring_link1" />
+    <exclude body1="base" body2="right_spring_link2" />
+    <exclude body1="base_linkother" body2="base_linkother2" />
+    <exclude body1="base_linkother" body2="base_splink" />
+    <exclude body1="base_linkother" body2="base_spring link 2" />
+    <exclude body1="base_linkother" body2="left_link1" />
+    <exclude body1="base_linkother" body2="left_link2" />
+    <exclude body1="base_linkother" body2="left_link_rear3" />
+    <exclude body1="base_linkother" body2="left_link_rear4" />
+    <exclude body1="base_linkother" body2="left_link_rear_1" />
+    <exclude body1="base_linkother" body2="left_link_reear2" />
+    <exclude body1="base_linkother2" body2="base_splink" />
+    <exclude body1="base_linkother2" body2="base_spring link 2" />
+    <exclude body1="base_linkother2" body2="left_link1" />
+    <exclude body1="base_linkother2" body2="left_link2" />
+    <exclude body1="base_linkother2" body2="left_link_rear3" />
+    <exclude body1="base_linkother2" body2="left_link_rear4" />
+    <exclude body1="base_linkother2" body2="left_link_rear_1" />
+    <exclude body1="base_linkother2" body2="left_link_reear2" />
+    <exclude body1="base_splink" body2="base_spring link 2" />
+    <exclude body1="base_splink" body2="left_link1" />
+    <exclude body1="base_splink" body2="left_link2" />
+    <exclude body1="base_splink" body2="left_link_rear3" />
+    <exclude body1="base_splink" body2="left_link_rear4" />
+    <exclude body1="base_splink" body2="left_link_rear_1" />
+    <exclude body1="base_splink" body2="left_link_reear2" />
+    <exclude body1="base_spring link 2" body2="left_link1" />
+    <exclude body1="base_spring link 2" body2="left_link2" />
+    <exclude body1="base_spring link 2" body2="left_link_rear3" />
+    <exclude body1="base_spring link 2" body2="left_link_rear4" />
+    <exclude body1="base_spring link 2" body2="left_link_rear_1" />
+    <exclude body1="base_spring link 2" body2="left_link_reear2" />
+    <exclude body1="left_link1" body2="left_link2" />
+    <exclude body1="left_link1" body2="left_link_rear3" />
+    <exclude body1="left_link1" body2="left_link_rear4" />
+    <exclude body1="left_link1" body2="left_link_rear_1" />
+    <exclude body1="left_link1" body2="left_link_reear2" />
+    <exclude body1="left_link2" body2="left_link_rear3" />
+    <exclude body1="left_link2" body2="left_link_rear4" />
+    <exclude body1="left_link2" body2="left_link_rear_1" />
+    <exclude body1="left_link2" body2="left_link_reear2" />
+    <exclude body1="left_link_rear3" body2="left_link_rear4" />
+    <exclude body1="left_link_rear3" body2="left_link_rear_1" />
+    <exclude body1="left_link_rear3" body2="left_link_reear2" />
+    <exclude body1="left_link_rear4" body2="left_link_rear_1" />
+    <exclude body1="left_link_rear4" body2="left_link_reear2" />
+    <exclude body1="left_link_rear_1" body2="left_link_reear2" />
+    <exclude body1="right_link1" body2="right_link2" />
+    <exclude body1="right_link1" body2="right_other 1_link" />
+    <exclude body1="right_link1" body2="right_other 2_link" />
+    <exclude body1="right_link1" body2="right_rear_link 4" />
+    <exclude body1="right_link1" body2="right_rear_link1" />
+    <exclude body1="right_link1" body2="right_rear_link2" />
+    <exclude body1="right_link1" body2="right_rear_link3" />
+    <exclude body1="right_link1" body2="right_spring_link1" />
+    <exclude body1="right_link1" body2="right_spring_link2" />
+    <exclude body1="right_link2" body2="right_other 1_link" />
+    <exclude body1="right_link2" body2="right_other 2_link" />
+    <exclude body1="right_link2" body2="right_rear_link 4" />
+    <exclude body1="right_link2" body2="right_rear_link1" />
+    <exclude body1="right_link2" body2="right_rear_link2" />
+    <exclude body1="right_link2" body2="right_rear_link3" />
+    <exclude body1="right_link2" body2="right_spring_link1" />
+    <exclude body1="right_link2" body2="right_spring_link2" />
+    <exclude body1="right_other 1_link" body2="right_other 2_link" />
+    <exclude body1="right_other 1_link" body2="right_rear_link 4" />
+    <exclude body1="right_other 1_link" body2="right_rear_link1" />
+    <exclude body1="right_other 1_link" body2="right_rear_link2" />
+    <exclude body1="right_other 1_link" body2="right_rear_link3" />
+    <exclude body1="right_other 1_link" body2="right_spring_link1" />
+    <exclude body1="right_other 1_link" body2="right_spring_link2" />
+    <exclude body1="right_other 2_link" body2="right_rear_link 4" />
+    <exclude body1="right_other 2_link" body2="right_rear_link1" />
+    <exclude body1="right_other 2_link" body2="right_rear_link2" />
+    <exclude body1="right_other 2_link" body2="right_rear_link3" />
+    <exclude body1="right_other 2_link" body2="right_spring_link1" />
+    <exclude body1="right_other 2_link" body2="right_spring_link2" />
+    <exclude body1="right_rear_link 4" body2="right_rear_link1" />
+    <exclude body1="right_rear_link 4" body2="right_rear_link2" />
+    <exclude body1="right_rear_link 4" body2="right_rear_link3" />
+    <exclude body1="right_rear_link 4" body2="right_spring_link1" />
+    <exclude body1="right_rear_link 4" body2="right_spring_link2" />
+    <exclude body1="right_rear_link1" body2="right_rear_link2" />
+    <exclude body1="right_rear_link1" body2="right_rear_link3" />
+    <exclude body1="right_rear_link1" body2="right_spring_link1" />
+    <exclude body1="right_rear_link1" body2="right_spring_link2" />
+    <exclude body1="right_rear_link2" body2="right_rear_link3" />
+    <exclude body1="right_rear_link2" body2="right_spring_link1" />
+    <exclude body1="right_rear_link2" body2="right_spring_link2" />
+    <exclude body1="right_rear_link3" body2="right_spring_link1" />
+    <exclude body1="right_rear_link3" body2="right_spring_link2" />
+    <exclude body1="right_spring_link1" body2="right_spring_link2" />
+  </contact>
+  <equality>
+    <connect name="closure_001" solref="0.004 1" solimp="0.99 0.999 0.0001 0.5 2" site1="closure_001_a_site" site2="closure_001_b_site" />
+    <connect name="closure_003" solref="0.004 1" solimp="0.99 0.999 0.0001 0.5 2" site1="closure_003_a_site" site2="closure_003_b_site" />
+    <connect name="closure_r_005" solref="0.004 1" solimp="0.99 0.999 0.0001 0.5 2" site1="closure_r_005_a_site" site2="closure_r_005_b_site" />
+    <connect name="closure_t_006" solref="0.004 1" solimp="0.99 0.999 0.0001 0.5 2" site1="closure_t_006_a_site" site2="closure_t_006_b_site" />
+    <connect name="closure_007" solref="0.004 1" solimp="0.99 0.999 0.0001 0.5 2" site1="closure_007_a_site" site2="closure_007_b_site" />
+    <connect name="closure_008" solref="0.004 1" solimp="0.99 0.999 0.0001 0.5 2" site1="closure_008_a_site" site2="closure_008_b_site" />
+  </equality>
+  <actuator>
+    <position name="left_link1_joint_position" joint="left_link1_joint" kp="50" ctrlrange="-1.57 1.57" ctrllimited="true" />
+    <position name="left_link_rear_1_joint_position" joint="left_link_rear_1_joint" kp="50" ctrlrange="-1.57 1.57" ctrllimited="true" />
+    <position name="left_link_rear3_joint_position" joint="left_link_rear3_joint" kp="50" ctrlrange="-1.57 1.57" ctrllimited="true" />
+    <position name="base_linkother_joint_position" joint="base_linkother_joint" kp="50" ctrlrange="-1.57 1.57" ctrllimited="true" />
+    <position name="right_link1_joint_position" joint="right_link1_joint" kp="50" ctrlrange="-1.57 1.57" ctrllimited="true" />
+    <position name="right_link2_joint_position" joint="right_link2_joint" kp="50" ctrlrange="-1.57 1.57" ctrllimited="true" />
+    <position name="right_rear_link1_joint_position" joint="right_rear_link1_joint" kp="50" ctrlrange="-1.57 1.57" ctrllimited="true" />
+    <position name="right_other_1_joint_position" joint="right_other 1_joint" kp="50" ctrlrange="-1.57 1.57" ctrllimited="true" />
+  </actuator>
+  <keyframe>
+    <key name="home" qpos="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" />
+  </keyframe>
+</mujoco>

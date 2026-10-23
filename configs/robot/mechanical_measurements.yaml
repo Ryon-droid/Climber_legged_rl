@@ -1,0 +1,98 @@
+# Source measurements only; not applied to MJCF inertials or a running simulator.
+# SI conversions preserve source scope/ambiguities. No curve fitting performed.
+source:
+  document: /home/lsx/下载/机械数据.docx
+  review: docs/机械数据核对.md
+  precedence: latest_user_confirmation_then_latest_mechanical_data_then_firmware_reference
+  firmware_conflicts_are_reference_only: true
+
+mass:
+  user_reported_chassis_mass_kg: 15.0 # original wording; scope clarified below
+  user_reported_mass_scope: complete_provided_model # user clarified: entire supplied model
+  latest_mechanical_update_2026_10_19:
+    one_side_leg_kg: 5.14 # latest user: complete side assembly including wheel and motors
+    both_sides_kg: 10.28 # 2 x 5.14; not additional to total
+    full_model_kg: 15.0 # excludes screws according to screenshot
+    screws_included: false
+    chain_removed_from_export: true # screenshot: chain omitted because difficult to export
+    chain_omission_reported_as_mass_gap_cause: true # user explanation; not yet quantitatively verified
+    chain_mass_each_side_kg: null # mass is included in quoted totals but its individual value remains unknown
+    exported_left_side_mass_kg: 0.8563198106 # latest MJCF, summed over base left child branches
+    exported_right_side_mass_kg: 1.153994436 # latest MJCF, summed over base right child branches
+    left_side_mass_gap_kg: 4.2836801894 # 5.14 - exported left side; not a chain weight estimate
+    right_side_mass_gap_kg: 3.986005564 # 5.14 - exported right side; not a chain weight estimate
+    wheel_assembly_in_one_side_leg: true # included; do not add 0.52 kg again
+    chain_mass_in_one_side_leg_quote: true # user confirmed each 5.14 kg side includes chain
+    chain_mass_in_full_model_quote: true # user confirmed 15 kg total includes chain
+    motor_mass_in_one_side_leg: true # user says all side parts included
+    remaining_non_side_assembly_mass_kg: 4.72 # 15 - 2*5.14; not automatically MJCF base mass
+    applied_to_mjcf: false
+  wheel_assembly_each_kg: 0.52 # document: includes wheel motor/gearbox
+  leg_each_kg: 2.87 # historical document value, superseded by newer 5.14 kg quote; not current input
+  right_leg_basis: reported_single_leg_value_and_bilateral_symmetry
+  central_body_kg: 8.3 # historical document value; cannot combine with newer 5.14 kg side-leg quote
+  component_sum_kg: 15.08 # historical 2*0.52 + 2*2.87 + 8.3; not the new breakdown
+  total_mass_for_simulation_kg: 15.0 # confirmed total target; not yet applied to MJCF
+  component_sum_minus_confirmed_total_kg: 0.08 # preserve source difference; cause unverified
+  per_link_mass_distribution_verified: false # individual link inertials still unverified
+
+geometry:
+  nominal_wheel_radius_m: 0.056 # earlier user message
+  loaded_effective_wheel_radius_m: 0.055 # document final summary
+  half_track_m: 0.21080 # document final summary; earlier text 0.210805
+  track_m: 0.4216
+  body_com_offset_magnitude_m: 0.04213
+  body_com_offset_vector_m: null # scalar is insufficient for 3D COM and sign
+  virtual_leg_length_definition: midpoint_of_front_rear_hip_axes_to_wheel_center
+  nominal_standing_pose:
+    source: user_annotated_standing_diagram_2026_10_19
+    pose_role: normal_standing # confirmed by user; not a joint-angle calibration
+    hip_to_wheel_vertical_separation_m: 0.135
+    dimension_interpretation: left_link1_joint_axis_to_left_link3_joint_axis_vertical_distance
+    dimension_interpretation_basis: drawn_dimension_endpoints # not a ground-contact dimension
+    hip_to_wheel_horizontal_offset_m: null # sketch is not a scaled CAD measurement
+    hip_axis_height_above_ground_estimate_m: 0.190 # 0.135 + loaded radius 0.055 on level ground
+    base_origin_height_above_ground_m: null # base-to-hip transform still required
+    body_ground_clearance_m: null # underside-to-ground distance is not marked
+    active_joint_positions_rad: null # height alone does not determine all four joint angles
+
+inertia:
+  wheel_assembly_axial_kg_m2: 0.0007865 # 0.5 * 0.52 kg * (0.055 m)^2; formula estimate in DOCX, not independently measured
+  wheel_axial_inertia_method: solid_cylinder_half_mass_radius_squared
+  wheel_inertia_axis_and_rotating_parts_verified: false # assembly mass includes gearbox/housing
+  central_body_pitch_at_com_kg_m2: 0.17607975764 # 176079757.64 g mm^2 * 1e-9
+  central_body_pitch_summary_kg_m2: 0.1761
+  whole_robot_yaw_summary_kg_m2: 0.2818
+  whole_robot_yaw_alternate_kg_m2: 0.45236925759 # earlier document value, pose unspecified
+  whole_robot_yaw_at_length_0_135m_candidate_kg_m2: 0.28175089999
+  yaw_axis_description: vertical_through_midpoint_of_equivalent_hip_connections
+  yaw_reference_pose_verified: false
+  per_link_full_inertia_tensors_verified: false
+
+equivalent_leg_samples:
+  # Rows kept in original source order. L/lw are m; inertia converted from kg mm^2.
+  # Source table's lb column was empty. It can be derived as L-lw.
+  # Measurement instructions describe pitch inertia at COM; actual axis/scope not verified.
+  columns: [leg_length_m, com_distance_from_wheel_m, pitch_inertia_kg_m2]
+  samples:
+    - [0.109, 0.10391, 0.02569425]
+    - [0.135, 0.12533, 0.02751139]
+    - [0.120, 0.11191, 0.02638158]
+    - [0.140, 0.12268, 0.02791156]
+    - [0.160, 0.13713, 0.02965849]
+    - [0.180, 0.151208, 0.03161375]
+    - [0.200, 0.166258, 0.03381403]
+    - [0.220, 0.18034, 0.03619037]
+    - [0.240, 0.19620, 0.03905857]
+    - [0.260, 0.213154, 0.04180830]
+    - [0.280, 0.223908, 0.04463235]
+    - [0.300, 0.238875, 0.04794551]
+    - [0.320, 0.240518, 0.05133024]
+    - [0.340, 0.269230, 0.05540561]
+    - [0.362, 0.312, 0.05971334]
+  source_order_sorted: false
+  measured_scope_verified: false
+  scope_note: historical_DOCX_leg_excludes_wheel_and_joint_motors_not_automatically_current_5_14kg_side_assembly
+  full_cad_pose_per_sample_available: false # L alone does not determine all closed-chain joint angles
+  fit_coefficients: null
+  valid_joint_limits_from_samples: null # measured virtual lengths are not mechanical limits

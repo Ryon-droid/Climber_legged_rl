@@ -1,0 +1,20 @@
+{
+  "status": "ok",
+  "coordinate_schema_version": 3,
+  "coordinate_frame": "z_up_x_forward",
+  "rotation_convention": "Rz(yaw) * Ry(pitch) * Rx(roll)",
+  "rpy_unit": "radian",
+  "warnings": [
+    "Model has 73 unassigned CAD parts that will not be exported in any link: part_105, part_114, part_122, part_129, part_248...",
+    "Closed-chain constraints are exported as MJCF equality constraints; URDF export is disabled for this model.",
+    "Closed-chain MJCF relies on an equality-constraint solver; tree-only viewers may not preview the coupled motion correctly.",
+    "Continuous joints on closed-chain paths are exported with finite limits to preserve the initial assembly branch.",
+    "Closed-chain MJCF adds position actuators only to selected or auto-detected driving joints; passive joints remain constraint-driven."
+  ],
+  "errors": [],
+  "mjcf_file": "robot.xml",
+  "mesh_mode": "per_part",
+  "mesh_files": [],
+  "logical_mesh_count": 0,
+  "mesh_chunks_split": false
+}
