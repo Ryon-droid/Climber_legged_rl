@@ -1,0 +1,32 @@
+# Authoritative CAD route. Validation tolerances are audit criteria, not measurements.
+schema_version: 1
+model_policy: source_cad_only
+source_model: sim2sim/climber_mjcf/robot.xml
+source_assembly: sim2sim/climber_mjcf/user_model.json
+source_parts: sim2sim/climber_mjcf/parts.json
+source_export_report: sim2sim/climber_mjcf/mjcf_export_report.json
+mechanical_measurements: configs/robot/mechanical_measurements.yaml
+hardware_calibration: configs/robot/hardware_calibration.yaml
+output_directory: outputs/cad_model
+# Diagnostic adapter: preserve CAD body transforms, axes, inertials, geoms, ranges and closures.
+# Only resolve mesh paths/shell compilation; remove exporter actuators; disable contact/gravity.
+# No mass scaling, proxy wheel/base, omitted spring surrogate, or invented nominal stance.
+expected_leg_joints: [left_link1_joint, left_link_rear_1_joint, right_link1_joint, right_rear_link1_joint]
+expected_wheel_joints: ['left_link 3_joint', 'right_link 3_joint']
+audit:
+  closure_tolerance_m: 0.0001
+  mass_tolerance_kg: 0.1
+  motion_test_deltas_rad: [-0.05, -0.02, 0.02, 0.05]
+  requested_angle_tolerance_rad: 0.001
+  solver_max_nfev: 400
+  jacobian_rank_tolerance_m_per_rad: 0.000001
+# Remain false until supported by CAD/material/bench evidence. No training override flag.
+verification:
+  rigid_body_mass_com_inertia_reconciled: false
+  unassigned_parts_accounted_for: false
+  independent_leg_motion_verified: false
+  spring_topology_and_force_model_verified: false
+  wheel_and_link_contact_geometry_verified: false
+  joint_operating_ranges_verified: false
+  actuator_output_envelopes_identified: false
+  measured_stance_reproduced: false

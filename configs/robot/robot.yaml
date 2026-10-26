@@ -1,6 +1,11 @@
 # Fill this from the actual Climber robot. Units are SI unless stated otherwise.
 robot:
   name: Climber
+  training_model_policy: source_cad_only
+  cad_model_config: configs/robot/cad_model.yaml
+  cad_kinematic_repair_config: configs/robot/cad_repair.yaml
+  cad_kinematic_repair_model: outputs/cad_repaired/robot_cad_repaired.xml # diagnostic only; not dynamics released
+  hardware_calibration_file: configs/robot/hardware_calibration.yaml
   model_file: assets/robot/climber.usdc
   source_usdz: assets/robot/source/climber_openusd.usdz
   mjcf_model_file: sim2sim/climber_mjcf/robot.xml

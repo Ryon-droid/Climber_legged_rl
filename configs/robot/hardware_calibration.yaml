@@ -1,0 +1,48 @@
+# Physical measurements only. null means unmeasured; simulation values never fill these fields.
+schema_version: 1
+status: unmeasured
+hardware_deployment_permitted: false
+conventions:
+  base_axes: {x: forward, y: left, z: up}
+  model_joint_units: rad
+  torque_units: output_joint_Nm
+  feedback_transform: 'q_model = direction * (q_feedback / feedback_to_joint_ratio - zero_feedback_rad)'
+  velocity_transform: 'dq_model = direction * dq_feedback / feedback_to_joint_ratio'
+  effort_transform: 'tau_model = direction * effort_to_output_Nm * command'
+  zero_feedback_rad_definition: feedback_angle_divided_by_ratio_at_model_q_zero
+  note: 'The feedback ratio depends on protocol semantics; do not automatically apply gearbox reduction twice.'
+channels:
+  - {role: left_front, model_joint: left_link1_joint, bus: null, motor_id: null, feedback_to_joint_ratio: null, direction: null, zero_feedback_rad: null, soft_min_rad: null, soft_max_rad: null, continuous_torque_Nm: null, peak_torque_Nm: null, peak_duration_s: null, speed_limit_rad_s: null, effort_to_output_Nm: null, measured: false}
+  - {role: left_rear, model_joint: left_link_rear_1_joint, bus: null, motor_id: null, feedback_to_joint_ratio: null, direction: null, zero_feedback_rad: null, soft_min_rad: null, soft_max_rad: null, continuous_torque_Nm: null, peak_torque_Nm: null, peak_duration_s: null, speed_limit_rad_s: null, effort_to_output_Nm: null, measured: false}
+  - {role: right_front, model_joint: right_link1_joint, bus: null, motor_id: null, feedback_to_joint_ratio: null, direction: null, zero_feedback_rad: null, soft_min_rad: null, soft_max_rad: null, continuous_torque_Nm: null, peak_torque_Nm: null, peak_duration_s: null, speed_limit_rad_s: null, effort_to_output_Nm: null, measured: false}
+  - {role: right_rear, model_joint: right_rear_link1_joint, bus: null, motor_id: null, feedback_to_joint_ratio: null, direction: null, zero_feedback_rad: null, soft_min_rad: null, soft_max_rad: null, continuous_torque_Nm: null, peak_torque_Nm: null, peak_duration_s: null, speed_limit_rad_s: null, effort_to_output_Nm: null, measured: false}
+  - {role: left_wheel, model_joint: 'left_link 3_joint', bus: null, motor_id: null, feedback_to_joint_ratio: null, direction: null, zero_feedback_rad: null, soft_min_rad: null, soft_max_rad: null, continuous_torque_Nm: null, peak_torque_Nm: null, peak_duration_s: null, speed_limit_rad_s: null, effort_to_output_Nm: null, measured: false}
+  - {role: right_wheel, model_joint: 'right_link 3_joint', bus: null, motor_id: null, feedback_to_joint_ratio: null, direction: null, zero_feedback_rad: null, soft_min_rad: null, soft_max_rad: null, continuous_torque_Nm: null, peak_torque_Nm: null, peak_duration_s: null, speed_limit_rad_s: null, effort_to_output_Nm: null, measured: false}
+imu:
+  sensor_to_base_rotation_wxyz: null
+  gyro_units: null
+  gyro_bias_rad_s: null
+  gravity_sign_and_static_tilt_verified: false
+control:
+  driver_command_mode: null
+  measured_policy_period_s: null
+  measured_low_level_period_s: null
+  measured_latency_p50_s: null
+  measured_latency_p99_s: null
+  watchdog_timeout_s: null
+  emergency_stop_verified: false
+  suspended_test_torque_caps_Nm: null
+  ground_test_torque_caps_Nm: null
+spring:
+  count: null
+  attachment_bodies_and_local_xyz: null
+  force_direction: null
+  mount_distance_range_m: null
+  force_length_samples_m_N: null
+  damping_and_hysteresis: null
+evidence:
+  operator: null
+  measured_at: null
+  firmware_version: null
+  raw_log_path: null
+  model_sha256: null

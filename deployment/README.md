@@ -7,4 +7,6 @@
 - 先保持 float32，完成 PyTorch/ONNX/Cube.AI/板端输出比较，再评估量化。
 - 固件剩余可用 RAM/Flash、Cube.AI 版本、电机/IMU 协议和实测延迟待补；内存预算需扣除现有固件占用。
 
-详见 [参考参数与STM32部署](../docs/参考参数与STM32部署.md)。当前目录没有已实现的 MCU 适配器或固件，导出脚本仍是占位。
+详见 [参考参数与STM32部署](../docs/参考参数与STM32部署.md)。当前目录没有已实现的 MCU 适配器或固件，已有历史近似实验TorchScript导出；真实模型ONNX/Cube.AI与MCU适配尚未实现。
+
+当前路线见 ../docs/真实模型训练.md；实测字段见 ../configs/robot/hardware_calibration.yaml。旧策略与试训限幅不作为板端配置。

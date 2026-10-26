@@ -1,0 +1,37 @@
+schema_version: 1
+model_policy: source_cad_kinematic_repair
+source_model: sim2sim/climber_mjcf/robot.xml
+source_assembly: sim2sim/climber_mjcf/user_model.json
+source_parts: sim2sim/climber_mjcf/parts.json
+mechanical_measurements: configs/robot/mechanical_measurements.yaml
+output_directory: outputs/cad_repaired
+purpose: geometric_and_kinematic_validation_only
+training_permitted: false
+symmetry_basis: user_confirmed_bilateral_chassis_symmetry
+spring_parts:
+  left:
+    cylinder_and_lower_eye: [part_582, part_583]
+    rod_and_upper_eye: [part_581, part_580]
+    lower_mount_body: left_link1
+    upper_mount_body: left_link2
+  right:
+    cylinder_and_lower_eye: [part_434, part_435]
+    rod_and_upper_eye: [part_433, part_432]
+    lower_mount_body: right_link1
+    upper_mount_body: right_link2
+# Geometry is recovered from actual CAD mesh, not a substitute spring graphic.
+# CAD eye bore positions and rod/cylinder principal axis require fit checks.
+# Source-export inertials remain unvalidated; no total-mass normalization.
+required_physical_inputs:
+  per_body_mass_com_fullinertia: null
+  spring_min_max_mount_distance_m: null
+  spring_force_length_curve: null
+  spring_damping: null
+  joint_output_torque_speed_envelope: null
+
+physical_data_availability:
+  recorded_at: 2026-10-27
+  per_body_mass_com_inertia: unavailable_user_confirmed
+  spring_manufacturer_specification: seller_declined_to_provide_user_confirmed
+  identification_directory: configs/robot/measurements
+  do_not_infer_95_65_meaning: true

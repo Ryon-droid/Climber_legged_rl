@@ -1,0 +1,93 @@
+# SIMULATION ONLY. User approved a labeled approximate experiment, 2026-10-26.
+# Never use these limits or mass distribution on hardware without calibration.
+experiment:
+  simulation_only: true
+  backend: mujoco
+  source_model: sim2sim/climber_mjcf/robot.xml
+  output_directory: outputs/mujoco_experiment
+  physical_left_is_negative_source_y: true
+  approximation_notes:
+    - Per-side inertia tensors and COM remain approximate, not measured.
+    - Side total 5.14 kg includes its wheel, motors and chains; no duplicate mass.
+    - Wheel collision uses a sphere; base a box; link collisions are omitted.
+    - Original CAD meshes are visual-only; original model files are unchanged.
+    - Gas-spring force is omitted until attachment and force direction are verified.
+    - Exported hinge ranges are provisional, not verified hardware hard stops.
+    - Motor torque and speed limits below are experimental output-joint limits.
+    - This is a flat standing baseline, not jump/obstacle or hardware-ready policy.
+    - A bounded numerical search did not find the 135 mm pose under export ranges.
+    - Initial experiment uses a 110 mm hip-wheel reset, not the measured stance.
+
+mass:
+  total_kg: 15.0
+  side_total_kg: 5.14
+  wheel_each_kg: 0.52
+  method: scale_existing_side_nonwheel_mass_and_inertia_preserving_local_com
+
+physics:
+  timestep: 0.002
+  solver_iterations: 80
+  wheel_radius_m: 0.055
+  wheel_friction: 0.8
+  base_collision_half_extents_m: [0.12, 0.09, 0.035]
+  measured_height_hip_above_wheel_m: 0.135
+  rest_height_hip_above_wheel_m: 0.110
+  # Feasible numerical reset is searched near the COM, not hardware calibration.
+  ik_max_closure_error_m: 0.0001
+  ik_max_height_error_m: 0.003
+  ik_seed: 42
+
+control:
+  leg_joints: [left_link1_joint, left_link_rear_1_joint, right_link1_joint, right_rear_link1_joint]
+  wheel_joints: ['left_link 3_joint', 'right_link 3_joint']
+  decimation: 5
+  leg_kp: 20.0
+  leg_kd: 1.0
+  wheel_kv: 0.2
+  leg_action_scale_rad: 0.5
+  wheel_action_scale_rad_s: 10.0
+  # 10 Nm is the exporter trial cap, NOT the reported 20 Nm rating/peak.
+  leg_torque_limit_Nm: 10.0
+  wheel_torque_limit_Nm: 2.0
+  # Beyond these trial speeds, torque that would accelerate further is blocked.
+  leg_speed_limit_rad_s: 15.0
+  wheel_speed_limit_rad_s: 30.0
+
+task:
+  episode_seconds: 5.0
+  command_forward_m_s: [0.0, 0.0]
+  command_yaw_rad_s: [0.0, 0.0]
+  reset_tilt_std_rad: 0.015
+  reset_velocity_std: 0.01
+  terminate_tilt_rad: 0.8
+  terminate_base_height_m: 0.075
+  terminate_max_closure_error_m: 0.01
+
+reward:
+  # Bounded positive terms, smoothness/effort costs and explicit fall cost.
+  upright: 1.0
+  hip_height: 1.0
+  linear_tracking: 1.0
+  yaw_tracking: 0.5
+  action_rate: 0.02
+  normalized_effort: 0.01
+  joint_speed: 0.0001
+  fall_penalty: 2.0
+
+training:
+  seed: 42
+  num_envs: 8
+  n_steps: 256
+  batch_size: 256
+  n_epochs: 5
+  learning_rate: 0.0003
+  gamma: 0.99
+  gae_lambda: 0.95
+  clip_range: 0.2
+  ent_coef: 0.005
+  max_grad_norm: 1.0
+  actor_hidden_dims: [128, 64, 32]
+  critic_hidden_dims: [256, 128, 64]
+  checkpoint_steps: 10000
+  # A deliberately bounded first run. Increase only after inspecting evaluation.
+  total_timesteps: 100000

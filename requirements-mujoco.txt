@@ -1,0 +1,11 @@
+# Independent CPU-physics baseline; does not replace Isaac Lab dependencies.
+mujoco==3.17.0
+numpy==2.2.6
+scipy==1.15.3
+PyYAML==6.0.3
+gymnasium==1.1.1
+stable-baselines3==2.6.0
+torch==2.6.0
+tensorboard==2.21.0
+imageio==2.38.0
+imageio-ffmpeg==0.6.0

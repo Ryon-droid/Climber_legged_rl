@@ -16,8 +16,7 @@ The export is structurally useful but not yet training-ready:
   interpretation still need confirmation from the mechanical and electrical
   teams.
 
-The replacement XML parses and all 510 referenced mesh files exist. MuJoCo is
-not installed in the current environment, so dynamics loading is not verified.
+The replacement XML parses and all 510 referenced mesh files exist. MuJoCo is installed in the separate climber-validation environment. The unscaled CAD diagnostic compiles with shell mesh handling; mass and spring-motion audits still fail training readiness. See ../docs/真实模型训练.md.
 Before sim2sim, load the XML in the installed MuJoCo version and check the
 closed-chain solver, initial pose, contacts, actuator direction and units. The
 MJCF uses millimeter STL meshes with `scale="0.001 0.001 0.001"` in the XML.

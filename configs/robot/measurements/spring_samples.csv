@@ -1,0 +1,13 @@
+side,mount_distance_m,axial_force_N,motion_direction,speed_m_s,temperature_C,source,measured_at
+left,,,compression,,,,
+left,,,compression,,,,
+left,,,compression,,,,
+left,,,extension,,,,
+left,,,extension,,,,
+left,,,extension,,,,
+right,,,compression,,,,
+right,,,compression,,,,
+right,,,compression,,,,
+right,,,extension,,,,
+right,,,extension,,,,
+right,,,extension,,,,
