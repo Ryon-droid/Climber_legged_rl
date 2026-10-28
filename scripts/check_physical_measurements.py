@@ -2,19 +2,31 @@
 import argparse
 import csv
 import json
+import math
 from pathlib import Path
 import sys
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'source'))
 import numpy as np
 import xml.etree.ElementTree as ET
 from climber_legged_rl.cad_model import ROOT
+from climber_legged_rl.physical_inputs import load_body_masses
+
+
+def read_csv(path):
+    with path.open(newline='', encoding='utf-8') as handle:
+        return list(csv.DictReader(handle))
 
 
 def check(directory):
-    directory=Path(directory);blockers=[];complete=[];total=0.;left=0.;right=0.
+    directory=Path(directory);blockers=[];complete=[];total=0.
     body_path=directory/'rigid_bodies.csv'
     if not body_path.exists():return {'ready_for_dynamics_identification':False,'blockers':['Missing rigid_bodies.csv']}
-    rows=list(csv.DictReader(body_path.open()))
+    rows=read_csv(body_path)
+    try:
+        supplied_masses = load_body_masses(directory)
+    except (ValueError, TypeError) as exc:
+        supplied_masses = {}
+        blockers.append('Invalid body mass inputs: ' + str(exc))
     names=[r['body'] for r in rows]
     model_path=ROOT/'outputs/cad_repaired/robot_cad_repaired.xml'
     expected_names={b.get('name') for b in ET.parse(model_path).getroot().findall('.//body')}
@@ -22,7 +34,10 @@ def check(directory):
     if len(set(names))!=len(names):blockers.append('Duplicate body names')
     for r in rows:
         name=r['body'];fields=['mass_kg','com_x_m','com_y_m','com_z_m','ixx_kg_m2','iyy_kg_m2','izz_kg_m2','ixy_kg_m2','ixz_kg_m2','iyz_kg_m2']
-        if any(not r[f].strip() for f in fields):blockers.append('Missing body mass/COM/inertia: '+name);continue
+        missing = [f for f in fields if not r[f].strip()]
+        if missing:
+            blockers.append('Missing body fields: ' + name + ': ' + ', '.join(missing))
+            continue
         try:
             a=np.array([float(r[f]) for f in fields])
             mass,x,y,z,xx,yy,zz,xy,xz,yz=a
@@ -34,17 +49,10 @@ def check(directory):
             if not r['source'].strip():raise ValueError('source/evidence missing')
             if r['reference_frame']!='MJCF_body_local_at_COM':raise ValueError('unsupported COM/inertia frame')
             complete.append(name);total+=mass
-            if name.startswith('left') or name.startswith('base_linkother'):
-                left+=mass
-            elif name.startswith('right'):
-                right+=mass
         except (ValueError,TypeError) as exc:blockers.append(name+': '+str(exc))
-    if len(complete)==len(rows):
-        if abs(total-15.)>.1:blockers.append(f'Measured body sum {total:g} kg does not match confirmed 15 kg')
-        if abs(left-5.14)>.1 or abs(right-5.14)>.1:blockers.append('Measured side sums do not match 5.14 kg per side; check scope')
     dimensions=directory/'spring_dimensions.csv';samples=directory/'spring_samples.csv'
     if dimensions.exists():
-        dim=list(csv.DictReader(dimensions.open()))
+        dim=read_csv(dimensions)
         for side in ('left','right'):
             matches=[r for r in dim if r['side']==side]
             if len(matches)!=1:blockers.append('Need one dimension row per side: '+side);continue
@@ -58,7 +66,7 @@ def check(directory):
             except (TypeError,ValueError) as exc:blockers.append('Spring dimensions '+side+': '+str(exc))
     else:blockers.append('Missing spring_dimensions.csv')
     if samples.exists():
-        all_samples=list(csv.DictReader(samples.open()))
+        all_samples=read_csv(samples)
         for side in ('left','right'):
             for direction in ('compression','extension'):
                 records=[r for r in all_samples if r['side']==side and r['motion_direction']==direction]
@@ -69,13 +77,17 @@ def check(directory):
                 except (ValueError,TypeError) as exc:blockers.append('Spring curve '+side+'/'+direction+': '+str(exc))
     else:blockers.append('Missing spring_samples.csv')
     if (directory/'unassigned_parts.csv').exists():
-        part_rows=list(csv.DictReader((directory/'unassigned_parts.csv').open()))
+        part_rows=read_csv(directory/'unassigned_parts.csv')
         if len(part_rows)!=72:blockers.append('Need all 72 remaining CAD parts in the review inventory')
         unresolved=[r['part_id'] for r in part_rows if not r['confirmed_body'].strip() or r['included_in_mass_scope'] not in ('yes','excluded_with_evidence') or not r['evidence'].strip()]
         if unresolved:blockers.append(f'{len(unresolved)} remaining CAD parts lack body/mass scope/evidence')
     else:blockers.append('Missing unassigned_parts.csv')
     return {'ready_for_dynamics_identification':not blockers,'hardware_ready':False,'completed_body_count':len(complete),'expected_body_count':len(rows),
-            'completed_mass_sum_kg':total,'blockers':blockers,'note':'Complete inputs permit further model construction; this is not a physics/training/hardware release.'}
+            'completed_mass_sum_kg':total,
+            'provided_mass_count':len(supplied_masses),'provided_mass_subtotal_kg':math.fsum(supplied_masses.values()),
+            'provided_body_masses_kg':supplied_masses,
+            'all_body_masses_provided':bool(rows) and len(supplied_masses)==len(rows),
+            'blockers':blockers,'note':'Masses are accepted independently of pending COM/inertia. Complete inputs permit further model construction, not training/hardware release.'}
 
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--directory',type=Path,default=ROOT/'configs/robot/measurements');p.add_argument('--output',type=Path,default=ROOT/'outputs/cad_repaired/physical_inputs_report.json');a=p.parse_args()

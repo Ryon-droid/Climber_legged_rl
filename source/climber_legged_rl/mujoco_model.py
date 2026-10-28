@@ -19,6 +19,8 @@ def load_config(path=DEFAULT_CONFIG):
     config = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
     if config["experiment"]["simulation_only"] is not True:
         raise ValueError("This approximate model is simulation-only")
+    if config['experiment'].get('model_route') == 'cad_dynamics':
+        return config
     if config["mass"]["total_kg"] <= 2 * config["mass"]["side_total_kg"]:
         raise ValueError("Mass breakdown leaves no positive central body mass")
     return config

@@ -1,5 +1,7 @@
 CAD repair commands: repair_cad_model.py, validate_cad_repair.py, prepare_physical_measurements.py, check_physical_measurements.py. See ../docs/CAD修正结果.md. These produce a kinematic candidate and explicit physical-input blockers.
 
+2026-10-28: `prepare_cad_dynamics.py` builds the floating six-motor CAD model. Run `smoke_mujoco.py --config configs/robot/cad_dynamics.yaml`, then `train.py --backend cad-dynamics`. `training_status.py` prints the current background run and checkpoints. See [CAD动力学训练](../docs/CAD动力学训练.md) for actual reset height and simulation assumptions.
+
 # Current route: actual CAD
 
 Run audit_cad_model.py to inspect preserved source geometry, mass and per-motor motion. train.py and check_training_readiness.py default to cad and report physical-model blockers. See ../docs/真实模型训练.md. Historical experiments require explicit --backend mujoco.

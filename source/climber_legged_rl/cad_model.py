@@ -9,6 +9,7 @@ import mujoco
 import numpy as np
 from scipy.optimize import least_squares
 import yaml
+from .physical_inputs import load_body_masses
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_CAD_CONFIG = ROOT / 'configs/robot/cad_model.yaml'
@@ -99,7 +100,8 @@ def audit_model(config_path=DEFAULT_CAD_CONFIG, run_motion=True):
     mujoco.mj_forward(model, data)
     measurements = yaml.safe_load((ROOT/cfg['mechanical_measurements']).read_text())
     target = measurements['mass']['total_mass_for_simulation_kg']
-    target_side = measurements['mass']['latest_mechanical_update_2026_10_19']['one_side_leg_kg']
+    target_side = measurements['mass'].get('side_total_kg')
+    confirmed_bodies = load_body_masses()
     user = json.loads((ROOT/cfg['source_assembly']).read_text())
     parts = json.loads((ROOT/cfg['source_parts']).read_text())['parts']
     assigned = {p for link in user['links'] for p in link.get('part_ids', [])}
@@ -120,14 +122,17 @@ def audit_model(config_path=DEFAULT_CAD_CONFIG, run_motion=True):
                              'source_local_com_m': inertial.get('pos'),
                              'source_inertia_quat_wxyz': inertial.get('quat', '1 0 0 0'),
                              'source_diaginertia_kg_m2': inertial.get('diaginertia'),
-                             'assigned_part_count': len(link.get('part_ids', []))})
+                             'assigned_part_count': len(link.get('part_ids', [])),
+                             'confirmed_mass_kg': confirmed_bodies.get(body.get('name')),
+                             'evidence': 'configs/robot/measurements/rigid_bodies.csv' if body.get('name') in confirmed_bodies else ''})
     mass = float(model.body_mass.sum())
     sides = {}
     base = root.find('./worldbody/body')
     for side in ('left','right'):
         bodies = [b for branch in base.findall('body') if branch.get('name','').startswith(side) for b in [branch,*branch.findall('.//body')]]
         value = sum(float(b.find('inertial').get('mass')) for b in bodies if b.find('inertial') is not None)
-        sides[side] = {'export_kg': value, 'confirmed_kg': target_side, 'missing_kg': target_side-value}
+        sides[side] = {'export_kg': value, 'confirmed_kg': target_side,
+                       'missing_kg': target_side-value if target_side is not None else None}
     errors = np.linalg.norm(closure_vectors(model,data),axis=1)
     jacobians = []
     for i in range(model.neq):
@@ -161,8 +166,16 @@ def audit_model(config_path=DEFAULT_CAD_CONFIG, run_motion=True):
                                 'outermost_mesh':max(meshes,key=lambda x:x['max_radius_m']),
                                 'source':'CAD mesh vertices; not friction/deflection measurement'}
     blockers = []
-    if abs(mass-target)>cfg['audit']['mass_tolerance_kg']:
+    if target is not None and abs(mass-target)>cfg['audit']['mass_tolerance_kg']:
         blockers.append(f'CAD mass {mass:.9f} kg differs from confirmed {target:g} kg; no scaling applied.')
+    mass_differences = []
+    for name, confirmed in confirmed_bodies.items():
+        body = root.find(f'.//body[@name="{name}"]')
+        actual = float(body.find('inertial').get('mass')) if body is not None and body.find('inertial') is not None else None
+        if actual is None or abs(actual-confirmed)>1e-8:
+            mass_differences.append({'body':name,'export_kg':actual,'confirmed_kg':confirmed})
+    if mass_differences:
+        blockers.append('Source CAD body masses differ from the latest confirmed inputs; use the repaired candidate with mass overrides.')
     if unassigned:
         blockers.append(f'{len(unassigned)} CAD parts are unassigned; account for each before dynamics release.')
     if not errors.size or errors.max()>cfg['audit']['closure_tolerance_m']:
@@ -178,7 +191,10 @@ def audit_model(config_path=DEFAULT_CAD_CONFIG, run_motion=True):
               'input_sha256':{key:sha256(ROOT/cfg[key]) for key in ('source_assembly','source_parts','source_export_report','mechanical_measurements')},
               'preserved':['body/joint transforms','explicit inertials','CAD mesh geometry','six closures','exported ranges'],
               'adapter_changes':['absolute mesh paths','shell compile mode','strict inertia validation','export actuator removal','contact/gravity disabled for kinematic audit'],
-              'export_mass_kg':mass,'confirmed_mass_kg':target,'mass_gap_kg':target-mass,'side_masses':sides,
+              'export_mass_kg':mass,'confirmed_mass_kg':target,
+              'mass_gap_kg':target-mass if target is not None else None,'side_masses':sides,
+              'confirmed_body_masses_kg':confirmed_bodies,'body_mass_differences':mass_differences,
+              'body_mass_inputs_sha256':sha256(ROOT/'configs/robot/measurements/rigid_bodies.csv'),
               'unassigned_part_count':len(unassigned),'nq':model.nq,'nv':model.nv,'nu':model.nu,
               'base_fixed_for_kinematic_audit':True,'closure_error_at_cad_zero_m':errors.tolist(),
               'constraint_jacobian_rank':rank,'local_motor_tangent_singular_values':tangent,

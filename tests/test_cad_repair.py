@@ -49,7 +49,11 @@ class CadRepairTests(unittest.TestCase):
             if old.get('name') in ('base_splink','base_spring link 2','right_spring_link1','right_spring_link2'):continue
             new=root.find('.//body[@name="'+old.get('name')+'"]')
             self.assertEqual(old.attrib,new.attrib)
-            self.assertEqual(old.find('inertial').attrib,new.find('inertial').attrib)
+            expected = dict(old.find('inertial').attrib)
+            overrides = {r['body']: r['confirmed_kg'] for r in self.report['body_mass_overrides']}
+            if old.get('name') in overrides:
+                expected['mass'] = format(overrides[old.get('name')], '.15g')
+            self.assertEqual(expected,new.find('inertial').attrib)
 
     def test_sliders_are_passive_and_explicitly_uncalibrated(self):
         root=ET.parse(self.path).getroot()
@@ -59,14 +63,15 @@ class CadRepairTests(unittest.TestCase):
             self.assertEqual(joint.get('type'),'slide')
             self.assertEqual(joint.get('limited'),'false')
         self.assertFalse(self.report['ready_for_training'])
-        self.assertLess(self.report['candidate_mass_kg'],8.)
+        self.assertAlmostEqual(self.report['candidate_mass_kg'],16.46345659572714,places=8)
+        self.assertIsNone(self.report['confirmed_mass_kg'])
 
     def test_independent_motion_and_135mm_stance(self):
         self.assertEqual(len(self.report['motion_samples']),24)
         self.assertTrue(self.report['motion_passed'])
         self.assertTrue(self.report['stance']['passed'])
         self.assertLess(self.report['stance']['max_closure_error_m'],1e-7)
-        for h in self.report['stance']['hip_wheel_vertical_m']:
+        for h in self.report['stance']['motor_midpoint_to_wheel_side_view_m']:
             self.assertAlmostEqual(h,.135,places=7)
 
     def test_left_closure_is_on_existing_pin_axis(self):
@@ -89,5 +94,18 @@ class CadRepairTests(unittest.TestCase):
     def test_source_hash_unchanged(self):
         from climber_legged_rl.cad_model import sha256
         self.assertEqual(self.report['source_sha256'],sha256(ROOT/'sim2sim/climber_mjcf/robot.xml'))
+
+    def test_latest_masses_are_applied_without_changing_inertia(self):
+        root=ET.parse(self.path).getroot()
+        original=ET.parse(ROOT/'sim2sim/climber_mjcf/robot.xml').getroot()
+        expected={'base':12.7,'left_link 3':.54,'right_link 3':.54,'left_link2':.89,'right_link2':.89}
+        for name,mass in expected.items():
+            new=root.find(f'.//body[@name="{name}"]/inertial')
+            old=original.find(f'.//body[@name="{name}"]/inertial')
+            self.assertAlmostEqual(float(new.get('mass')),mass)
+            self.assertEqual({k:v for k,v in new.attrib.items() if k!='mass'},
+                             {k:v for k,v in old.attrib.items() if k!='mass'})
+        self.assertIn('body_mass_inputs',self.report['source_input_sha256'])
+        self.assertFalse(self.report['ready_for_training'])
 
 if __name__=='__main__':unittest.main()

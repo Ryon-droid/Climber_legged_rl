@@ -36,9 +36,10 @@ def main() -> None:
             return torch.clamp(self.output(self.layers(obs)),-1.0,1.0)
 
     actor=Actor(policy).eval()
-    traced=torch.jit.trace(actor,torch.zeros((1,24),dtype=torch.float32))
+    observation_dim=policy.observation_space.shape[0]
+    traced=torch.jit.trace(actor,torch.zeros((1,observation_dim),dtype=torch.float32))
     rng=np.random.default_rng(2026)
-    observations=rng.uniform(-10,10,(128,24)).astype(np.float32)
+    observations=rng.uniform(-10,10,(128,observation_dim)).astype(np.float32)
     expected,_=policy.predict(observations,deterministic=True)
     with torch.no_grad():
         actual=traced(torch.from_numpy(observations)).numpy()
@@ -52,7 +53,7 @@ def main() -> None:
         for _ in range(100):
             expected,_=policy.predict(obs,deterministic=True)
             with torch.no_grad():
-                actual=traced(torch.from_numpy(obs).reshape(1,24)).numpy()[0]
+                actual=traced(torch.from_numpy(obs).reshape(1,observation_dim)).numpy()[0]
             trajectory_error=max(trajectory_error,float(np.abs(expected-actual).max()))
             obs,_,done,truncated,_=env.step(actual)
             if done or truncated:
@@ -61,7 +62,7 @@ def main() -> None:
             raise RuntimeError("Trajectory export parity failed")
         contract={
             "simulation_only":True,"hardware_deployment_permitted":False,
-            "format":"TorchScript","dtype":"float32","input_shape":[1,24],"output_shape":[1,6],
+            "format":"TorchScript","dtype":"float32","input_shape":[1,observation_dim],"output_shape":[1,6],
             "observation_clip":[-10,10],
             "observations_in_order":[
                 {"name":"base_ang_vel","size":3,"scale":0.25,"unit":"rad/s"},
@@ -80,6 +81,11 @@ def main() -> None:
             "random_observation_max_abs_error":max_error,
             "trajectory_max_abs_error":trajectory_error,
             "warning":"Not ONNX/CubeAI conversion. Hardware axes/encoders, spring, limits and inertias are uncalibrated."}
+        if env.stationary_hold:
+            contract['observations_in_order'].extend([
+                {"name":"reset_position_error_in_body_xy","size":2,"scale":5.0,"unit":"m"},
+                {"name":"heading_error_sin_cos_minus_one","size":2,"scale":1.0},
+                {"name":"body_planar_velocity","size":2,"scale":2.0,"unit":"m/s"}])
     finally:
         env.close()
     args.output.mkdir(parents=True,exist_ok=True)

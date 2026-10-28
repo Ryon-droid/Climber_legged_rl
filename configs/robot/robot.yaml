@@ -10,7 +10,7 @@ robot:
   source_usdz: assets/robot/source/climber_openusd.usdz
   mjcf_model_file: sim2sim/climber_mjcf/robot.xml
   mechanical_measurements_file: configs/robot/mechanical_measurements.yaml
-  total_mass_kg: 15.0 # latest mechanical screenshot confirms complete model, excluding screws; MJCF not reconciled
+  total_mass_kg: null # sum complete per-body inputs; current five-body subtotal is 15.56 kg
   base_link: null # TODO
   bilateral_symmetry_confirmed: true # user: physical left/right mechanisms mirror
   expected_wheel_joint_names:

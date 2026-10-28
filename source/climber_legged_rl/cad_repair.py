@@ -1,6 +1,6 @@
 """Reconstruct CAD gas-spring geometry as a hinge/slider diagnostic candidate.
 
-No hardware stroke/force or 15 kg mass distribution is invented. Explicit
+No hardware stroke/force or unspecified mass distribution is invented. Explicit
 spring inertials are recomputed using the source export's inferred density,
 strictly to preserve the provenance of the uncalibrated geometric model.
 """
@@ -59,8 +59,14 @@ def fit_axis(triangles):
     return axis
 
 
-def solve_positions(model, prescribed=None, height=None, initial=None, continuity=False):
+def solve_positions(model, prescribed=None, height=None, initial=None, continuity=False, stance_physics=None):
     data=mujoco.MjData(model)
+    if stance_physics:
+        from .stance_geometry import motor_midpoints_in_base, wheel_centers_in_wheel_bodies, virtual_leg_geometry
+        from .chassis_frame import frame_from_mounting_plate
+        midpoint,_=motor_midpoints_in_base(model,stance_physics)
+        wheel_centers=wheel_centers_in_wheel_bodies(model,stance_physics)
+        frame=frame_from_mounting_plate(model,stance_physics['chassis_reference_mesh'])
     motor_names=['left_link1_joint','left_link_rear_1_joint','right_link1_joint','right_rear_link1_joint']
     wheels=['left_link 3_joint','right_link 3_joint']
     fixed={int(model.joint(n).qposadr[0]):0.0 for n in wheels}
@@ -93,11 +99,17 @@ def solve_positions(model, prescribed=None, height=None, initial=None, continuit
             values.append(np.array([data.body(s+'_link1').xpos[2]-data.body(s+'_link 3').xpos[2]-height for s in ('left','right')])*1000)
             q=[data.qpos[int(model.joint(n).qposadr[0])] for n in motor_names]
             values.append((np.array(q[:2])-q[2:])*0.1)
+        if stance_physics:
+            length=virtual_leg_geometry(model,data,midpoint,wheel_centers,frame)['side_view_distance_m']
+            values.append((length-stance_physics['rest_motor_midpoint_to_wheel_center_m'])*1000)
+            q=np.array([data.qpos[int(model.joint(n).qposadr[0])] for n in motor_names])
+            values.append((q[:2]-q[2:])*.1)
+            values.append(data.qpos[indices]*1e-6)
         if continuity:
             values.append((data.qpos[indices]-initial[indices])*0.001)
         return np.concatenate(values)
     fit=least_squares(residual,np.clip(initial[indices],np.array(low)+1e-10,np.array(high)-1e-10),
-                      bounds=(low,high),max_nfev=1200,ftol=1e-12,xtol=1e-12,gtol=1e-11)
+                      bounds=(low,high),max_nfev=2400 if stance_physics else 1200,ftol=1e-12,xtol=1e-12,gtol=1e-9 if stance_physics else 1e-11)
     residual(fit.x)
     return data,fit
 
@@ -191,6 +203,17 @@ def build_repaired(config_path=DEFAULT_REPAIR_CONFIG):
         geometry_checks.append({'side':side,'lower_pin_source_m':lo.tolist(),'upper_pin_source_m':hi.tolist(),
                                 'pin_distance_at_cad_zero_m':float(np.linalg.norm(hi-lo)),
                                 'axis_from_cad_pins':direction.tolist()})
+    from .physical_inputs import load_body_masses
+    body_masses = load_body_masses(ROOT / cfg['physical_data_availability']['identification_directory'])
+    source_input_hashes['body_mass_inputs'] = sha256(ROOT / cfg['physical_data_availability']['identification_directory'] / 'rigid_bodies.csv')
+    mass_overrides = []
+    for name, mass in body_masses.items():
+        body = root.find(f'.//body[@name="{name}"]')
+        if body is None or body.find('inertial') is None:
+            raise ValueError('Confirmed mass has no matching repaired body: ' + name)
+        inertial = body.find('inertial')
+        mass_overrides.append({'body': name, 'previous_kg': float(inertial.get('mass')), 'confirmed_kg': mass})
+        inertial.set('mass', format(mass, '.15g'))
     output=ROOT/cfg['output_directory'];output.mkdir(parents=True,exist_ok=True)
     root.set('model','climber_CAD_REPAIRED_KINEMATIC_CANDIDATE')
     world=root.find('worldbody')
@@ -218,15 +241,36 @@ def build_repaired(config_path=DEFAULT_REPAIR_CONFIG):
             motion.append({'joint':name,'delta_rad':delta,'max_closure_error_m':error,'passed':bool(fit.success and error<1e-4),
                            'slide_displacements_m':{s:float(d.qpos[int(model.joint(s+'_gas_slide_joint').qposadr[0])]) for s in ('left','right')}})
     measurements=yaml.safe_load((ROOT/cfg['mechanical_measurements']).read_text())
-    height=measurements['geometry']['nominal_standing_pose']['hip_to_wheel_vertical_separation_m']
-    stance,fit=solve_positions(model,height=height)
+    pose_measurements=measurements['geometry']['nominal_standing_pose']
+    height=pose_measurements.get('hip_to_wheel_vertical_separation_m')
+    stance_physics=None
+    if pose_measurements.get('motor_axis_midpoint_to_wheel_center_distance_m'):
+        if pose_measurements.get('distance_projection')!='side_view_ignore_lateral_installation_offset':
+            raise ValueError('Standing length measurement needs an explicit side-view definition')
+        stance_physics={'chassis_reference_mesh':'part_151_solid_151',
+            'motor_center_reference_meshes':pose_measurements['motor_center_reference_meshes'],
+            'wheel_center_reference_meshes':{'left':'part_515_solid_515','right':'part_346_solid_346'},
+            'rest_motor_midpoint_to_wheel_center_m':pose_measurements['motor_axis_midpoint_to_wheel_center_distance_m']}
+    stance,fit=solve_positions(model,height=height,stance_physics=stance_physics)
     heights=[float(stance.body(s+'_link1').xpos[2]-stance.body(s+'_link 3').xpos[2]) for s in ('left','right')]
     stance_error=float(np.linalg.norm(closure_vectors(model,stance),axis=1).max())
     stance_report={'target_hip_wheel_vertical_m':height,'hip_wheel_vertical_m':heights,'max_closure_error_m':stance_error,
-                   'passed':bool(fit.success and stance_error<1e-4 and max(abs(h-height) for h in heights)<.003),
+                   'passed':bool(fit.success and stance_error<1e-4 and (height is None or max(abs(h-height) for h in heights)<.003)),
                    'qpos':stance.qpos.tolist(),'motor_positions_rad':{n:float(stance.qpos[int(model.joint(n).qposadr[0])]) for n in motor_names},
                    'spring_pin_distances_m':{s:float(np.linalg.norm(stance.site(s+'_gas_rod_pin').xpos-stance.body(s+'_gas_cylinder').xpos)) for s in ('left','right')},
                    'note':'Numerical pose only. Unknown physical spring travel and encoder zeros remain unresolved.'}
+    if stance_physics:
+        from .stance_geometry import motor_midpoints_in_base, wheel_centers_in_wheel_bodies, virtual_leg_geometry
+        from .chassis_frame import frame_from_mounting_plate
+        midpoint,evidence=motor_midpoints_in_base(model,stance_physics)
+        wheel_centers=wheel_centers_in_wheel_bodies(model,stance_physics)
+        frame=frame_from_mounting_plate(model,stance_physics['chassis_reference_mesh'])
+        geometry=virtual_leg_geometry(model,stance,midpoint,wheel_centers,frame)
+        stance_report['motor_midpoint_to_wheel_side_view_m']=geometry['side_view_distance_m'].tolist()
+        stance_report['target_motor_midpoint_to_wheel_side_view_m']=stance_physics['rest_motor_midpoint_to_wheel_center_m']
+        stance_report['motor_center_evidence']=evidence
+        stance_report['passed'] &= bool(np.max(abs(geometry['side_view_distance_m']-stance_physics['rest_motor_midpoint_to_wheel_center_m']))<.003)
+        stance_report['target_hip_wheel_vertical_m']=None
     pose=root.find('keyframe')
     if pose is not None:root.remove(pose)
     if stance_report['passed']:
@@ -243,12 +287,14 @@ def build_repaired(config_path=DEFAULT_REPAIR_CONFIG):
             'source_export_mass_kg':float(original.body_mass.sum()),'candidate_mass_kg':float(model.body_mass.sum()),
             'confirmed_mass_kg':measurements['mass']['total_mass_for_simulation_kg'],
             'restored_part_ids':['part_433'],'remaining_unassigned_part_count':len(set(parts)-{pid for link in assembly['links'] for pid in link['part_ids']}-{'part_433'}),
-            'blockers':['Per-body mass, COM and inertia are not physically reconciled to 15 kg.',
+            'body_mass_overrides': mass_overrides,
+            'mass_properties_status': 'Confirmed masses applied; inherited COM/inertia remain uncalibrated and unscaled.',
+            'blockers':['Remaining per-body masses and body COM/inertia still require physical reconciliation.',
                         'Spring travel, force-length curve, damping and mount reconstruction still require physical/CAD review.',
                         'Remaining 72 unassigned parts require body/material review.',
                         'Contacts, floating-base dynamics and actual six-channel actuator envelopes are not validated.'],
             'kinematic_only_settings':{'base_fixed':True,'gravity_disabled':True,'collisions_disabled':True,'slide_limits_unknown':True,'spring_force_omitted':True},
-            'scope':'Repair candidate for kinematics, with actual CAD geometry; never a certified 15 kg training model.'}
+            'scope':'Repair candidate for kinematics with confirmed mass overrides; COM/inertia and dynamics are not released.'}
     if sha256(source)!=source_hash:raise RuntimeError('Original CAD was modified')
     (output/'repair_report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
     (output/'status.json').write_text(json.dumps({'state':'kinematic_candidate_validated' if report['motion_passed'] and stance_report['passed'] else 'kinematic_validation_failed','training_permitted':False,'source_preserved':True},indent=2))

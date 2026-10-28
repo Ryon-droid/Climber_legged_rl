@@ -18,6 +18,9 @@ class ReadinessTests(unittest.TestCase):
         self.assertEqual(info["missing_meshes"], [])
         self.assertGreater(info["exported_mass_kg"], 0)
         self.assertGreater(info["mesh_count"], 0)
+        self.assertIsNone(info['confirmed_total_mass_kg'])
+        self.assertEqual(info['confirmed_body_masses_kg']['base'],12.7)
+        self.assertEqual(len(info['body_mass_mismatches']),5)
 
     def test_missing_wheel_actuators_and_fixed_base_are_detected(self):
         xml = '<mujoco><worldbody><body name="base"><inertial mass="2"/></body></worldbody><actuator><motor joint="left_link1_joint"/></actuator></mujoco>'

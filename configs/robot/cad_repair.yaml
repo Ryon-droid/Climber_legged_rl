@@ -31,7 +31,7 @@ required_physical_inputs:
 
 physical_data_availability:
   recorded_at: 2026-10-27
-  per_body_mass_com_inertia: unavailable_user_confirmed
+  per_body_mass_com_inertia: five_body_masses_confirmed_com_inertia_pending
   spring_manufacturer_specification: seller_declined_to_provide_user_confirmed
   identification_directory: configs/robot/measurements
   do_not_infer_95_65_meaning: true

@@ -29,7 +29,7 @@ def run(config_path=DEFAULT_CONFIG, steps=1000):
         for i in range(steps):
             action = np.zeros(6) if mode == "zero" else rng.uniform(-1,1,6)
             obs,reward,terminated,truncated,info=env.step(action)
-            assert obs.shape == (24,) and env.observation_space.contains(obs)
+            assert obs.shape == env.observation_space.shape and env.observation_space.contains(obs)
             assert np.isfinite(reward)
             maximum_closure = max(maximum_closure,info["closure_error_m"])
             saw_contact |= info["wheel_contacts"] > 0
@@ -47,6 +47,9 @@ def run(config_path=DEFAULT_CONFIG, steps=1000):
             "config_sha256":hashlib.sha256(Path(config_path).read_bytes()).hexdigest(),
             "model_sha256":hashlib.sha256((folder/"robot_experiment.xml").read_bytes()).hexdigest(),
             "env_sha256":hashlib.sha256((ROOT/"source/climber_legged_rl/mujoco_env.py").read_bytes()).hexdigest()}
+    if config['experiment'].get('model_route')=='cad_dynamics':
+        from climber_legged_rl.cad_dynamics import input_hashes
+        report['input_sha256']=input_hashes(config_path)
     (folder/"smoke_report.json").write_text(json.dumps(report,indent=2),encoding="utf-8")
     print(json.dumps(report,indent=2))
     return report

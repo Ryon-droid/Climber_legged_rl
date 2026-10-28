@@ -16,6 +16,8 @@ import sys
 import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'source'))
+from climber_legged_rl.physical_inputs import load_body_masses
 LEG_JOINTS = (
     "left_link1_joint", "left_link_rear_1_joint",
     "right_link1_joint", "right_rear_link1_joint",
@@ -52,6 +54,14 @@ def inspect_model(root: ET.Element, model_path: Path) -> dict:
     mapped = {a.get("joint") for a in actuators}
     mesh_paths = [model_path.parent / m.get("file", "") for m in root.findall("./asset/mesh")]
     mass = sum(float(i.get("mass", "0")) for i in root.findall(".//body/inertial"))
+    confirmed_bodies = load_body_masses()
+    body_names = {b.get('name') for b in root.findall('.//body')}
+    mismatches = []
+    for name, expected in confirmed_bodies.items():
+        body = root.find(f'.//body[@name="{name}"]')
+        actual = float(body.find('inertial').get('mass')) if body is not None and body.find('inertial') is not None else None
+        if actual is None or abs(actual-expected)>1e-8:
+            mismatches.append({'body':name,'model_kg':actual,'confirmed_kg':expected})
     return {
         "sha256": hashlib.sha256(model_path.read_bytes()).hexdigest(),
         "base_body": base.get("name"),
@@ -65,8 +75,10 @@ def inspect_model(root: ET.Element, model_path: Path) -> dict:
         "mesh_count": len(mesh_paths),
         "missing_meshes": [str(p) for p in mesh_paths if not p.is_file()],
         "exported_mass_kg": mass,
-        "confirmed_total_mass_kg": 15.0,
-        "mass_note": "15 kg is user-confirmed; no scaling or redistribution is applied.",
+        "confirmed_total_mass_kg": sum(confirmed_bodies.values()) if set(confirmed_bodies)==body_names else None,
+        "confirmed_body_masses_kg": confirmed_bodies,
+        "body_mass_mismatches": mismatches,
+        "mass_note": "Latest per-body masses are authoritative; no previous total/side constraint or mass normalization.",
     }
 
 
@@ -110,11 +122,31 @@ def check_dynamics(root: ET.Element, model_path: Path) -> dict:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--backend", choices=["cad","cad-repaired","isaaclab","mujoco"], default="cad")
+    parser.add_argument("--backend", choices=["cad","cad-repaired","cad-dynamics","isaaclab","mujoco"], default="cad")
     parser.add_argument("--dynamics", action="store_true")
     parser.add_argument("--output", type=Path)
     parser.add_argument("--config", type=Path, help="Configuration for the CAD route")
     args = parser.parse_args()
+    if args.backend == 'cad-dynamics':
+        from climber_legged_rl.cad_dynamics import DEFAULT_DYNAMICS_CONFIG, validate_artifacts
+        report={'backend':'cad-dynamics','simulation_only':True,'hardware_ready':False,
+                'training_started_by_this_check':False,'blockers':[]}
+        try:
+            model,smoke=validate_artifacts(args.config or DEFAULT_DYNAMICS_CONFIG)
+            report.update(total_mass_kg=model['total_mass_kg'],nu=model['nu'],closures=model['closures'],
+                          rest_height_hip_above_wheel_m=model['rest_height_hip_above_wheel_m'],
+                          assumptions=model['approximations'],smoke_passed=smoke['passed'])
+            if 'standing_geometry' in model:
+                report['standing_geometry']=model['standing_geometry']
+        except (OSError,KeyError,ValueError,RuntimeError) as exc:
+            report['blockers'].append(str(exc))
+        report['ready_for_training']=not report['blockers']
+        serialized=json.dumps(report,ensure_ascii=False,indent=2)
+        print(serialized)
+        if args.output:
+            args.output.parent.mkdir(parents=True,exist_ok=True)
+            args.output.write_text(serialized+chr(10),encoding='utf-8')
+        return 0 if report['ready_for_training'] else 2
     if args.backend == "cad-repaired":
         sys.path.insert(0, str(ROOT/"source"))
         from climber_legged_rl.cad_repair import build_repaired, DEFAULT_REPAIR_CONFIG
@@ -193,8 +225,8 @@ def main() -> int:
         blockers.append("Exported actuators do not match four leg motors plus two wheel motors.")
     if info["missing_meshes"]:
         blockers.append("Referenced mesh files are missing.")
-    if abs(info["exported_mass_kg"] - info["confirmed_total_mass_kg"]) > 0.1:
-        blockers.append("Exported mass disagrees with confirmed mass; reconcile or explicitly approve an approximate experiment.")
+    if info['body_mass_mismatches']:
+        blockers.append('Model body masses disagree with the latest confirmed per-body inputs.')
     report = {"training_started": False, "python": sys.executable, "modules": modules,
               "placeholder_locations": placeholders, "model": info, "blockers": blockers,
               "warnings": ["Original USD and latest MJCF are not verified as synchronized.",

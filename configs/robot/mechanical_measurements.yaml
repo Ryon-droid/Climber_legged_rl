@@ -1,4 +1,4 @@
-# Source measurements only; not applied to MJCF inertials or a running simulator.
+# Confirmed masses are applied to the repaired kinematic MJCF; COM/inertia remain uncalibrated.
 # SI conversions preserve source scope/ambiguities. No curve fitting performed.
 source:
   document: /home/lsx/下载/机械数据.docx
@@ -7,33 +7,31 @@ source:
   firmware_conflicts_are_reference_only: true
 
 mass:
-  user_reported_chassis_mass_kg: 15.0 # original wording; scope clarified below
-  user_reported_mass_scope: complete_provided_model # user clarified: entire supplied model
-  latest_mechanical_update_2026_10_19:
-    one_side_leg_kg: 5.14 # latest user: complete side assembly including wheel and motors
-    both_sides_kg: 10.28 # 2 x 5.14; not additional to total
-    full_model_kg: 15.0 # excludes screws according to screenshot
-    screws_included: false
-    chain_removed_from_export: true # screenshot: chain omitted because difficult to export
-    chain_omission_reported_as_mass_gap_cause: true # user explanation; not yet quantitatively verified
-    chain_mass_each_side_kg: null # mass is included in quoted totals but its individual value remains unknown
-    exported_left_side_mass_kg: 0.8563198106 # latest MJCF, summed over base left child branches
-    exported_right_side_mass_kg: 1.153994436 # latest MJCF, summed over base right child branches
-    left_side_mass_gap_kg: 4.2836801894 # 5.14 - exported left side; not a chain weight estimate
-    right_side_mass_gap_kg: 3.986005564 # 5.14 - exported right side; not a chain weight estimate
-    wheel_assembly_in_one_side_leg: true # included; do not add 0.52 kg again
-    chain_mass_in_one_side_leg_quote: true # user confirmed each 5.14 kg side includes chain
-    chain_mass_in_full_model_quote: true # user confirmed 15 kg total includes chain
-    motor_mass_in_one_side_leg: true # user says all side parts included
-    remaining_non_side_assembly_mass_kg: 4.72 # 15 - 2*5.14; not automatically MJCF base mass
-    applied_to_mjcf: false
-  wheel_assembly_each_kg: 0.52 # document: includes wheel motor/gearbox
-  leg_each_kg: 2.87 # historical document value, superseded by newer 5.14 kg quote; not current input
-  right_leg_basis: reported_single_leg_value_and_bilateral_symmetry
-  central_body_kg: 8.3 # historical document value; cannot combine with newer 5.14 kg side-leg quote
-  component_sum_kg: 15.08 # historical 2*0.52 + 2*2.87 + 8.3; not the new breakdown
-  total_mass_for_simulation_kg: 15.0 # confirmed total target; not yet applied to MJCF
-  component_sum_minus_confirmed_total_kg: 0.08 # preserve source difference; cause unverified
+  latest_body_mass_update_2026_10_28:
+    source: user_confirmation_2026_10_28
+    source_statement: 'bas主体刚体是12.7kg，左右轮部刚体是540g，左右link2是890g'
+    body_name_normalization: {bas: base}
+    bilateral_values_are_each_body: true
+    body_masses_kg:
+      base: 12.7
+      'left_link 3': 0.54
+      'right_link 3': 0.54
+      left_link2: 0.89
+      right_link2: 0.89
+    confirmed_body_count: 5
+    confirmed_body_mass_subtotal_kg: 15.56 # only these five distinct bodies
+    status: authoritative_user_confirmed
+    replaces_previous_mass_values: true
+    full_model_total_mass_kg: null # no revised whole-model total supplied
+    precedence: latest_body_masses_override_older_values_for_these_same_bodies
+    com_and_inertia_supplied: false
+    applied_to_mjcf: true # repaired kinematic candidate mass only; source CAD exports are not rewritten
+    inertia_update_policy: retain_existing_uncalibrated_values_without_scaling
+    identification_table: configs/robot/measurements/rigid_bodies.csv
+  total_mass_for_simulation_kg: null # derive from all body masses once supplied; no old total constraint
+  side_total_kg: null # no aggregate side mass constraint
+  chain_removed_from_export: true
+  chain_mass_each_side_kg: null
   per_link_mass_distribution_verified: false # individual link inertials still unverified
 
 geometry:
@@ -45,13 +43,21 @@ geometry:
   body_com_offset_vector_m: null # scalar is insufficient for 3D COM and sign
   virtual_leg_length_definition: midpoint_of_front_rear_hip_axes_to_wheel_center
   nominal_standing_pose:
-    source: user_annotated_standing_diagram_2026_10_19
+    source: user_clarification_2026_10_28_motor_midpoint
+    source_statement: '两个电机轴心连线的中点到轮毂中心为 0.135 米'
     pose_role: normal_standing # confirmed by user; not a joint-angle calibration
-    hip_to_wheel_vertical_separation_m: 0.135
-    dimension_interpretation: left_link1_joint_axis_to_left_link3_joint_axis_vertical_distance
-    dimension_interpretation_basis: drawn_dimension_endpoints # not a ground-contact dimension
+    motor_axis_midpoint_to_wheel_center_distance_m: 0.135
+    distance_projection: side_view_ignore_lateral_installation_offset # explicit user confirmation
+    motor_center_reference_meshes:
+      left: [part_439_surface_shell_439, part_449_surface_shell_449]
+      right: [part_270_surface_shell_270, part_280_surface_shell_280]
+    motor_center_reference_basis: concentric_cad_motor_housing_side_view_circle_fit
+    driven_joint_origins_are_not_physical_motor_centers: true
+    hip_to_wheel_vertical_separation_m: null # previous 135 mm vertical interpretation withdrawn
+    dimension_interpretation: midpoint_of_two_physical_motor_axes_to_wheel_hub_center
+    dimension_interpretation_basis: explicit_user_confirmation_2026_10_28
     hip_to_wheel_horizontal_offset_m: null # sketch is not a scaled CAD measurement
-    hip_axis_height_above_ground_estimate_m: 0.190 # 0.135 + loaded radius 0.055 on level ground
+    hip_axis_height_above_ground_estimate_m: null # 135 mm is a distance, not a vertical height
     base_origin_height_above_ground_m: null # base-to-hip transform still required
     body_ground_clearance_m: null # underside-to-ground distance is not marked
     active_joint_positions_rad: null # height alone does not determine all four joint angles

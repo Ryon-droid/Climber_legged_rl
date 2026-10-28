@@ -1,0 +1,148 @@
+# First light horizontal-push curriculum; simulation choices, not competition force specifications.
+control:
+  decimation: 10
+  leg_action_scale_rad: 0.25
+  leg_joints:
+  - left_link1_joint
+  - left_link_rear_1_joint
+  - right_link1_joint
+  - right_rear_link1_joint
+  leg_kd: 1.0
+  leg_kp: 20.0
+  leg_speed_limit_rad_s: 15.0
+  leg_torque_limit_Nm: 10.0
+  wheel_action_scale_rad_s: 10.0
+  wheel_joints:
+  - left_link 3_joint
+  - right_link 3_joint
+  wheel_kv: 0.2
+  wheel_speed_limit_rad_s: 30.0
+  wheel_torque_limit_Nm: 2.0
+experiment:
+  approximation_notes:
+  - Actual repaired CAD geometry and six closures retained. Latest five masses used;
+    no total/side normalization.
+  - Inherited COM/inertia and other masses accepted as current simulation parameters,
+    not bench identified.
+  - 450 N nominal spring modeled as constant extension force; force curve/stroke/damping
+    unknown.
+  - Controller gains, damping, armature, friction and output limits are simulation
+    settings.
+  - Standing reference is the physical motor-axis midpoint to wheel-center side-view
+    distance of 135 mm, with chassis mounting plate horizontal.
+  backend: mujoco
+  model_route: cad_dynamics
+  output_directory: outputs/cad_dynamics_round6_push
+  simulation_only: true
+  source_model: outputs/cad_repaired/robot_cad_repaired.xml
+mass:
+  method: preserve_repaired_body_inertials_no_scaling
+physics:
+  active_armature: 0.002
+  base_collision_half_extents_m:
+  - 0.12
+  - 0.09
+  - 0.035
+  chassis_reference_mesh: part_151_solid_151
+  ik_max_closure_error_m: 0.0001
+  ik_max_height_error_m: 0.003
+  ik_seed: 42
+  joint_damping: 0.05
+  motor_center_reference_meshes:
+    left:
+    - part_439_surface_shell_439
+    - part_449_surface_shell_449
+    right:
+    - part_270_surface_shell_270
+    - part_280_surface_shell_280
+  passive_armature: 0.0001
+  reset_clearance_m: 0.002
+  rest_motor_midpoint_to_wheel_center_m: 0.135
+  solver_iterations: 100
+  standing_distance_definition: motor_midpoint_to_wheel_center_side_view
+  timestep: 0.001
+  wheel_center_reference_meshes:
+    left: part_515_solid_515
+    right: part_346_solid_346
+  wheel_friction: 0.8
+  wheel_radius_m: 0.056
+reward:
+  action_rate: 0.02
+  alive: 0.5
+  angular_velocity: 0.1
+  fall_penalty: 20.0
+  heading_hold: 1.5
+  joint_speed: 0.0001
+  linear_tracking: 2.0
+  normalized_effort: 0.01
+  position_hold: 2.0
+  upright: 6.0
+  virtual_leg_length: 2.0
+  yaw_tracking: 1.5
+spring:
+  force_N: 450.0
+  model: constant_extension_force_at_reconstructed_pin_sites
+  physical_curve_verified: false
+task:
+  command_forward_m_s:
+  - 0.0
+  - 0.0
+  command_yaw_rad_s:
+  - 0.0
+  - 0.0
+  episode_seconds: 30.0
+  heading_sigma_rad: 0.08726646259971647
+  linear_tracking_sigma_m_s: 0.05
+  position_sigma_m: 0.05
+  reset_tilt_std_rad: 0.008
+  reset_velocity_std: 0.005
+  stationary_hold: true
+  stationary_max_displacement_m: 0.05
+  stationary_max_heading_rad: 0.08726646259971647
+  terminate_base_height_m: 0.075
+  terminate_max_closure_error_m: 0.01
+  terminate_tilt_rad: 0.8
+  upright_sigma_rad: 0.17453292519943295
+  virtual_leg_length_sigma_m: 0.01
+  yaw_tracking_sigma_rad_s: 0.05
+training:
+  action_std: 0.035
+  actor_hidden_dims:
+  - 128
+  - 64
+  - 32
+  batch_size: 512
+  checkpoint_steps: 10000
+  clip_range: 0.2
+  critic_hidden_dims:
+  - 256
+  - 128
+  - 64
+  ent_coef: 0.0
+  gae_lambda: 0.97
+  gamma: 0.999
+  learning_rate: 3.0e-05
+  max_grad_norm: 1.0
+  n_epochs: 10
+  n_steps: 1024
+  num_envs: 8
+  seed: 47
+  total_timesteps: 2000000
+push:
+  enabled: true
+  episode_probability: 0.7
+  force_N:
+  - 2.0
+  - 5.0
+  duration_seconds:
+  - 0.1
+  - 0.2
+  interval_seconds:
+  - 8.0
+  - 12.0
+  first_push_seconds: 3.0
+  recovery_seconds: 4.0
+  settle_seconds: 0.5
+  max_transient_displacement_m: 0.2
+  max_transient_heading_rad: 0.3490658503988659
+  recovery_tilt_rad: 0.08726646259971647
