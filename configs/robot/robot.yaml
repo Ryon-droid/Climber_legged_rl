@@ -82,8 +82,10 @@ actuators:
     chain_driven_count_per_side: 1
     reduction_ratio: 9.0
     rated_torque_Nm: 20.0
-    torque_reference: null # TODO: motor shaft or gearbox output
-    torque_limit_Nm: null # TODO: confirm usable continuous/peak limits
+    torque_reference: joint_output_after_gearbox # user confirmed 2026-10-29
+    torque_limit_Nm: 20.0 # rated output, user confirmed 2026-10-29
+    peak_torque_Nm: 40.0 # peak duration and torque-speed curve remain unknown
+    peak_duration_seconds: null
     chain_transmission:
       # Ratios below refer to the additional chain AFTER the 9:1 gearbox.
       # i_chain = driven_teeth / driver_teeth; positive magnitude, direction separate.
@@ -118,8 +120,9 @@ springs:
   rod_diameter_m: 0.006 # interpreted from 15*6 notation; confirm if notation differs
   nominal_force_N: 450.0 # reported rating; reference stroke/temperature unknown
   force_direction: null # TODO: extension push / retraction pull
-  extended_mount_center_distance_m: null
-  stroke_m: null
+  extended_mount_center_distance_m: 0.220 # user-confirmed pin centers, 2026-10-29
+  stroke_m: 0.065 # 220-155 mm; minimum interpreted as 15.5 cm
+  compressed_mount_center_distance_m: 0.155 # user reply 15.5, same cm unit
   mounting_points: null # TODO: endpoint body names and local xyz, both sides
   diagram_evidence:
     # User screenshot: design names, not resolved runtime MJCF references.

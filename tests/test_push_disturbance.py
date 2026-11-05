@@ -10,6 +10,60 @@ sys.path.insert(0, str(ROOT/'source'))
 
 
 class PushTests(unittest.TestCase):
+    def test_balanced_sectors_and_oblique_force_preserve_magnitude_and_seed(self):
+        import numpy as np
+        from climber_legged_rl.push_disturbance import PushDisturbance
+        config=dict(self.config['push'],direction_mode='balanced_sectors',direction_sectors=8,
+            direction_jitter_deg=0.,elevation_deg=[-15.,15.],force_N=[8.,40.],
+            force_bands=[dict(force_N=[8.,15.],probability=.5),
+                         dict(force_N=[15.,25.],probability=.35),
+                         dict(force_N=[25.,40.],probability=.15)])
+        push=PushDisturbance(config,.01)
+        samples=[]
+        for _ in range(2):
+            push.reset(np.random.default_rng(31))
+            for i in range(8):push.force(1+100*i,1000)
+            events=push.metrics()['push_events'];samples.append(events)
+            self.assertEqual(sorted(round(e['azimuth_deg']) for e in events),list(range(0,360,45)))
+            self.assertTrue(any(e['force_world_N'][2]>0 for e in events))
+            self.assertTrue(any(e['force_world_N'][2]<0 for e in events))
+            for e in events:
+                force=np.linalg.norm(e['force_world_N']);band=config['force_bands'][e['force_band_index']]['force_N']
+                self.assertGreaterEqual(force,band[0]);self.assertLessEqual(force,band[1])
+                self.assertAlmostEqual(e['impulse_Ns'],force*e['duration_seconds'])
+                self.assertLessEqual(abs(e['elevation_deg']),15.)
+        self.assertEqual(samples[0],samples[1])
+
+    def test_invalid_direction_and_band_settings_rejected(self):
+        from climber_legged_rl.push_disturbance import PushDisturbance
+        for patch in [dict(direction_mode='unknown'),dict(direction_mode='balanced_sectors',direction_sectors=3),
+                      dict(direction_mode='balanced_sectors',direction_jitter_deg=23.),
+                      dict(elevation_deg=[20.,-20.]),dict(elevation_deg=[-46.,0.]),
+                      dict(force_bands=[]),dict(force_bands=[dict(force_N=[1.,2.],probability=1.)]),
+                      dict(force_bands=[dict(force_N=[1.,1.],probability=.9)])]:
+            with self.assertRaises(ValueError):PushDisturbance(dict(self.config['push'],**patch),.01)
+
+    def test_environment_applies_oblique_vertical_component_and_clears_it(self):
+        import yaml
+        import numpy as np
+        from climber_legged_rl.mujoco_env import ClimberMujocoEnv
+        config=copy.deepcopy(self.config)
+        config['push'].update(direction_mode='balanced_sectors',direction_sectors=8,
+                              direction_jitter_deg=0.,elevation_deg=[15.,15.])
+        with tempfile.TemporaryDirectory() as directory:
+            path=Path(directory)/'oblique.yaml';path.write_text(yaml.safe_dump(config))
+            env=ClimberMujocoEnv(ROOT/'outputs/cad_dynamics_round5/robot_experiment.xml',path)
+            try:
+                env.reset(seed=9);env.data.qpos[2]+=1.;env.data.qvel[:]=0.
+                env.step(np.zeros(6));env.step(np.zeros(6))
+                force=env.data.xfrc_applied[env.base_id,:3].copy()
+                self.assertAlmostEqual(np.linalg.norm(force),1.)
+                self.assertAlmostEqual(force[2],np.sin(np.radians(15.)))
+                np.testing.assert_array_equal(env.data.xfrc_applied[env.base_id,3:],0.)
+                env.step(np.zeros(6));env.step(np.zeros(6))
+                np.testing.assert_array_equal(env.data.xfrc_applied[env.base_id],0.)
+            finally:env.close()
+
     def setUp(self):
         import yaml
         self.config = yaml.safe_load((ROOT/'configs/robot/cad_dynamics_round6_push.yaml').read_text())

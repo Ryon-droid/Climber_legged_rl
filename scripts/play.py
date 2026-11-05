@@ -20,13 +20,16 @@ def main() -> None:
     parser.add_argument("--report",type=Path)
     parser.add_argument('--viewer',action='store_true',help='Open the interactive MuJoCo viewer')
     parser.add_argument('--loop',action='store_true',help='Repeat episodes until the viewer is closed')
+    parser.add_argument('--command-forward',type=float,help='Fixed forward command for velocity-task viewer, m/s')
+    parser.add_argument('--command-yaw',type=float,help='Fixed yaw command for velocity-task viewer, rad/s')
+    parser.add_argument('--stop-after-seconds',type=float,help='Return a fixed movement command to zero at this time')
     args=parser.parse_args()
     if args.pose_only:
         if not args.config or args.checkpoint or args.video or args.report:
             parser.error('--pose-only requires --config and cannot use --checkpoint, --video or --report')
         os.environ.setdefault('MUJOCO_GL','glfw')
         import mujoco.viewer
-        from climber_legged_rl.mujoco_env import ClimberMujocoEnv
+        from climber_legged_rl.mujoco_env import make_mujoco_env as ClimberMujocoEnv
         from climber_legged_rl.mujoco_model import ROOT,load_config
         config=load_config(args.config)
         env=ClimberMujocoEnv(ROOT/config['experiment']['output_directory']/'robot_experiment.xml',args.config)
@@ -58,6 +61,11 @@ def main() -> None:
         parser.error('--loop requires --viewer')
     if args.viewer and args.video:
         parser.error('Choose --viewer or --video')
+    fixed_command=args.command_forward is not None or args.command_yaw is not None
+    if (fixed_command or args.stop_after_seconds is not None) and not args.viewer:
+        parser.error('Command overrides require --viewer')
+    if args.stop_after_seconds is not None and not fixed_command:
+        parser.error('--stop-after-seconds requires a fixed movement command')
     os.environ.setdefault("MUJOCO_GL",'glfw' if args.viewer else 'egl')
     from climber_legged_rl.mujoco_training import evaluate
     directory=args.checkpoint.resolve().parent
@@ -69,8 +77,15 @@ def main() -> None:
         import mujoco.viewer
         import numpy as np
         from stable_baselines3 import PPO
-        from climber_legged_rl.mujoco_env import ClimberMujocoEnv
+        from climber_legged_rl.mujoco_env import make_mujoco_env as ClimberMujocoEnv
         env=ClimberMujocoEnv(model_path,config_path)
+        velocity_task=env.config['task'].get('velocity_tracking',False)
+        if fixed_command and not velocity_task:
+            env.close()
+            parser.error('Fixed movement commands require a velocity-task checkpoint')
+        reset_options={'velocity_command':[args.command_forward or 0.,args.command_yaw or 0.]} if fixed_command else None
+        if args.stop_after_seconds is not None:
+            reset_options['stop_after_seconds']=args.stop_after_seconds
         if args.horizon_seconds is not None:
             env.max_steps=int(np.ceil(args.horizon_seconds/env.dt))
         policy=PPO.load(str(args.checkpoint),device='cpu')
@@ -85,12 +100,20 @@ def main() -> None:
                 viewer.opt.geomgroup[1]=int(env.cad_dynamics)
                 episode=0
                 while viewer.is_running() and (args.loop or episode<args.episodes):
-                    obs,_=env.reset(seed=args.seed+episode)
+                    obs,_=env.reset(seed=args.seed+episode,options=reset_options)
                     print('PLAYBACK_EPISODE='+str(episode+1),flush=True)
                     deadline=time.monotonic()
+                    last_command=None
                     while viewer.is_running():
+                        if velocity_task:
+                            command=tuple(np.round(env.commands,2))
+                            if command!=last_command and env.steps%50==0:
+                                print('COMMAND forward=%.2f m/s yaw=%.2f rad/s'%command,flush=True)
+                                last_command=command
                         action,_=policy.predict(obs,deterministic=True)
                         obs,_,done,truncated,_=env.step(action)
+                        if velocity_task:
+                            viewer.cam.lookat[:]=env.data.xpos[env.base_id]
                         viewer.sync()
                         deadline+=env.dt
                         time.sleep(max(0.,deadline-time.monotonic()))
@@ -108,7 +131,7 @@ def main() -> None:
     if args.video:
         import imageio.v2 as imageio
         from stable_baselines3 import PPO
-        from climber_legged_rl.mujoco_env import ClimberMujocoEnv
+        from climber_legged_rl.mujoco_env import make_mujoco_env as ClimberMujocoEnv
         env=ClimberMujocoEnv(model_path,config_path,render_mode="rgb_array")
         if args.horizon_seconds is not None:
             import numpy as np

@@ -1,4 +1,4 @@
-"""Seeded horizontal force pulses and post-push recovery accounting."""
+"""Seeded force pulses, optional balanced directions, and recovery accounting."""
 from __future__ import annotations
 import math
 import numpy as np
@@ -24,12 +24,40 @@ class PushDisturbance:
                 raise ValueError('Push intervals must leave time for recovery')
             if config['settle_seconds'] > config['recovery_seconds']:
                 raise ValueError('Push settle time exceeds recovery deadline')
+            mode = config.get('direction_mode', 'uniform_horizontal')
+            if mode not in ('uniform_horizontal', 'balanced_sectors'):
+                raise ValueError('Unknown push direction mode')
+            if mode == 'balanced_sectors':
+                sectors = config.get('direction_sectors', 8)
+                jitter = config.get('direction_jitter_deg', 0.)
+                if type(sectors) is not int or sectors < 4 or sectors > 360:
+                    raise ValueError('Push direction sectors must be an integer in [4,360]')
+                if not np.isfinite(jitter) or not 0 <= jitter <= 180 / sectors:
+                    raise ValueError('Push direction jitter exceeds sector half-width')
+            elevation = config.get('elevation_deg')
+            if elevation is not None and (len(elevation) != 2 or not np.isfinite(elevation).all()
+                    or not -45 <= elevation[0] <= elevation[1] <= 45):
+                raise ValueError('Push elevation must be an ordered range within +/-45 degrees')
+            bands = config.get('force_bands')
+            if bands is not None:
+                if not isinstance(bands, list) or not bands:
+                    raise ValueError('Push force bands must be a nonempty list')
+                for band in bands:
+                    values = band.get('force_N', [])
+                    probability = band.get('probability', 0.)
+                    if (len(values) != 2 or not np.isfinite(values).all()
+                            or not config['force_N'][0] <= values[0] <= values[1] <= config['force_N'][1]
+                            or not np.isfinite(probability) or probability <= 0):
+                        raise ValueError('Invalid push force band')
+                if not math.isclose(sum(b['probability'] for b in bands), 1., abs_tol=1e-8):
+                    raise ValueError('Push force band probabilities must sum to one')
         self.reset(np.random.default_rng(0))
 
     def reset(self, rng):
         self.rng = rng
         self.events = []
         self.active = None
+        self.direction_order = []
         self.episode_enabled = self.enabled and rng.random() < self.config['episode_probability']
         self.next_step = math.ceil(self.config['first_push_seconds']/self.dt) if self.episode_enabled else None
 
@@ -44,13 +72,31 @@ class PushDisturbance:
             if step + duration_steps + recovery_steps > max_steps:
                 self.next_step = None
                 return force
-            magnitude = float(self.rng.uniform(*self.config['force_N']))
-            angle = self.rng.uniform(-np.pi, np.pi)
-            force[:2] = magnitude*np.array([np.cos(angle), np.sin(angle)])
+            bands = self.config.get('force_bands')
+            band_index = None
+            if bands is not None:
+                band_index = int(self.rng.choice(len(bands), p=[b['probability'] for b in bands]))
+            limits = bands[band_index]['force_N'] if bands is not None else self.config['force_N']
+            magnitude = float(self.rng.uniform(*limits))
+            if self.config.get('direction_mode') == 'balanced_sectors':
+                if not self.direction_order:
+                    self.direction_order = self.rng.permutation(self.config.get('direction_sectors', 8)).tolist()
+                sector = self.direction_order.pop()
+                angle = 2*np.pi*sector/self.config.get('direction_sectors', 8)
+                angle += np.radians(self.rng.uniform(-self.config.get('direction_jitter_deg', 0.),
+                                                     self.config.get('direction_jitter_deg', 0.)))
+            else:
+                angle = self.rng.uniform(-np.pi, np.pi)
+            elevation = np.radians(self.rng.uniform(*self.config['elevation_deg'])) if 'elevation_deg' in self.config else 0.
+            force[:2] = magnitude*np.cos(elevation)*np.array([np.cos(angle), np.sin(angle)])
+            force[2] = magnitude*np.sin(elevation)
             event = dict(start_step=step, end_step=step+duration_steps,
                          deadline_step=step+duration_steps+recovery_steps, force_world_N=force.tolist(),
                          duration_seconds=duration_steps*self.dt, impulse_Ns=magnitude*duration_steps*self.dt,
                          recovered=False, recovery_seconds=None, settled_steps=0)
+            if bands is not None or self.config.get('direction_mode') == 'balanced_sectors' or 'elevation_deg' in self.config:
+                event.update(azimuth_deg=float(np.degrees(angle) % 360),
+                             elevation_deg=float(np.degrees(elevation)),force_band_index=band_index)
             self.events.append(event)
             self.active = event
             self.next_step = step + math.ceil(self.rng.uniform(*self.config['interval_seconds'])/self.dt)

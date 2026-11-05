@@ -34,6 +34,25 @@ mass:
   chain_mass_each_side_kg: null
   per_link_mass_distribution_verified: false # individual link inertials still unverified
 
+leg_joint_output_torque:
+  source: user_confirmation_2026_10_29
+  source_statement: 额定20峰值40
+  reference: joint_output_after_gearbox
+  rated_Nm: 20.0
+  peak_Nm: 40.0
+  peak_duration_seconds: null
+  torque_speed_curve_verified: false
+
+gas_spring_travel:
+  source: user_confirmation_2026_10_29
+  maximum_statement: 完全伸长销轴中心距22厘米
+  minimum_statement: 最短15.5，沿用厘米单位
+  eye_center_distance_min_m: 0.155
+  eye_center_distance_max_m: 0.220
+  stroke_m: 0.065
+  sides: [left, right]
+  bilateral_same_limits_assumed: true
+
 geometry:
   nominal_wheel_radius_m: 0.056 # earlier user message
   loaded_effective_wheel_radius_m: 0.055 # document final summary

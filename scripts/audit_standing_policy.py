@@ -8,15 +8,16 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'source'))
 
 import numpy as np
 from stable_baselines3 import PPO
-from climber_legged_rl.mujoco_env import ClimberMujocoEnv
+from climber_legged_rl.mujoco_env import make_mujoco_env as ClimberMujocoEnv
 
 
-def audit(checkpoint,config_path=None,episodes=5,horizon_seconds=30,seed=81000):
+def audit(checkpoint,config_path=None,episodes=5,horizon_seconds=30,seed=81000,model_path=None):
     checkpoint=Path(checkpoint).resolve()
     folder=checkpoint.parent.parent if checkpoint.parent.name in ('best','checkpoints') else checkpoint.parent
     config_path=Path(config_path or folder/'config.yaml').resolve()
     policy=PPO.load(checkpoint,device='cpu')
-    env=ClimberMujocoEnv(folder/'robot_experiment.xml',config_path)
+    model_path=Path(model_path or folder/'robot_experiment.xml').resolve()
+    env=ClimberMujocoEnv(model_path,config_path)
     env.max_steps=int(np.ceil(horizon_seconds/env.dt))
     records=[]
     try:
@@ -80,11 +81,16 @@ def audit(checkpoint,config_path=None,episodes=5,horizon_seconds=30,seed=81000):
                     if env.push.enabled:
                         records[-1]['push_metrics']=info['push_metrics']
                         records[-1]['push_recovery_success']=info['push_recovery_success']
+                    if 'getup_metrics' in info:
+                        records[-1]['getup_metrics']=info['getup_metrics']
+                        records[-1]['combined_success']=info['combined_success']
                     break
     finally:env.close()
     return {'checkpoint':str(checkpoint),'checkpoint_timesteps':policy.num_timesteps,
             'checkpoint_sha256':hashlib.sha256(checkpoint.read_bytes()).hexdigest(),
-            'config':str(config_path),'horizon_seconds':horizon_seconds,'seed':seed,
+            'config':str(config_path),'model':str(model_path),
+            'model_sha256':hashlib.sha256(model_path.read_bytes()).hexdigest(),
+            'horizon_seconds':horizon_seconds,'seed':seed,
             'target_hip_height_m':env.target_hip_height,
             'target_virtual_leg_length_m':getattr(env,'target_virtual_leg_length',None),
             'timeout_fraction':float(np.mean([r['reason']=='timeout' for r in records])),
@@ -94,20 +100,21 @@ def audit(checkpoint,config_path=None,episodes=5,horizon_seconds=30,seed=81000):
                 'pushed_episode_success_fraction':float(np.mean([r['push_recovery_success'] for r in records if r['push_metrics']['push_count']>0]))
                     if any(r['push_metrics']['push_count']>0 for r in records) else None} if env.push.enabled else {}),
             'summary':{key:float(np.mean([r[key] for r in records])) for key in records[0]
-                       if key not in ('seed','reason','warnings','mean_leg_positions_rad','push_metrics')},
+                       if key not in ('seed','reason','warnings','mean_leg_positions_rad','push_metrics','getup_metrics')},
             'episodes':records,'simulation_only':True}
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--checkpoint',type=Path,required=True)
     parser.add_argument('--config',type=Path)
+    parser.add_argument('--model',type=Path,help='Explicit model for a documented mechanics-transfer evaluation')
     parser.add_argument('--episodes',type=int,default=5)
     parser.add_argument('--horizon-seconds',type=float,default=30)
     parser.add_argument('--seed',type=int,default=81000)
     parser.add_argument('--output',type=Path,required=True)
     args=parser.parse_args()
     if args.episodes<1 or not 0<args.horizon_seconds<=120:parser.error('Require positive episodes and horizon in (0,120]')
-    report=audit(args.checkpoint,args.config,args.episodes,args.horizon_seconds,args.seed)
+    report=audit(args.checkpoint,args.config,args.episodes,args.horizon_seconds,args.seed,args.model)
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_text(json.dumps(report,ensure_ascii=False,indent=2))
     print(json.dumps({k:v for k,v in report.items() if k!='episodes'},ensure_ascii=False,indent=2))

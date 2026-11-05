@@ -26,8 +26,40 @@ def input_hashes(config_path):
         sources.append(ROOT/'source/climber_legged_rl/chassis_frame.py')
     if config['physics'].get('standing_distance_definition'):
         sources.append(ROOT/'source/climber_legged_rl/stance_geometry.py')
+    if config.get('task', {}).get('velocity_tracking'):
+        sources.append(ROOT/'source/climber_legged_rl/velocity_env.py')
     if config.get('push', {}).get('enabled'):
         sources.append(ROOT/'source/climber_legged_rl/push_disturbance.py')
+    if config.get('getup', {}).get('enabled'):
+        sources.append(ROOT/'source/climber_legged_rl/getup.py')
+        if config['getup'].get('dynamic_control',{}).get('enabled'):
+            sources.append(ROOT/'source/climber_legged_rl/dynamic_getup.py')
+        if config['getup'].get('support_control',{}).get('enabled'):
+            sources.append(ROOT/'source/climber_legged_rl/supported_getup.py')
+        if config['getup'].get('policy_control',{}).get('enabled'):
+            sources.append(ROOT/'source/climber_legged_rl/policy_getup.py')
+        if config['getup'].get('reset_curriculum',{}).get('enabled'):
+            sources.append(ROOT/'source/climber_legged_rl/getup_curriculum.py')
+    if config.get('getup', {}).get('enabled') or config['spring'].get('eye_center_limits_m'):
+        sources.append(ROOT/'source/climber_legged_rl/spring_geometry.py')
+    if config.get('observations') or config.get('robustness'):
+        sources.append(ROOT/'source/climber_legged_rl/observation_history.py')
+    if config.get('training', {}).get('history_standing_actor'):
+        sources.append(ROOT/'source/climber_legged_rl/history_policy.py')
+    if config.get('balance_recovery', {}).get('enabled'):
+        sources.append(ROOT/'source/climber_legged_rl/balance_rewards.py')
+    if config.get('training', {}).get('velocity_estimator', {}).get('enabled'):
+        sources.append(ROOT/'source/climber_legged_rl/velocity_estimation.py')
+    if config.get('training', {}).get('standing_rehearsal', {}).get('enabled'):
+        sources.append(ROOT/'source/climber_legged_rl/standing_rehearsal.py')
+        dataset = ROOT/config['training']['standing_rehearsal']['dataset']
+        sources.extend([dataset, dataset.with_suffix('.json'), dataset.parent/'config.yaml'])
+    if config.get('training', {}).get('hard_push_resets', {}).get('enabled'):
+        sources.append(ROOT/'source/climber_legged_rl/push_reset_replay.py')
+    if config.get('training', {}).get('hard_standing_resets', {}).get('enabled'):
+        sources.append(ROOT/'source/climber_legged_rl/standing_reset_replay.py')
+    if config['experiment'].get('physics_backend') == 'mujoco_warp':
+        sources.append(ROOT/'source/climber_legged_rl/warp_backend.py')
     return {str(p.relative_to(ROOT)):sha256(p) for p in sources}
 
 
@@ -48,6 +80,12 @@ def validate_artifacts(config_path=DEFAULT_DYNAMICS_CONFIG):
         raise RuntimeError('CAD dynamics generation report is stale')
     if smoke.get('input_sha256') != input_hashes(config_path):
         raise RuntimeError('CAD dynamics smoke input hashes are stale')
+    if config.get('getup', {}).get('enabled'):
+        from .getup import validate_pose_bank
+        validate_pose_bank(config_path)
+        if config['getup'].get('reset_curriculum',{}).get('enabled'):
+            from .getup_curriculum import validate_curriculum_bank
+            validate_curriculum_bank(config_path,folder)
     return report, smoke
 
 
@@ -132,6 +170,8 @@ def build_dynamics(config_path=DEFAULT_DYNAMICS_CONFIG):
     config = load_config(config_path)
     if config['experiment'].get('model_route') != 'cad_dynamics':
         raise ValueError('Expected cad_dynamics configuration')
+    from .spring_geometry import configured_eye_limits, apply_eye_limits
+    configured_eye_limits(config, required=config.get('getup', {}).get('enabled', False))
     source = ROOT / config['experiment']['source_model']
     source_hash = sha256(source)
     root = ET.parse(source).getroot()
@@ -195,12 +235,25 @@ def build_dynamics(config_path=DEFAULT_DYNAMICS_CONFIG):
     for joint in root.findall('.//body/joint'):
         joint.set('damping', str(physics['joint_damping']))
         joint.set('armature', str(physics['active_armature'] if joint.get('name') in active else physics['passive_armature']))
+    # Apply opt-in get-up ranges AFTER solving the unchanged standing keyframe.
+    # These replace CAD exporter branch guards only in the explicit combined task.
+    overrides = physics.get('joint_range_overrides_rad', {})
+    if overrides and not config.get('getup', {}).get('enabled'):
+        raise ValueError('Joint range overrides require the explicit get-up task')
+    for name, bounds in overrides.items():
+        joint = root.find(f'.//body/joint[@name="{name}"]')
+        if (joint is None or joint.get('type', 'hinge') != 'hinge'
+                or len(bounds) != 2 or not np.isfinite(bounds).all() or bounds[0] >= bounds[1]):
+            raise ValueError('Invalid get-up joint range override: ' + name)
+        joint.set('limited', 'true')
+        joint.set('range', ' '.join(str(v) for v in bounds))
     actuator = ET.SubElement(root, 'actuator')
     for i, name in enumerate(control['leg_joints'] + control['wheel_joints']):
         limit = control['leg_torque_limit_Nm'] if i < 4 else control['wheel_torque_limit_Nm']
         ET.SubElement(actuator,'motor',name=f'motor_{i}',joint=name,gear='1',
                       ctrllimited='true',ctrlrange=f'{-limit} {limit}')
     spring = config['spring']
+    spring_travel = apply_eye_limits(root, fixed, qpos, config)
     if spring['model'] != 'constant_extension_force_at_reconstructed_pin_sites' or not np.isfinite(spring['force_N']) or spring['force_N'] < 0:
         raise ValueError('Unsupported spring model or invalid nominal extension force')
     for side in ('left', 'right'):
@@ -237,6 +290,8 @@ def build_dynamics(config_path=DEFAULT_DYNAMICS_CONFIG):
               'chassis_reference_mesh':reference_mesh,
               'chassis_axes_in_base':chassis_frame.tolist() if chassis_frame is not None else None,
               'spring':spring,'approximations':config['experiment']['approximation_notes'],
+              'joint_range_overrides_rad':overrides,
+              'spring_travel':spring_travel,
               'input_sha256':input_hashes(config_path),
               'hardware_ready':False}
     if physics.get('standing_distance_definition'):

@@ -13,12 +13,17 @@ from .mujoco_model import DEFAULT_CONFIG, load_config, closure_error
 
 
 class ClimberMujocoEnv(gym.Env):
+    extra_observation_dimensions = 0
     metadata = {"render_modes": ["rgb_array"], "render_fps": 100}
 
     def __init__(self, model_path, config_path=DEFAULT_CONFIG, render_mode=None):
         super().__init__()
         self.config = load_config(config_path)
         self.stationary_hold = self.config['task'].get('stationary_hold', False)
+        from .balance_rewards import BalanceRecoveryReward
+        self.balance_recovery = BalanceRecoveryReward(self.config.get('balance_recovery', {}))
+        if self.balance_recovery.enabled and not self.stationary_hold:
+            raise ValueError('Balance recovery rewards require stationary hold')
         if self.stationary_hold:
             task = self.config['task']
             for key in ('position_sigma_m', 'heading_sigma_rad', 'linear_tracking_sigma_m_s', 'yaw_tracking_sigma_rad_s',
@@ -74,7 +79,8 @@ class ClimberMujocoEnv(gym.Env):
             raise ValueError('Push recovery currently requires stationary hold observations')
         self.max_steps = math.ceil(self.config["task"]["episode_seconds"] / self.dt)
         self.action_space = spaces.Box(-1.0, 1.0, shape=(6,), dtype=np.float32)
-        self.observation_space = spaces.Box(-10.0, 10.0, shape=(30 if self.stationary_hold else 24,), dtype=np.float32)
+        dimensions = (30 if self.stationary_hold else 24) + self.extra_observation_dimensions
+        self.observation_space = spaces.Box(-10.0, 10.0, shape=(dimensions,), dtype=np.float32)
         self.nominal_qpos = self.model.key_qpos[0].copy()
         self.nominal_legs = self.nominal_qpos[self.q_indices[:4]].copy()
         mujoco.mj_resetDataKeyframe(self.model, self.data, 0)
@@ -90,6 +96,35 @@ class ClimberMujocoEnv(gym.Env):
         self.steps = 0
         self._total_reward = 0.0
         self._last_warning_counts = np.array(self.data.warning.number).copy()
+
+    def _extra_observation(self):
+        return np.empty(0)
+
+    def _leg_reference(self):
+        return self.nominal_legs
+
+    def _leg_targets(self, action):
+        return np.clip(self._leg_reference() + action[:4] * self.control["leg_action_scale_rad"],
+                       self.leg_low, self.leg_high)
+
+    def _push_force(self):
+        return self.push.force(self.steps, self.max_steps)
+
+    def _observe_motor_torque(self, torque):
+        """Optional instrumentation after output torque and speed limiting."""
+        pass
+
+    def _termination_reason(self, base_contact, upright, max_closure):
+        task = self.config['task']
+        if base_contact:
+            return 'base_contact'
+        if self.data.xpos[self.base_id, 2] < task['terminate_base_height_m']:
+            return 'low_base'
+        if upright < np.cos(task['terminate_tilt_rad']):
+            return 'tilt'
+        if max_closure > task['terminate_max_closure_error_m']:
+            return 'closure'
+        return None
 
     def _rotation(self):
         return self.data.xmat[self.base_id].reshape(3, 3) @ self.chassis_axes
@@ -138,6 +173,7 @@ class ClimberMujocoEnv(gym.Env):
             local_displacement = self._rotation().T @ np.r_[displacement, 0.]
             obs = np.r_[obs, local_displacement[:2] * 5., np.sin(heading_error),
                         np.cos(heading_error)-1., linear[:2] * 2.]
+        obs = np.r_[obs, self._extra_observation()]
         if obs.shape != self.observation_space.shape or not np.isfinite(obs).all():
             raise RuntimeError("Invalid observation: numerical instability or wrong dimensions")
         return np.clip(obs, -10, 10).astype(np.float32)
@@ -171,6 +207,28 @@ class ClimberMujocoEnv(gym.Env):
             self.data.xfrc_applied[self.base_id, :] = 0.
         return self._observation(), {"simulation_only": True}
 
+    def _advance_physics(self, target_legs, target_wheels):
+        """CPU reference integration; optional batched backends implement this contract."""
+        torque = np.zeros(6)
+        saturated = np.zeros(6)
+        with np.errstate(over="raise", invalid="raise"):
+            for _ in range(self.control["decimation"]):
+                speed = self.data.qvel[self.v_indices]
+                torque[:4] = self.control["leg_kp"] * (target_legs - self.data.qpos[self.q_indices[:4]]) - self.control["leg_kd"] * speed[:4]
+                torque[4:] = self.control["wheel_kv"] * (target_wheels - speed[4:])
+                if hasattr(self, 'motor_strength'):
+                    torque *= self.motor_strength
+                saturated += np.abs(torque) >= self.torque_limits
+                torque = np.clip(torque, -self.torque_limits, self.torque_limits)
+                torque[(np.abs(speed) > self.speed_limits) & (torque * speed > 0)] = 0
+                self.data.ctrl[:] = torque
+                self._observe_motor_torque(torque)
+                if self.spring_dofs:
+                    self.data.qfrc_applied[:] = 0.0
+                    self.data.qfrc_applied[self.spring_dofs] = self.config['spring']['force_N']
+                mujoco.mj_step(self.model, self.data)
+        return torque, saturated
+
     def step(self, action):
         action = np.asarray(action, dtype=np.float64)
         if action.shape != (6,) or not np.isfinite(action).all():
@@ -178,29 +236,19 @@ class ClimberMujocoEnv(gym.Env):
         action = np.clip(action, -1, 1)
         previous = self.action.copy()
         self.action[:] = action
-        target_legs = np.clip(self.nominal_legs + action[:4] * self.control["leg_action_scale_rad"], self.leg_low, self.leg_high)
+        target_legs = self._leg_targets(action)
         target_wheels = action[4:] * self.control["wheel_action_scale_rad_s"]
-        torque = np.zeros(6)
         if self.push.enabled:
             self.data.xfrc_applied[self.base_id, :] = 0.
-            self.data.xfrc_applied[self.base_id, :3] = self.push.force(self.steps, self.max_steps)
-        with np.errstate(over="raise", invalid="raise"):
-            for _ in range(self.control["decimation"]):
-                speed = self.data.qvel[self.v_indices]
-                torque[:4] = self.control["leg_kp"] * (target_legs - self.data.qpos[self.q_indices[:4]]) - self.control["leg_kd"] * speed[:4]
-                torque[4:] = self.control["wheel_kv"] * (target_wheels - speed[4:])
-                torque = np.clip(torque, -self.torque_limits, self.torque_limits)
-                torque[(np.abs(speed) > self.speed_limits) & (torque * speed > 0)] = 0
-                self.data.ctrl[:] = torque
-                if self.spring_dofs:
-                    self.data.qfrc_applied[:] = 0.0
-                    self.data.qfrc_applied[self.spring_dofs] = self.config['spring']['force_N']
-                mujoco.mj_step(self.model, self.data)
+            self.data.xfrc_applied[self.base_id, :3] = self._push_force()
+        stepper = getattr(self, 'physics_stepper', None)
+        torque, saturated = (self._advance_physics(target_legs, target_wheels) if stepper is None
+                             else stepper(self, target_legs, target_wheels))
         mujoco.mj_forward(self.model, self.data)
         self.steps += 1
         if not np.isfinite(self.data.qpos).all() or not np.isfinite(self.data.qvel).all() or np.max(np.abs(self.data.qvel)) > 10000:
             raise RuntimeError("MuJoCo diverged; aborting rather than training on corrupted transitions")
-        if abs(self.data.time - self.steps * self.dt) > 1e-6:
+        if abs(self.data.time - self.steps * self.dt) > getattr(self, 'physics_time_tolerance', 1e-6):
             raise RuntimeError("Simulator reset time after instability; stop and inspect model")
         if np.any(np.array(self.data.warning.number) > self._last_warning_counts):
             raise RuntimeError('MuJoCo issued a dynamics warning; inspect the model before continuing')
@@ -222,15 +270,7 @@ class ClimberMujocoEnv(gym.Env):
                 else:
                     wheel_contacts.update(pair.intersection(self.wheel_geoms))
         task = self.config["task"]
-        reason = None
-        if base_contact:
-            reason = "base_contact"
-        elif self.data.xpos[self.base_id,2] < task["terminate_base_height_m"]:
-            reason = "low_base"
-        elif upright < np.cos(task["terminate_tilt_rad"]):
-            reason = "tilt"
-        elif max_closure > task["terminate_max_closure_error_m"]:
-            reason = "closure"
+        reason = self._termination_reason(base_contact, upright, max_closure)
         terminated = reason is not None
         truncated = self.steps >= self.max_steps and not terminated
         weights = self.config["reward"]
@@ -251,6 +291,9 @@ class ClimberMujocoEnv(gym.Env):
             terms['yaw_tracking'] = float(np.exp(-(angular[2]/task['yaw_tracking_sigma_rad_s'])**2)) * weights['yaw_tracking']
             terms['position_hold'] = float(np.exp(-np.sum(displacement**2)/task['position_sigma_m']**2)) * weights['position_hold']
             terms['heading_hold'] = float(np.exp(-(heading_error/task['heading_sigma_rad'])**2)) * weights['heading_hold']
+            if getattr(self, 'acquired', True):
+                terms.update(self.balance_recovery.terms(displacement, linear[:2], heading_error, angular[2],
+                    tilt=tilt, tilt_rate=float(np.linalg.norm(angular[:2]))))
         if 'alive' in weights:
             terms['alive'] = weights['alive'] if not terminated else 0.
         if 'angular_velocity' in weights:
@@ -270,6 +313,8 @@ class ClimberMujocoEnv(gym.Env):
                 "planar_displacement_m": float(np.linalg.norm(displacement)),
                 "heading_error_rad": heading_error, "planar_speed_m_s": float(np.linalg.norm(linear[:2])),
                 "termination_reason": reason, "reward_terms": terms}
+        info['motor_torque_Nm'] = torque.tolist()
+        info['motor_saturation_fraction'] = (saturated / self.control['decimation']).tolist()
         if terminated or truncated:
             info["episode_metrics"] = {"reward": self._total_reward, "seconds": self.steps*self.dt, "reason": reason or "timeout"}
         if self.stationary_hold:
@@ -317,3 +362,31 @@ class ClimberMujocoEnv(gym.Env):
         if self.renderer is not None:
             self.renderer.close()
             self.renderer = None
+
+
+def _make_task_env(model_path, config_path=DEFAULT_CONFIG, render_mode=None):
+    """Select the combined task explicitly; historical configs retain their behavior."""
+    if load_config(config_path).get('task', {}).get('velocity_tracking', False):
+        from .velocity_env import ClimberVelocityEnv
+        return ClimberVelocityEnv(model_path,config_path,render_mode=render_mode)
+    if load_config(config_path).get('getup', {}).get('enabled', False):
+        if load_config(config_path)['getup'].get('policy_control',{}).get('enabled'):
+            from .policy_getup import ClimberPolicyGetupEnv
+            return ClimberPolicyGetupEnv(model_path,config_path,render_mode=render_mode)
+        if load_config(config_path)['getup'].get('support_control',{}).get('enabled'):
+            from .supported_getup import ClimberSupportedGetupEnv
+            return ClimberSupportedGetupEnv(model_path,config_path,render_mode=render_mode)
+        if load_config(config_path)['getup'].get('dynamic_control',{}).get('enabled'):
+            from .dynamic_getup import ClimberDynamicGetupEnv
+            return ClimberDynamicGetupEnv(model_path,config_path,render_mode=render_mode)
+        if load_config(config_path)['getup'].get('reset_curriculum',{}).get('enabled'):
+            from .getup_curriculum import ClimberGetupCurriculumEnv
+            return ClimberGetupCurriculumEnv(model_path,config_path,render_mode=render_mode)
+        from .getup import ClimberGetupEnv
+        return ClimberGetupEnv(model_path, config_path, render_mode=render_mode)
+    return ClimberMujocoEnv(model_path, config_path, render_mode=render_mode)
+
+
+def make_mujoco_env(model_path, config_path=DEFAULT_CONFIG, render_mode=None):
+    from .observation_history import wrap_observations
+    return wrap_observations(_make_task_env(model_path, config_path, render_mode), load_config(config_path))

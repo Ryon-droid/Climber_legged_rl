@@ -1,0 +1,186 @@
+control:
+  decimation: 10
+  leg_action_scale_rad: 0.25
+  leg_joints:
+  - left_link1_joint
+  - left_link_rear_1_joint
+  - right_link1_joint
+  - right_rear_link1_joint
+  leg_kd: 1.0
+  leg_kp: 20.0
+  leg_speed_limit_rad_s: 15.0
+  leg_torque_limit_Nm: 10.0
+  wheel_action_scale_rad_s: 10.0
+  wheel_joints:
+  - left_link 3_joint
+  - right_link 3_joint
+  wheel_kv: 0.2
+  wheel_speed_limit_rad_s: 30.0
+  wheel_torque_limit_Nm: 2.0
+experiment:
+  approximation_notes:
+  - Actual repaired CAD geometry and six closures retained. Latest five masses used;
+    no total/side normalization.
+  - Inherited COM/inertia and other masses accepted as current simulation parameters,
+    not bench identified.
+  - 450 N nominal spring modeled as constant extension force; force curve and damping
+    unknown; pin-center travel constrained to user-confirmed 155-220 mm.
+  - Controller gains, damping, armature, friction and output limits are simulation
+    settings.
+  - Standing reference is the physical motor-axis midpoint to wheel-center side-view
+    distance of 135 mm, with chassis mounting plate horizontal.
+  - Movement speed commands are a conservative simulation curriculum, not measured
+    hardware speed ratings.
+  - 'Fast command variant: forward +/-0.30 m/s and yaw +/-0.60 rad/s are simulation
+    targets, not validated policy or hardware performance.'
+  backend: mujoco
+  model_route: cad_dynamics
+  output_directory: outputs/cad_velocity_round4
+  simulation_only: true
+  source_model: outputs/cad_repaired/robot_cad_repaired.xml
+mass:
+  method: preserve_repaired_body_inertials_no_scaling
+physics:
+  active_armature: 0.002
+  base_collision_half_extents_m:
+  - 0.12
+  - 0.09
+  - 0.035
+  chassis_reference_mesh: part_151_solid_151
+  ik_max_closure_error_m: 0.0001
+  ik_max_height_error_m: 0.003
+  ik_seed: 42
+  joint_damping: 0.05
+  motor_center_reference_meshes:
+    left:
+    - part_439_surface_shell_439
+    - part_449_surface_shell_449
+    right:
+    - part_270_surface_shell_270
+    - part_280_surface_shell_280
+  passive_armature: 0.0001
+  reset_clearance_m: 0.002
+  rest_motor_midpoint_to_wheel_center_m: 0.135
+  solver_iterations: 100
+  standing_distance_definition: motor_midpoint_to_wheel_center_side_view
+  timestep: 0.001
+  wheel_center_reference_meshes:
+    left: part_515_solid_515
+    right: part_346_solid_346
+  wheel_friction: 0.8
+  wheel_radius_m: 0.056
+reward:
+  action_rate: 0.02
+  alive: 0.5
+  angular_velocity: 0.1
+  fall_penalty: 20.0
+  heading_hold: 1.5
+  joint_speed: 0.0001
+  linear_tracking: 18.0
+  normalized_effort: 0.01
+  position_hold: 2.0
+  upright: 6.0
+  virtual_leg_length: 2.0
+  yaw_tracking: 9.0
+spring:
+  force_N: 450.0
+  model: constant_extension_force_at_reconstructed_pin_sites
+  physical_curve_verified: false
+  eye_center_limits_m:
+    left:
+    - 0.155
+    - 0.22
+    right:
+    - 0.155
+    - 0.22
+task:
+  command_forward_m_s:
+  - -0.3
+  - 0.3
+  command_yaw_rad_s:
+  - -0.6
+  - 0.6
+  episode_seconds: 20.0
+  heading_sigma_rad: 0.08726646259971647
+  linear_tracking_sigma_m_s: 0.3
+  position_sigma_m: 0.05
+  reset_tilt_std_rad: 0.008
+  reset_velocity_std: 0.005
+  stationary_hold: false
+  stationary_max_displacement_m: 0.05
+  stationary_max_heading_rad: 0.08726646259971647
+  terminate_base_height_m: 0.075
+  terminate_max_closure_error_m: 0.01
+  terminate_tilt_rad: 0.8
+  upright_sigma_rad: 0.17453292519943295
+  virtual_leg_length_sigma_m: 0.01
+  yaw_tracking_sigma_rad_s: 0.6
+  velocity_tracking: true
+  velocity_commands:
+    resample_seconds: 6.0
+    initial_stand_seconds: 1.0
+    ramp_seconds: 2.0
+    idle_probability: 0.15
+    axis_probability: 0.85
+  velocity_evaluation:
+    settle_seconds: 2.0
+    forward_rmse_m_s: 0.06
+    lateral_rmse_m_s: 0.05
+    yaw_rmse_rad_s: 0.12
+    max_tilt_rad: 0.17453292519943295
+    leg_rmse_m: 0.01
+    idle_max_displacement_m: 0.05
+    idle_max_heading_rad: 0.08726646259971647
+training:
+  action_std:
+  - 0.03
+  - 0.03
+  - 0.03
+  - 0.03
+  - 0.25
+  - 0.25
+  actor_hidden_dims:
+  - 128
+  - 64
+  - 32
+  batch_size: 512
+  checkpoint_steps: 10000
+  clip_range: 0.1
+  critic_hidden_dims:
+  - 256
+  - 128
+  - 64
+  ent_coef: 0.0
+  gae_lambda: 0.97
+  gamma: 0.999
+  learning_rate: 3.0e-05
+  max_grad_norm: 1.0
+  n_epochs: 3
+  n_steps: 512
+  num_envs: 8
+  seed: 115
+  total_timesteps: 500000
+  allow_spring_limit_warm_start: false
+  target_kl: 0.01
+  reset_optimizer_on_warm_start: true
+  evaluation_steps: 25000
+  evaluate_initial_policy: true
+  vf_coef: 0.0001
+push:
+  enabled: false
+  episode_probability: 0.0
+  force_N:
+  - 2.0
+  - 10.0
+  duration_seconds:
+  - 0.05
+  - 0.1
+  interval_seconds:
+  - 8.0
+  - 12.0
+  first_push_seconds: 3.0
+  recovery_seconds: 4.0
+  settle_seconds: 0.5
+  max_transient_displacement_m: 0.2
+  max_transient_heading_rad: 0.3490658503988659
+  recovery_tilt_rad: 0.08726646259971647

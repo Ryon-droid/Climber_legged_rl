@@ -9,7 +9,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1] / "source"))
 
 import numpy as np
 from stable_baselines3.common.env_checker import check_env
-from climber_legged_rl.mujoco_env import ClimberMujocoEnv
+from climber_legged_rl.mujoco_env import make_mujoco_env as ClimberMujocoEnv
 from climber_legged_rl.mujoco_model import DEFAULT_CONFIG, ROOT, load_config
 
 

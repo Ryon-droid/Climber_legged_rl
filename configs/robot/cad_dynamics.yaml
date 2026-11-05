@@ -58,6 +58,8 @@ control:
   wheel_kv: 0.2
   leg_action_scale_rad: 0.25
   wheel_action_scale_rad_s: 10.0
+  # Historical standing-controller cap, not the motor's rating.
+  # Confirmed output: rated20/peak40 Nm; get-up uses cad_getup_stand_round6_support.yaml.
   leg_torque_limit_Nm: 10.0
   wheel_torque_limit_Nm: 2.0
   leg_speed_limit_rad_s: 15.0
@@ -110,6 +112,10 @@ training:
   checkpoint_steps: 10000
   total_timesteps: 1000000
 spring:
+  # Pin-center lengths confirmed 2026-10-29: 15.5-22 cm, both sides.
+  eye_center_limits_m:
+    left: [0.155, 0.220]
+    right: [0.155, 0.220]
   force_N: 450.0
   model: constant_extension_force_at_reconstructed_pin_sites
   physical_curve_verified: false
