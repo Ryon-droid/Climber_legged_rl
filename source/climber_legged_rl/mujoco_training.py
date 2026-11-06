@@ -171,6 +171,16 @@ class CombinedEvalCallback(BaseCallback):
         self.modes=('folded','standing','curriculum') if curriculum else ('folded','standing')
         self.counts={mode:[] for mode in self.modes}
         config = load_config(config_path) if Path(config_path).is_file() else {}
+        evaluation_settings = config.get('training', {})
+        self.pose_episodes = evaluation_settings.get('evaluation_pose_episodes', 1)
+        self.evaluation_seed = evaluation_settings.get('evaluation_seed', 41000)
+        if type(self.pose_episodes) is not int or not 1 <= self.pose_episodes <= 64:
+            raise ValueError('Pose evaluation episodes must be an integer from 1 to 64')
+        if type(self.evaluation_seed) is not int or self.evaluation_seed < 0:
+            raise ValueError('Evaluation seed must be a nonnegative integer')
+        self.rank_worst_pose = evaluation_settings.get('evaluation_rank_worst_pose', False)
+        if type(self.rank_worst_pose) is not bool:
+            raise ValueError('evaluation_rank_worst_pose must be a boolean')
         self.push_enabled = bool(config.get('push', {}).get('enabled'))
         self.push_episodes = int(config.get('training', {}).get('evaluation_push_episodes', 0))
         if self.push_episodes < 0 or (self.push_episodes and not config.get('push', {}).get('enabled')):
@@ -235,10 +245,10 @@ class CombinedEvalCallback(BaseCallback):
         baseline_options = {'push_episode_probability': 0.0} if (self.push_episodes or self.hard_push_seeds) else {}
         common = dict(checkpoint=candidate,config_path=self.config_path,model_path=self.model_path)
         jobs = {'baseline_'+mode: dict(common,episodes=self.standing_episodes if mode=='standing' else 5,
-                    seed=41000,reset_mode=mode,**baseline_options)
+                    seed=self.evaluation_seed,reset_mode=mode,**baseline_options)
                 for mode in self.modes if not (self.all_poses and mode=='folded')}
         for offset in self.pose_offsets:
-            jobs['pose_'+str(offset)] = dict(common,episodes=1,seed=41000,reset_mode='folded',
+            jobs['pose_'+str(offset)] = dict(common,episodes=self.pose_episodes,seed=self.evaluation_seed,reset_mode='folded',
                 rearward_offset_m=offset,**baseline_options)
         for seed in self.hard_standing_seeds:
             jobs['hard_'+str(seed)] = dict(common, episodes=1, seed=seed, reset_mode='standing',
@@ -265,6 +275,8 @@ class CombinedEvalCallback(BaseCallback):
         rates=[groups[mode]['combined_success_fraction'] for mode in self.modes]
         acquired=float(np.mean([r['getup_metrics']['acquired'] for r in groups['folded']['episodes']]))
         score=(min(rates),float(np.mean(rates)),acquired,float(np.mean([g['mean_reward'] for g in groups.values()])))
+        if self.rank_worst_pose and pose_results:
+            score=(min([*rates, *[g['combined_success_fraction'] for g in pose_results.values()]]), *score[1:])
         record=dict(timesteps=self.num_timesteps,folded_success_fraction=rates[0],standing_success_fraction=rates[1],
                     folded_acquired_fraction=acquired,score=score,groups=groups)
         if pose_results:
@@ -374,6 +386,42 @@ class StatusCallback(BaseCallback):
         return True
 
 
+def tightened_spring_limit_transfer(previous_model, model_path, previous_config, config):
+    """Migrate an existing measured upper stop only with an explicit bounded recipe."""
+    from .spring_geometry import configured_eye_limits
+    previous_limits = configured_eye_limits(previous_config, required=True)
+    limits = configured_eye_limits(config, required=True)
+    recipe = config['training'].get('spring_limit_migration', {})
+    if (not isinstance(recipe, dict) or recipe.get('mode') != 'tighten_upper_stop'
+            or recipe.get('previous_eye_center_limits_m') != previous_limits):
+        raise ValueError('Existing spring stops require an explicit tighten_upper_stop migration with matching previous limits')
+    old_spring, new_spring = dict(previous_config['spring']), dict(config['spring'])
+    old_spring.pop('eye_center_limits_m')
+    new_spring.pop('eye_center_limits_m')
+    if old_spring != new_spring:
+        raise ValueError('Spring-stop tightening cannot change force or other mechanics')
+    old, new = ET.parse(previous_model).getroot(), ET.parse(model_path).getroot()
+    for side, bounds in limits.items():
+        before = previous_limits[side]
+        if bounds[0] is None or before[0] != bounds[0] or not bounds[0] < bounds[1] < before[1]:
+            raise ValueError('Spring-stop tightening must preserve each lower stop and reduce each upper stop')
+        name = side + '_gas_slide_joint'
+        a, b = (root.find('.//joint[@name="'+name+'"]') for root in (old, new))
+        body = new.find('.//body[@name="'+side+'_gas_rod"]')
+        if (a is None or b is None or body is None or a.get('type') != 'slide'
+                or b.get('type') != 'slide' or a.get('limited') != 'true' or b.get('limited') != 'true'):
+            raise ValueError('Spring-stop tightening requires two existing limited sliders')
+        zero = np.linalg.norm(np.fromstring(body.get('pos', ''), sep=' '))
+        for element, expected in ((a, before), (b, bounds)):
+            actual = np.fromstring(element.get('range', ''), sep=' ')
+            if actual.shape != (2,) or not np.allclose(actual + zero, expected, atol=1e-12, rtol=0):
+                raise ValueError('Gas-slider range does not match declared pin-center lengths')
+        a.set('range', b.get('range'))
+    canonical = lambda root: ET.canonicalize(ET.tostring(root, encoding='unicode'), strip_text=True)
+    if canonical(old) != canonical(new):
+        raise ValueError('Spring-stop tightening rejects XML changes beyond the two slider ranges')
+
+
 def spring_limit_transfer(previous_model, model_path, previous_config, config, allow_getup_guards=False):
     """Permit only adding explicit spring travel stops; all other XML stays identical."""
     from .spring_geometry import configured_eye_limits
@@ -381,7 +429,9 @@ def spring_limit_transfer(previous_model, model_path, previous_config, config, a
     old_spring = dict(previous_config['spring'])
     new_spring = dict(config['spring'])
     if old_spring.pop('eye_center_limits_m', None) is not None:
-        raise ValueError('Spring-limit transfer only supports adding previously absent travel stops')
+        if allow_getup_guards:
+            raise ValueError('Cannot combine existing spring-stop tightening with CAD guard migration')
+        return tightened_spring_limit_transfer(previous_model, model_path, previous_config, config)
     new_spring.pop('eye_center_limits_m', None)
     if old_spring != new_spring:
         raise ValueError('Spring-limit transfer cannot change spring force or other mechanics')
@@ -637,12 +687,19 @@ def load_warm_start(checkpoint, vector, settings, device, seed):
         from .history_policy import HistoryStandingPolicy
         if isinstance(previous.policy, HistoryStandingPolicy):
             frozen = settings.get('freeze_rising_actor', previous.policy.freeze_rising_actor)
-            if type(frozen) is not bool:
-                raise ValueError('freeze_rising_actor must be a boolean')
+            standing_frozen = settings.get('freeze_standing_actor', False)
+            if type(frozen) is not bool or type(standing_frozen) is not bool:
+                raise ValueError('freeze_rising_actor and freeze_standing_actor must be booleans')
             previous.policy.freeze_rising_actor = frozen
             previous.policy.mlp_extractor.policy_net.rising_net.requires_grad_(not frozen)
             previous.policy.mlp_extractor.policy_net.rising_head.requires_grad_(not frozen)
+            previous.policy.mlp_extractor.policy_net.standing_net.requires_grad_(not standing_frozen)
+            previous.policy.mlp_extractor.policy_net.standing_head.requires_grad_(not standing_frozen)
             previous.policy_kwargs['freeze_rising_actor'] = frozen
+            fixed_std = settings.get('freeze_action_std', False)
+            if type(fixed_std) is not bool:
+                raise ValueError('freeze_action_std must be a boolean')
+            previous.policy.log_std.requires_grad_(not fixed_std)
         if (settings.get('allow_spring_limit_warm_start', False) or settings.get('allow_getup_guard_warm_start', False)
                 or settings.get('reset_optimizer_on_warm_start',False)):
             previous.policy.optimizer = previous.policy.optimizer_class(previous.policy.parameters(),
@@ -884,7 +941,8 @@ def train(config_path,total_steps=None,num_envs=None,device="cpu",run_name=None,
     metadata['observation_history'] = dict(frames=history_frames(config), order='oldest_to_newest',
         reset_fill='repeat_first_frame', input_dimensions=vector.observation_space.shape[0])
     if settings.get('history_standing_actor', False):
-        metadata['history_actor'] = dict(rising_branch_frozen=model.policy.freeze_rising_actor, standing_branch_trainable=True,
+        metadata['history_actor'] = dict(rising_branch_frozen=model.policy.freeze_rising_actor,
+            standing_branch_trainable=not settings.get('freeze_standing_actor', False),
             current_frame_dimensions=36, phase_index=-1, threshold=.95)
     (run_dir/'metadata.json').write_text(json.dumps(metadata,indent=2),encoding='utf-8')
     if replay_arrays is not None:

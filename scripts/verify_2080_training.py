@@ -34,10 +34,12 @@ def main():
     parser.add_argument('--run-dir', type=Path, required=True)
     parser.add_argument('--expected-steps', type=int, required=True)
     parser.add_argument('--elapsed-seconds', type=float)
+    parser.add_argument('--config', type=Path, default=ROOT/'configs/robot/cad_balance_estimator_round14.yaml')
+    parser.add_argument('--parent', type=Path, default=ROOT/'outputs/mujoco_runs/cad_balance_estimator_round13_20261101_221330/best/best_model.zip')
     args = parser.parse_args()
     torch.set_num_threads(1)
     folder = args.run_dir.resolve()
-    cfg = ROOT / 'configs/robot/cad_balance_estimator_round14.yaml'
+    cfg = args.config.resolve()
     config = load_config(cfg)
     active_xml = ROOT / config['experiment']['output_directory'] / 'robot_experiment.xml'
     validate_artifacts(cfg)
@@ -46,7 +48,7 @@ def main():
     assert status['state'] == 'completed', status
     assert status['timesteps'] >= args.expected_steps
     assert metadata['num_envs'] >= 1
-    parent = ROOT / 'outputs/mujoco_runs/cad_balance_estimator_round13_20261101_221330/best/best_model.zip'
+    parent = args.parent.resolve()
     checkpoint = folder / 'final_policy.zip'
     validate_policy_transfer(checkpoint, active_xml, config)
     previous = PPO.load(parent, device='cpu')

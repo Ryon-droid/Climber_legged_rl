@@ -371,6 +371,9 @@ def _make_task_env(model_path, config_path=DEFAULT_CONFIG, render_mode=None):
         return ClimberVelocityEnv(model_path,config_path,render_mode=render_mode)
     if load_config(config_path).get('getup', {}).get('enabled', False):
         if load_config(config_path)['getup'].get('policy_control',{}).get('enabled'):
+            if load_config(config_path)['getup'].get('folded_reset_noise', {}).get('enabled'):
+                from .robust_getup import ClimberRobustGetupEnv
+                return ClimberRobustGetupEnv(model_path, config_path, render_mode=render_mode)
             from .policy_getup import ClimberPolicyGetupEnv
             return ClimberPolicyGetupEnv(model_path,config_path,render_mode=render_mode)
         if load_config(config_path)['getup'].get('support_control',{}).get('enabled'):

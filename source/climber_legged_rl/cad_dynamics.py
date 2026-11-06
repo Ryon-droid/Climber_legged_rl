@@ -38,6 +38,8 @@ def input_hashes(config_path):
             sources.append(ROOT/'source/climber_legged_rl/supported_getup.py')
         if config['getup'].get('policy_control',{}).get('enabled'):
             sources.append(ROOT/'source/climber_legged_rl/policy_getup.py')
+        if config['getup'].get('folded_reset_noise',{}).get('enabled'):
+            sources.append(ROOT/'source/climber_legged_rl/robust_getup.py')
         if config['getup'].get('reset_curriculum',{}).get('enabled'):
             sources.append(ROOT/'source/climber_legged_rl/getup_curriculum.py')
     if config.get('getup', {}).get('enabled') or config['spring'].get('eye_center_limits_m'):

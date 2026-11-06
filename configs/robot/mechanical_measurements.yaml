@@ -44,12 +44,15 @@ leg_joint_output_torque:
   torque_speed_curve_verified: false
 
 gas_spring_travel:
-  source: user_confirmation_2026_10_29
-  maximum_statement: 完全伸长销轴中心距22厘米
+  source: user_confirmation_2026_11_06
+  maximum_statement: 安装限位块后最大伸长销轴中心距20.8厘米
   minimum_statement: 最短15.5，沿用厘米单位
   eye_center_distance_min_m: 0.155
-  eye_center_distance_max_m: 0.220
-  stroke_m: 0.065
+  eye_center_distance_max_m: 0.208
+  stroke_m: 0.053 # derived from new installed upper stop and inherited minimum
+  previous_upper_limit_m: 0.220 # historical 2026-10-29 value, superseded by installed stop
+  minimum_source: user_confirmation_2026_10_29_retained
+  installed_limit_block: true
   sides: [left, right]
   bilateral_same_limits_assumed: true
 
