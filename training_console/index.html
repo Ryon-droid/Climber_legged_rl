@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="climber-token" content="__CLIMBER_TOKEN__">
+  <title>Climber · 训练控制台</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<aside class="sidebar">
+  <a href="#overview" class="brand"><span class="brand-icon">C<span>↗</span></span><span>CLIMBER<small>ROBOTICS LAB</small></span></a>
+  <div class="nav-label">工作空间</div>
+  <nav>
+    <a class="nav-item active" href="#overview"><span>◫</span>训练概览</a>
+    <a class="nav-item" href="#learning"><span>⌁</span>学习曲线</a>
+    <a class="nav-item" href="#simulation"><span>▷</span>仿真预览</a>
+    <a class="nav-item" href="#terminal"><span>›_</span>远端终端</a>
+    <a class="nav-item" href="#evaluation"><span>▥</span>效果评估</a>
+    <a class="nav-item" href="#logs"><span>≡</span>训练日志</a>
+  </nav>
+  <div class="sidebar-bottom"><span class="tiny-dot"></span>本机控制台<small>208 mm 轮腿机器人<br>Climber_legged_rl</small></div>
+</aside>
+<main id="overview">
+  <header>
+    <div><div class="eyebrow">CLIMBER / REINFORCEMENT LEARNING</div><h1>训练控制台<span class="version">LOCAL</span></h1></div>
+    <div class="header-right"><span id="connection" class="badge neutral"><i></i>连接训练设备…</span><button id="refresh" class="icon-button" title="立即刷新" aria-label="立即刷新">↻</button></div>
+  </header>
+  <section class="run-strip">
+    <div><span class="label">当前实验</span><select id="run-select" aria-label="选择训练记录"><option value="">正在读取训练记录…</option></select></div>
+    <div class="run-state"><span class="pulse" id="pulse"></span><span id="phase">等待设备响应</span></div>
+  </section>
+  <div id="error-banner" class="error-banner" hidden></div>
+  <section class="stats" aria-label="训练状态">
+    <article class="stat"><div class="stat-label">当前推力档位 <span>01</span></div><div class="stat-value"><span id="level">—</span><small>N</small></div><div class="stat-foot" id="target">本轮目标 — · 长期目标 150 N</div></article>
+    <article class="stat"><div class="stat-label">采样步数 <span>02</span></div><div class="stat-value" id="steps">—</div><div class="stat-foot" id="step-note">等待训练数据</div></article>
+    <article class="stat"><div class="stat-label">本档最佳成功率 <span>03</span></div><div class="stat-value"><span id="success">—</span><small id="success-unit">%</small></div><div class="stat-foot" id="success-note">选模结果，非最终验收</div></article>
+    <article class="stat"><div class="stat-label">已运行时间 <span>04</span></div><div class="stat-value mono" id="elapsed">—</div><div class="stat-foot" id="time-note">等待本轮时间估算</div></article>
+  </section>
+  <section class="experiment-grid">
+    <article class="panel progress-panel"><div class="panel-head"><div><h2>本轮进度</h2><p id="experiment-description">读取对照实验配置</p></div><span class="micro-badge" id="env-count">— 个环境</span></div><div class="progress-overview"><strong id="progress-percent">0%</strong><span id="remaining-time">正在估算剩余时间</span></div><progress id="total-progress" max="100" value="0"></progress><div id="arm-progress" class="arm-progress"></div><div class="progress-caption" id="progress-caption">检查点与最终评估会额外耗时</div></article>
+    <article class="panel resource-panel"><div class="panel-head"><div><h2>设备资源</h2><p>远端工作站 · 实时读取</p></div><span class="micro-badge" id="compute-mode">CPU 并行 PPO</span></div><div class="resource-row"><span>显存</span><strong id="vram-label">—</strong></div><progress id="vram-bar" max="100" value="0"></progress><div class="resource-row"><span>系统内存</span><strong id="ram-label">—</strong></div><progress id="ram-bar" max="100" value="0"></progress><div class="resource-bottom"><span id="throughput">采样速度 —</span><span id="gpu-label">GPU —</span></div></article>
+  </section>
+  <section class="curriculum-panel"><div class="curriculum-heading"><span class="label">推力课程</span><span id="budget-note">按达标结果逐级推进</span></div><div id="curriculum" class="curriculum"></div></section>
+  <section id="learning" class="learning-section"><div class="section-heading"><div><h2>学习曲线</h2><p>原始日志 · 各组横轴从零开始，可直接对照</p></div><div class="chart-options"><label>选模场景<select id="chart-group"><option value="exact18">固定 18 N</option><option value="level">本档随机推扰</option><option value="accepted15">10–15 N 推扰</option><option value="standing">无推扰站立</option><option value="difficult_getup">困难起身</option></select></label></div></div><div id="arm-legend" class="arm-legend"></div>
+    <div class="charts-grid">
+      <article class="panel"><div class="panel-head"><div><h2>选模成功率</h2><p>虚线为父模型 · 橙色描边为被保留的检查点</p></div><span class="micro-badge">评估指标</span></div><div class="metric-chart" id="chart" data-metric="selection"></div><div class="chart-foot"><span>成功率不能单独代表整体验收通过</span><span id="checkpoint-count">0 次检查</span></div></article>
+      <article class="panel"><div class="panel-head"><div><h2>平均回合奖励</h2><p>原始训练奖励 · 不能仅凭奖励判断策略好坏</p></div><span class="micro-badge">reward</span></div><div class="metric-chart" id="chart-reward" data-metric="reward"></div></article>
+      <article class="panel"><div class="panel-head"><div><h2>平均回合时长</h2><p>每步 0.01 秒 · 完整站立回合 20 秒</p></div><span class="micro-badge">秒</span></div><div class="metric-chart" id="chart-episode" data-metric="episode_steps"></div></article>
+      <article class="panel"><div class="panel-head"><div><h2>训练回合成功率</h2><p>近期回合的滚动统计 · 与独立测试集不同</p></div><span class="micro-badge">%</span></div><div class="metric-chart" id="chart-success" data-metric="success"></div></article>
+      <article class="panel"><div class="panel-head"><div><h2>策略更新幅度</h2><p>近似 KL · 观察每次更新是否过大</p></div><span class="micro-badge">approx. KL</span></div><div class="metric-chart" id="chart-kl" data-metric="kl"></div></article>
+      <article class="panel"><div class="panel-head"><div><h2>价值预测误差</h2><p>训练器记录的 value loss · 越低不等于成功率越高</p></div><span class="micro-badge">loss</span></div><div class="metric-chart" id="chart-value" data-metric="value_loss"></div></article>
+    </div><p class="learning-note" id="learning-note">每 5 秒同步；鼠标移动到曲线上可查看数值。单击图例可隐藏或显示分组。</p>
+  </section>
+  <div class="workspace">
+    <section class="panel preview-panel" id="simulation">
+      <div class="panel-head"><div><h2>仿真预览</h2><p>当前机器人 · 当前保留策略</p></div><span class="micro-badge">MuJoCo</span></div>
+      <div class="video-stage" id="video-stage">
+        <div class="video-placeholder" id="video-placeholder"><span class="play-glyph">▷</span><strong>查看真实策略表现</strong><p>生成一段独立仿真录像<br>在这里直接播放</p></div>
+        <video id="video" controls playsinline preload="metadata" hidden></video>
+      </div>
+      <div class="preview-controls"><label>初态<select id="preview-mode"><option value="standing">站立抗推扰</option><option value="folded">趴姿起身</option></select></label><label>推力 / N<input id="preview-force" type="number" min="0" max="150" value="18" step="1"></label><label>随机种子<input id="preview-seed" type="number" min="0" max="2147483647" value="840000"></label></div>
+      <div class="preview-action"><button class="primary" id="generate">▷ 生成当前策略预览</button><a id="download-video" class="text-link" hidden download>保存视频 ↗</a></div>
+      <p class="video-note" id="video-note">20 秒回合；提前失败会如实保留。推力为 0.05～0.10 秒短脉冲。</p>
+      <div id="video-meta" class="video-meta" hidden></div>
+      <details class="video-library"><summary>已有仿真视频 <span id="video-count">0</span></summary><div id="video-list"></div></details>
+    </section>
+    <section class="panel terminal-panel" id="terminal">
+      <div class="panel-head"><div><h2>远端终端 <span id="terminal-status" class="inline-status">未连接</span></h2><p>2080 SUPER 工作站 · 训练仓库目录</p></div><button id="terminal-connect" class="secondary">连接终端</button></div>
+      <div class="command-presets"><button data-command="status">训练状态</button><button data-command="log">最近日志</button><button data-command="gpu">设备负载</button><button data-command="files">仿真脚本</button></div>
+      <pre id="terminal-output" class="terminal-output" tabindex="0" aria-label="远端终端输出">连接后可以输入远端指令。
+已自动准备训练 Python 环境，支持 cd、查看日志、执行仿真脚本等操作。
+</pre>
+      <form id="command-form"><div class="command-line"><span class="prompt">❯</span><textarea id="command-input" rows="2" placeholder="输入远端指令，Enter 执行 · Shift+Enter 换行" aria-label="终端指令" spellcheck="false"></textarea><button class="send-button" type="submit" aria-label="执行指令">↵</button></div></form>
+      <div class="terminal-foot"><span>指令在远端运行 · 会保留当前目录</span><button id="interrupt" class="text-button">中断当前命令 <kbd>Ctrl C</kbd></button></div>
+    </section>
+    <section class="panel evaluation-panel" id="evaluation">
+      <div class="panel-head"><div><h2>效果评估</h2><p id="evaluation-kind">等待选模结果</p></div><span id="eval-badge" class="micro-badge">选模集</span></div>
+      <table><thead><tr><th>测试场景</th><th>训练前</th><th>保留模型</th></tr></thead><tbody id="eval-body"><tr><td colspan="3" class="table-empty">正在读取评估数据…</td></tr></tbody></table>
+      <div class="evaluation-note" id="evaluation-note">选模数据用于训练时挑选检查点；独立验收会在本轮结束后显示。</div>
+      <details class="checkpoint-details"><summary>模型与设备信息</summary><dl id="hardware"></dl><p id="checkpoint-path"></p></details>
+    </section>
+  </div>
+  <section class="panel log-panel" id="logs"><details><summary><span>训练日志</span><span id="updated">等待更新</span></summary><pre id="training-log">等待连接…</pre></details></section>
+  <footer><span><i class="tiny-dot"></i> 本机访问 · SSH 连接</span><span id="footer-host">Climber_legged_rl / 2080 SUPER</span></footer>
+</main>
+<div id="toast" role="status" hidden></div>
+<script src="/app.js"></script>
+</body>
+</html>

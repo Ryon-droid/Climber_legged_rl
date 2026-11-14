@@ -1,6 +1,7 @@
 """Training-only replay of seeded standing episodes with actual force pulses."""
 import gymnasium as gym
 import numpy as np
+import copy
 
 
 class PushResetReplay(gym.Wrapper):
@@ -35,3 +36,42 @@ class PushResetReplay(gym.Wrapper):
             observation, info = self.env.reset(seed=seed, options=options)
         return observation, {**info, 'training_hard_push_reset': replay,
             'training_hard_push_seed': seed if replay else None}
+
+
+class ExactPushResetReplay(gym.Wrapper):
+    """Keep the discovered force law for the entire replayed episode.
+
+    Matching seed, reset mode and force law reproduces the original pulse RNG.
+    Recovery actions still come exclusively from the currently trained policy.
+    """
+    def __init__(self,env,cases,probability,seed):
+        super().__init__(env)
+        if not cases or not np.isfinite(probability) or not 0<probability<1:
+            raise ValueError('Invalid exact push replay settings')
+        self.cases=copy.deepcopy(cases);self.probability=probability
+        self.original=copy.deepcopy(env.unwrapped.push.config)
+        for case in self.cases:
+            force=case.get('force_N',[])
+            if (type(case.get('seed')) is not int or case['seed']<0 or len(force)!=2
+                    or not np.isfinite(force).all() or not 0<force[0]<=force[1]
+                    or force[1]>self.original['force_N'][1]):
+                raise ValueError('Invalid exact replay case or stage force exceeded')
+        self.rng=np.random.default_rng(seed)
+
+    def reset(self,*,seed=None,options=None):
+        push=self.env.unwrapped.push
+        push.config=copy.deepcopy(self.original)
+        replay=seed is None and options is None and self.rng.random()<self.probability
+        if replay:
+            case=self.cases[int(self.rng.integers(len(self.cases)))]
+            seed=case['seed'];options={'reset_mode':'standing'}
+            push.config.update(episode_probability=float(case.get('push',True)),force_N=list(case['force_N']))
+            push.config.pop('force_bands',None)
+        try:
+            observation,info=self.env.reset(seed=seed,options=options)
+        except BaseException:
+            push.config=copy.deepcopy(self.original)
+            raise
+        return observation,{**info,'training_hard_push_reset':replay,
+            'training_hard_push_seed':seed if replay else None,
+            'training_exact_force_replay':replay}
