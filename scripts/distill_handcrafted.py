@@ -80,24 +80,45 @@ def collect(env, student, standing_label_policy, n_folded, n_standing, seconds=2
     return xs, ys, ws
 
 
-def leg_augmentation(env, x, n, seed):
-    """The rising leg channel is a known saturating proportional map of the four leg
-    angles, so cover the whole joint box instead of only visited states. Without this
-    the actor extrapolates badly as soon as the rise drifts off the demonstration path.
-    Observation layout: indices 8..11 hold qpos(leg) - nominal_legs."""
+def expert_augmentation(env, x, n, seed):
+    """The handcrafted expert is an explicit function of (leg angles, gravity, pitch rate,
+    local x, forward speed). Rollouts only visit a narrow slice of that domain, so the
+    actor extrapolates badly as soon as the rise drifts. Sample that domain directly and
+    label every sample with the expert formula so the actor matches it everywhere.
+
+    Observation layout: [angular*0.25, gravity, commands, qpos(leg)-nominal, qvel*0.05,
+    applied action, local displacement*5, sin/cos heading error, linear velocity*2, extras].
+    """
     rng = np.random.default_rng(seed)
-    base = np.asarray(x, dtype=np.float32)[rng.integers(len(x), size=n)]
+    obs = np.asarray(x, dtype=np.float32)[rng.integers(len(x), size=n)].copy()
     low, high = env.leg_low, env.leg_high
     nominal = env.nominal_legs
-    q = np.where(rng.random((n, 4)) < 0.7,
-                 np.clip(nominal + rng.normal(0., 0.35, (n, 4)), low, high),
+    q = np.where(rng.random((n, 4)) < 0.6,
+                 np.clip(nominal + rng.normal(0., 0.45, (n, 4)), low, high),
                  rng.uniform(low, high, (n, 4)))
-    base[:, 8:12] = q - nominal
-    y = np.clip((nominal - q)/env.dynamic['incremental_target_scale_rad'], -1., 1.)
-    return base, y
+    pitch = rng.uniform(-0.7, 0.7, n)
+    roll = rng.uniform(-0.25, 0.25, n)
+    rate = rng.uniform(-5., 5., n)
+    local_x = rng.uniform(-0.25, 0.25, n)
+    forward = rng.uniform(-0.4, 0.4, n)
+    obs[:, 0] = rng.uniform(-3., 3., n)*0.25
+    obs[:, 1] = rate*0.25
+    obs[:, 2] = rng.uniform(-2., 2., n)*0.25
+    obs[:, 3] = np.sin(pitch)
+    obs[:, 4] = -np.cos(pitch)*np.sin(roll)
+    obs[:, 5] = -np.cos(pitch)*np.cos(roll)
+    obs[:, 8:12] = q - nominal
+    obs[:, 18:24] = rng.uniform(-1., 1., (n, 6))
+    obs[:, 24] = local_x*5.
+    obs[:, 28] = forward*2.
+    fwd = np.clip(185.3709835995987*pitch + 12.381648013013905*rate
+                  - 22.98302737207376*local_x + 46.682530363210674*forward, -10., 10.)
+    wheel = fwd/env.control['wheel_action_scale_rad_s']
+    legs = np.clip((nominal - q)/env.dynamic['incremental_target_scale_rad'], -1., 1.)
+    return obs, np.column_stack([legs, wheel, wheel])
 
 
-def fit(policy, x, y, w, updates, batch_size, lr, seed, symmetry=10.0, leg_aug=None, leg_weight=5.0):
+def fit(policy, x, y, w, updates, batch_size, lr, seed, symmetry=10.0, aug=None, aug_weight=1.0):
     rng = np.random.default_rng(seed)
     xt = torch.as_tensor(np.asarray(x, dtype=np.float32), device=policy.device)
     yt = torch.as_tensor(np.asarray(y, dtype=np.float32), device=policy.device)
@@ -107,9 +128,9 @@ def fit(policy, x, y, w, updates, batch_size, lr, seed, symmetry=10.0, leg_aug=N
     p = p * (1.0 + 3.0 * (np.abs(np.asarray(y)) > 0.5).mean(axis=1))
     p /= p.sum()
     opt = torch.optim.Adam(policy.policy.parameters(), lr=lr)
-    if leg_aug is not None:
-        xa = torch.as_tensor(np.asarray(leg_aug[0], dtype=np.float32), device=policy.device)
-        ya = torch.as_tensor(np.asarray(leg_aug[1], dtype=np.float32), device=policy.device)
+    if aug is not None:
+        xa = torch.as_tensor(np.asarray(aug[0], dtype=np.float32), device=policy.device)
+        ya = torch.as_tensor(np.asarray(aug[1], dtype=np.float32), device=policy.device)
     t0 = time.monotonic()
     for u in range(updates):
         for g in opt.param_groups: g['lr'] = lr * (1 - 0.8 * u / updates)
@@ -121,10 +142,10 @@ def fit(policy, x, y, w, updates, batch_size, lr, seed, symmetry=10.0, leg_aug=N
         # Keep the two wheel commands identical: asymmetric wheels yaw the robot and
         # violate the get-up heading / yaw-rate acquisition gate.
         loss = loss + symmetry * torch.mean((m[:, 4] - m[:, 5]) ** 2)
-        if leg_aug is not None:
+        if aug is not None:
             j = rng.integers(len(xa), size=batch_size // 2)
             ma = policy.policy.get_distribution(xa[j]).distribution.mean
-            loss = loss + leg_weight * torch.mean((ma[:, :4] - ya[j]) ** 2)
+            loss = loss + aug_weight * torch.mean((ma - ya[j]) ** 2)
         opt.zero_grad(); loss.backward()
         torch.nn.utils.clip_grad_norm_(policy.policy.parameters(), 1.0); opt.step()
         if (u + 1) % 500 == 0 or u + 1 == updates:
@@ -176,8 +197,8 @@ def main():
     print(f"BASELINE standing success={s}/20 acquired={a} mean_s={l:.2f} reasons={r}", flush=True)
 
     x, y, w = collect(env, None, policy, args.folded_episodes, args.standing_episodes)
-    leg_aug = leg_augmentation(env, x, 40000, seed=777)
-    fit(policy, x, y, w, args.updates, args.batch_size, args.learning_rate, seed=202611, leg_aug=leg_aug)
+    aug = expert_augmentation(env, x, 60000, seed=777)
+    fit(policy, x, y, w, args.updates, args.batch_size, args.learning_rate, seed=202611, aug=aug)
     policy.save(run_dir / 'policy_after_imitation.zip')
     s, a, l, r = short_eval(env, policy, 'folded', 20)
     print(f"AFTER_IMIT folded success={s}/20 acquired={a} mean_s={l:.2f} reasons={r}", flush=True)
@@ -188,9 +209,9 @@ def main():
         x2, y2, w2 = collect(env, policy, policy, args.folded_episodes, args.standing_episodes,
                              noise=0.05, seed=1000 + stage)
         x.extend(x2); y.extend(y2); w.extend(w2)
-        leg_aug = leg_augmentation(env, x, 40000, seed=777 + stage)
+        aug = expert_augmentation(env, x, 60000, seed=777 + stage)
         fit(policy, x, y, w, args.dagger_updates, args.batch_size, args.learning_rate,
-            seed=202611 + stage, leg_aug=leg_aug)
+            seed=202611 + stage, aug=aug)
         policy.save(run_dir / f'policy_after_dagger_{stage}.zip')
         s, a, l, r = short_eval(env, policy, 'folded', 20)
         print(f"AFTER_DAGGER_{stage} folded success={s}/20 acquired={a} mean_s={l:.2f} reasons={r}", flush=True)
