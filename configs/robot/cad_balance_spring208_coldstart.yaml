@@ -154,12 +154,12 @@ task:
   yaw_tracking_sigma_rad_s: 0.05
 training:
   action_std:
-  - 0.3
-  - 0.3
-  - 0.3
-  - 0.3
-  - 0.2
-  - 0.2
+  - 0.05
+  - 0.05
+  - 0.05
+  - 0.05
+  - 0.1
+  - 0.1
   actor_hidden_dims:
   - 128
   - 64
@@ -171,13 +171,13 @@ training:
   - 256
   - 128
   - 64
-  ent_coef: 0.001
+  ent_coef: 0.0
   gae_lambda: 0.95
-  gamma: 0.999
-  learning_rate: 0.0003
-  max_grad_norm: 0.5
+  gamma: 0.995
+  learning_rate: 0.0005
+  max_grad_norm: 1.0
   separate_actor_critic_gradient_clipping: true
-  n_epochs: 5
+  n_epochs: 10
   n_steps: 1024
   num_envs: 8
   seed: 144
@@ -190,7 +190,7 @@ training:
   evaluation_standing_episodes: 20
   demonstration_replay:
     enabled: false
-  vf_coef: 0.5
+  vf_coef: 0.05
   hard_standing_resets:
     enabled: false
     probability: 0.35
@@ -356,9 +356,9 @@ getup:
     phase_seconds: 2.0
     rated_torque_Nm: 20.0
     peak_window_seconds: 0.6
-    standing_leg_kp: 20.0
-    standing_leg_kd: 1.0
-    standing_torque_limit_Nm: 10.0
+    standing_leg_kp: 80.0
+    standing_leg_kd: 2.0
+    standing_torque_limit_Nm: 20.0
 observations:
   history_frames: 1
 balance_recovery:
