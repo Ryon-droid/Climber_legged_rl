@@ -26,8 +26,14 @@ class ClimberDynamicGetupEnv(ClimberGetupEnv):
         return min(.99,self.steps*self.dt/self.getup['deadline_seconds'])
 
     def _leg_reference(self):
-        # No hidden time-driven joint path in the observation or controller.
-        return self.nominal_legs
+        # Rising observes the prepared closed-chain waypoints on the physical rise clock;
+        # acquired standing uses the nominal joint targets.
+        if getattr(self, 'acquired', True) or getattr(self, 'rise_waypoints', None) is None:
+            return self.nominal_legs
+        t = min(1., self.steps * self.dt / self.getup['rise_seconds'])
+        blend = t * t * (3. - 2. * t)
+        return np.array([np.interp(blend, self.rise_progress, self.rise_waypoints[:, j])
+                         for j in range(4)])
 
     def _leg_targets(self,action):
         if getattr(self,'acquired',True):
