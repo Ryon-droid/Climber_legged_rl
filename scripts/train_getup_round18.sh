@@ -3,7 +3,7 @@ set -euo pipefail
 cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.."
 export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
 parent="outputs/mujoco_runs/cad_getup_stand_round17_light_push_20261031_152823"
-/root/gpufree-data/.venvs/climber-validation/bin/python - "$parent" <<'CHECK_PARENT'
+/home/climber/.venvs/climber_rl_20261104/bin/python - "$parent" <<'CHECK_PARENT'
 import json,sys
 from pathlib import Path
 p=Path(sys.argv[1])
@@ -26,7 +26,7 @@ for run in Path('outputs/mujoco_runs').glob('cad_getup_stand_round18_multidirect
 CHECK_PARENT
 training_name="cad_getup_stand_round18_multidirection_$(date +%Y%m%d_%H%M%S)"
 mkdir -p outputs/cad_getup_stand_round18_multidirection
-/root/gpufree-data/.venvs/climber-validation/bin/python -u scripts/train.py \
+/home/climber/.venvs/climber_rl_20261104/bin/python -u scripts/train.py \
   --backend cad-dynamics --config configs/robot/cad_getup_stand_round18_multidirection.yaml \
   --warm-start "$parent/best/best_model.zip" \
   --device cpu --run-name "$training_name" "$@" 2>&1 | tee "outputs/cad_getup_stand_round18_multidirection/${training_name}.log"

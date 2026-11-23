@@ -4,7 +4,7 @@ cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.."
 training_name="cad_getup_stand_round9_imitation_seed_$(date +%Y%m%d_%H%M%S)"
 training_log="outputs/cad_getup_stand_round9_imitation/${training_name}.log"
 mkdir -p outputs/cad_getup_stand_round9_imitation
-initial_checkpoint="$(/root/gpufree-data/.venvs/climber-validation/bin/python - <<'PY'
+initial_checkpoint="$(/home/climber/.venvs/climber_rl_20261104/bin/python - <<'PY'
 import hashlib,json
 from pathlib import Path
 import yaml
@@ -21,7 +21,7 @@ print(initial)
 PY
 )"
 env OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
-  /root/gpufree-data/.venvs/climber-validation/bin/python -u scripts/distill_getup_policy.py \
+  /home/climber/.venvs/climber_rl_20261104/bin/python -u scripts/distill_getup_policy.py \
   --config configs/robot/cad_getup_stand_round9_imitation.yaml \
   --run-name "$training_name" --initial-checkpoint "$initial_checkpoint" \
   --focus-offset-m 0.36 --focus-weight 2 "$@" 2>&1 | tee "$training_log"

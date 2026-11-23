@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.."
-checkpoint_path="$(/root/gpufree-data/.venvs/climber-validation/bin/python - <<'PY'
+checkpoint_path="$(/home/climber/.venvs/climber_rl_20261104/bin/python - <<'PY'
 import hashlib,json
 from pathlib import Path
 config=Path('configs/robot/cad_getup_stand_round9_imitation.yaml')
@@ -15,6 +15,6 @@ print(checkpoint)
 PY
 )"
 exec env MUJOCO_GL=glfw OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
-  /root/gpufree-data/.venvs/climber-validation/bin/python -u scripts/play_getup.py \
+  /home/climber/.venvs/climber_rl_20261104/bin/python -u scripts/play_getup.py \
   --config configs/robot/cad_getup_stand_round9_imitation.yaml \
   --checkpoint "$checkpoint_path" --reset-mode folded --loop "$@"

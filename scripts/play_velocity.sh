@@ -4,7 +4,7 @@ cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.."
 export MUJOCO_GL="${MUJOCO_GL:-glfw}"
 export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
 # Resolve only real movement runs, never validation or get-up policies.
-checkpoint="$(/root/gpufree-data/.venvs/climber-validation/bin/python - <<'PY'
+checkpoint="$(/home/climber/.venvs/climber_rl_20261104/bin/python - <<'PY'
 from pathlib import Path
 import json
 folders=sorted(Path('outputs/mujoco_runs').glob('cad_velocity_round*_*'),key=lambda p:p.stat().st_mtime,reverse=True)
@@ -18,5 +18,5 @@ else:
     raise SystemExit('暂无正式移动训练的best模型。先运行 bash scripts/train_velocity.sh；不把站立或短验证权重当作移动模型。')
 PY
 )"
-/root/gpufree-data/.venvs/climber-validation/bin/python scripts/play.py \
+/home/climber/.venvs/climber_rl_20261104/bin/python scripts/play.py \
   --checkpoint "$checkpoint" --viewer --loop "$@"

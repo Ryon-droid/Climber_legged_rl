@@ -3,7 +3,7 @@ set -euo pipefail
 cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.."
 export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
 parent="outputs/mujoco_runs/cad_getup_stand_round22_guarded_balance_20261031_183529"
-/root/gpufree-data/.venvs/climber-validation/bin/python - "$parent" <<'CHECK'
+/home/climber/.venvs/climber_rl_20261104/bin/python - "$parent" <<'CHECK'
 from pathlib import Path
 import json,sys
 p=Path(sys.argv[1])
@@ -19,7 +19,7 @@ for entry in Path("/proc").glob("[0-9]*/cmdline"):
 CHECK
 training_name="cad_getup_stand_round23_phase_balance_$(date +%Y%m%d_%H%M%S)"
 mkdir -p outputs/cad_getup_stand_round23_phase_balance
-/root/gpufree-data/.venvs/climber-validation/bin/python -u scripts/train.py \
+/home/climber/.venvs/climber_rl_20261104/bin/python -u scripts/train.py \
   --backend cad-dynamics --config configs/robot/cad_getup_stand_round23_phase_balance.yaml \
   --warm-start "$parent/best/best_model.zip" --device cpu --run-name "$training_name" "$@" \
   2>&1 | tee "outputs/cad_getup_stand_round23_phase_balance/${training_name}.log"

@@ -2,7 +2,7 @@
 set -euo pipefail
 cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.."
 if [[ " ${*} " != *" --help "* && " ${*} " != *" -h "* ]]; then
-  /root/gpufree-data/.venvs/climber-validation/bin/python - <<'PY'
+  /home/climber/.venvs/climber_rl_20261104/bin/python - <<'PY'
 from pathlib import Path
 import yaml
 config = yaml.safe_load(Path('configs/robot/cad_getup_stand_round11_ppo_replay.yaml').read_text())
@@ -15,7 +15,7 @@ training_name="cad_getup_stand_round11_ppo_replay_$(date +%Y%m%d_%H%M%S)"
 training_log="outputs/cad_getup_stand_round11_ppo_replay/${training_name}.log"
 mkdir -p outputs/cad_getup_stand_round11_ppo_replay
 env OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
-  /root/gpufree-data/.venvs/climber-validation/bin/python -u scripts/train.py \
+  /home/climber/.venvs/climber_rl_20261104/bin/python -u scripts/train.py \
   --backend cad-dynamics --config configs/robot/cad_getup_stand_round11_ppo_replay.yaml \
   --warm-start outputs/mujoco_runs/cad_getup_stand_round10_ppo_refine_20261029_180330/best/best_model.zip \
   --device cpu --run-name "$training_name" "$@" 2>&1 | tee "$training_log"
