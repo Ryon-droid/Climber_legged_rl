@@ -76,6 +76,31 @@ class StandingMotorAuthorityTests(unittest.TestCase):
         np.testing.assert_array_equal(e.torque_limits, [10.] * 4 + [2.] * 2)
         self.assertFalse(metadata['runtime_override'])
 
+    def test_wheel_response_override_only_applies_after_acquisition(self):
+        e = self.env.unwrapped
+        config = copy.deepcopy(e.config)
+        metadata = apply_standing_motor_limit(e, 20., standing_wheel_kv=.4)
+        self.assertFalse(metadata['pd_gains_unchanged'])
+        for mode, expected in [('standing', .4), ('folded', .2), ('standing', .4)]:
+            e.reset(seed=12, options={'reset_mode': mode})
+            e.step(np.zeros(6))
+            self.assertEqual(e.control['wheel_kv'], expected)
+        self.assertEqual(e.config, config)
+        np.testing.assert_array_equal(e.torque_limits, [20.] * 4 + [2.] * 2)
+        e.reset(seed=12, options={'reset_mode': 'folded'})
+        e.acquired = True
+        e._set_motor_envelope()
+        self.assertEqual(e.control['wheel_kv'], .4)
+
+    def test_bad_wheel_gains_are_rejected_atomically(self):
+        e = self.env.unwrapped
+        envelope, control = dict(e.envelope), dict(e.control)
+        for gain in (0., -1., float('nan'), float('inf')):
+            with self.assertRaises(ValueError):
+                apply_standing_motor_limit(e, 20., standing_wheel_kv=gain)
+            self.assertEqual(e.envelope, envelope)
+            self.assertEqual(e.control, control)
+
     def test_actual_physics_clips_at_twenty_instead_of_ten(self):
         e = self.env.unwrapped
         # Discarded low-level saturation probe, not a policy rollout or training.
@@ -137,15 +162,28 @@ class StandingMotorAuthorityTests(unittest.TestCase):
         self.assertIn('strict_success', row)
         self.assertTrue(np.all(np.array(row['peak_torque_Nm']) <= [20.] * 4 + [2.] * 2))
 
+    def test_evaluator_applies_and_records_wheel_response(self):
+        from train_spring208_push import evaluate_case
+        checkpoint = ROOT / 'outputs/push_recovery_curriculum18_20261115/selected_policy.zip'
+        spec = dict(config=str(self.cfg), group='standing', mode='standing', push=False,
+                    seed=12, balance_curriculum_stage='balance',
+                    standing_leg_torque_limit_Nm=20., standing_wheel_kv=.4)
+        row = evaluate_case((str(checkpoint), spec, True))
+        self.assertEqual(row['motor_envelope']['standing_wheel_kv'], .4)
+        self.assertEqual(row['motor_envelope']['rising_wheel_kv'], .2)
+        self.assertEqual(row['warnings'], 0)
+        self.assertTrue(row['success'])
+        self.assertTrue(np.all(np.array(row['peak_torque_Nm']) <= [20.] * 4 + [2.] * 2))
+
 
 class MotorProfileTests(unittest.TestCase):
     def test_only_new_profile_requests_twenty(self):
         import train_spring208_push_balance as trainer
         previous = trainer.PROFILE
         try:
-            for profile in ('balance_first18', 'sustained_balance18', 'rated_balance18'):
+            for profile in ('balance_first18', 'sustained_balance18', 'rated_balance18', 'reactive_balance18'):
                 trainer.PROFILE = profile
-                expected = {'standing_leg_torque_limit_Nm': 20.} if profile == 'rated_balance18' else {}
+                expected = {'standing_leg_torque_limit_Nm': 20.} if profile in ('rated_balance18', 'reactive_balance18') else {}
                 self.assertEqual(trainer.motor_options(), expected)
                 self.assertEqual(trainer.sustained_profile(), profile != 'balance_first18')
         finally:

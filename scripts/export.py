@@ -79,6 +79,7 @@ def main() -> None:
             "output_clipped":[-1,1],"nominal_leg_q_rad":env.nominal_legs.tolist(),
             "leg_action_scale_rad":config["control"]["leg_action_scale_rad"],
             "wheel_action_scale_rad_s":config["control"]["wheel_action_scale_rad_s"],
+            "wheel_action_sign":list(config["control"].get("wheel_action_sign",[1.0,-1.0])),
             "control_frequency_hz":1.0/env.dt,
             "model_sha256":hashlib.sha256(model_path.read_bytes()).hexdigest(),
             "checkpoint_sha256":hashlib.sha256(args.checkpoint.read_bytes()).hexdigest(),

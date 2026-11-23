@@ -37,6 +37,9 @@ class ClimberMujocoEnv(gym.Env):
         self.render_mode = render_mode
         self.renderer = None
         self.control = self.config["control"]
+        self.wheel_action_sign = np.asarray(self.control.get("wheel_action_sign", [1.0, -1.0]), dtype=np.float64)
+        if self.wheel_action_sign.shape != (2,) or not np.isin(self.wheel_action_sign, (-1.0, 1.0)).all():
+            raise ValueError("wheel_action_sign must be two entries, each +1 or -1")
         names = self.control["leg_joints"] + self.control["wheel_joints"]
         if self.model.nu != 6 or any(self.model.actuator(i).trnid[0] != self.model.joint(n).id for i, n in enumerate(names)):
             raise ValueError("Model motor ordering must match four leg joints and two wheels")
@@ -237,7 +240,7 @@ class ClimberMujocoEnv(gym.Env):
         previous = self.action.copy()
         self.action[:] = action
         target_legs = self._leg_targets(action)
-        target_wheels = action[4:] * self.control["wheel_action_scale_rad_s"]
+        target_wheels = action[4:] * self.control["wheel_action_scale_rad_s"] * self.wheel_action_sign
         if self.push.enabled:
             self.data.xfrc_applied[self.base_id, :] = 0.
             self.data.xfrc_applied[self.base_id, :3] = self._push_force()

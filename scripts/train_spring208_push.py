@@ -66,7 +66,8 @@ def evaluate_case(job):
     env=make_mujoco_env(ROOT/config['experiment']['output_directory']/'robot_experiment.xml',config_path)
     base=env.unwrapped
     from climber_legged_rl.motor_authority import apply_standing_motor_limit
-    motor_envelope=apply_standing_motor_limit(env,spec.get('standing_leg_torque_limit_Nm'))
+    motor_envelope=apply_standing_motor_limit(env,spec.get('standing_leg_torque_limit_Nm'),
+                                             spec.get('standing_wheel_kv'))
     push=dict(base.push.config,episode_probability=float(spec['push']))
     if spec.get('force_N'):
         push['force_N']=spec['force_N'];push.pop('force_bands',None)
@@ -94,6 +95,13 @@ def evaluate_case(job):
         base._observe_motor_torque=measured
     try:
         obs,reset=env.reset(seed=spec['seed'],options={'reset_mode':spec['mode']})
+        measure_quality = spec.get('measure_recovery_quality', False)
+        previous_action = previous_delta = None
+        action_curvature_sum = angular_speed_squared = 0.
+        min_clearance = float('inf')
+        clearance_samples = quality_samples = 0
+        if measure_quality:
+            from climber_legged_rl.recovery_clearance_reward import minimum_base_clearance
         if physics_measurement:springs()
         maximum=dict(displacement_m=0.,heading_deg=0.,tilt_deg=0.,closure_m=0.)
         pre_push_maximum=dict(displacement_m=0.,heading_deg=0.,tilt_deg=0.)
@@ -101,6 +109,18 @@ def evaluate_case(job):
         while True:
             action=policy.predict(obs,deterministic=True)[0]
             obs,reward,done,truncated,info=env.step(action)
+            if measure_quality and info.get('getup_acquired', True):
+                clipped = np.clip(action, -1., 1.)
+                delta = None if previous_action is None else clipped-previous_action
+                if delta is not None and previous_delta is not None:
+                    action_curvature_sum += float(np.mean((delta-previous_delta)**2))
+                previous_action = clipped.copy()
+                previous_delta = None if delta is None else delta.copy()
+                angular_speed_squared += float(np.sum(base._kinematics()[0][:2]**2))
+                quality_samples += 1
+                if base.steps % 10 == 0 or done or truncated:
+                    min_clearance = min(min_clearance, minimum_base_clearance(base))
+                    clearance_samples += 1
             maximum['displacement_m']=max(maximum['displacement_m'],info['planar_displacement_m'])
             maximum['heading_deg']=max(maximum['heading_deg'],float(np.degrees(abs(info['heading_error_rad']))))
             maximum['tilt_deg']=max(maximum['tilt_deg'],float(np.degrees(info['tilt_rad'])))
@@ -129,6 +149,10 @@ def evaluate_case(job):
             spring_upper_mm=(upper*1000).tolist() if physics_measurement else None,
             spring_lower_mm=(lower*1000).tolist() if physics_measurement else None,
             spring_sample_count=samples,peak_torque_Nm=info['peak_torque_Nm'],
+            recovery_quality=(dict(action_curvature_rms=float(np.sqrt(action_curvature_sum/max(quality_samples-2,1))),
+                tilt_rate_rms_rad_s=float(np.sqrt(angular_speed_squared/max(quality_samples,1))),
+                minimum_base_clearance_mm=min_clearance*1000 if clearance_samples else None,
+                clearance_sample_count=clearance_samples) if measure_quality else None),
             final_errors=dict(position_m=info['planar_displacement_m'],
                 heading_deg=float(np.degrees(abs(info['heading_error_rad']))),
                 speed_m_s=info['planar_speed_m_s'],yaw_rate_rad_s=abs(info['yaw_rate_rad_s'])))

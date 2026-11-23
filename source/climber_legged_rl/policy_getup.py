@@ -18,6 +18,7 @@ class ClimberPolicyGetupEnv(ClimberDynamicGetupEnv):
             raise ValueError('Full policy control cannot enable reference assistance')
         self.control = dict(self.control)
         self.rise_kp, self.rise_kd = self.control['leg_kp'], self.control['leg_kd']
+        self.rise_wheel_kv = self.control['wheel_kv']
         positive = ('rated_torque_Nm', 'peak_window_seconds',
                     'standing_leg_kp', 'standing_leg_kd', 'standing_torque_limit_Nm')
         if any(not np.isfinite(self.envelope.get(k, 0)) or self.envelope[k] <= 0 for k in positive):
@@ -47,6 +48,8 @@ class ClimberPolicyGetupEnv(ClimberDynamicGetupEnv):
         high_gain = rising and seconds < self.envelope.get('rise_gain_seconds', float('inf'))
         self.control['leg_kp'] = self.rise_kp if high_gain else self.envelope['standing_leg_kp']
         self.control['leg_kd'] = self.rise_kd if high_gain else self.envelope['standing_leg_kd']
+        self.control['wheel_kv'] = (self.rise_wheel_kv if rising else
+                                   self.envelope.get('standing_wheel_kv', self.rise_wheel_kv))
         if rising and seconds < self.envelope['peak_window_seconds']:
             limit = self.config['control']['leg_torque_limit_Nm']
         else:

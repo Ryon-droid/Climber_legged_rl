@@ -110,7 +110,7 @@ class ClimberSupportedGetupEnv(ClimberDynamicGetupEnv):
         if assisting:
             executed *= self.support['learned_assistance_scale']
             executed[4:] = (np.array([forward, -forward])+yaw+
-                            executed[4:]*self.support['wheel_residual_rad_s'])/self.control['wheel_action_scale_rad_s']
+                            executed[4:]*self.support['wheel_residual_rad_s'])/self.control['wheel_action_scale_rad_s']*self.wheel_action_sign
         return executed
 
     def step(self, action):

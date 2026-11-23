@@ -72,6 +72,26 @@ class ExperimentTests(unittest.TestCase):
         self.assertFalse(terminated)
         self.assertTrue(truncated)
 
+    def test_positive_wheel_action_rolls_forward(self):
+        import mujoco
+        import numpy as np
+        self.env.reset(seed=7)
+        self.env.data.qpos[3:7]=[1.0,0.0,0.0,0.0]
+        self.env.data.qvel[:]=0.0
+        mujoco.mj_forward(self.env.model,self.env.data)
+        rotation=self.env._rotation().copy()
+        # The exported wheel axles point along opposite world axes, so a
+        # positive policy action must map to this mirrored joint velocity.
+        self.env.data.qvel[self.env.v_indices[4:]]=self.env.wheel_action_sign
+        mujoco.mj_forward(self.env.model,self.env.data)
+        rolling=[]
+        velocity=np.empty(6)
+        for body in self.env.wheel_ids:
+            mujoco.mj_objectVelocity(self.env.model,self.env.data,mujoco.mjtObj.mjOBJ_BODY,body,velocity,0)
+            implied=np.cross(velocity[:3],[0.0,0.0,float(self.env.config["physics"]["wheel_radius_m"])])
+            rolling.append(float((rotation.T@implied)[0]))
+        self.assertTrue(all(value>0.01 for value in rolling),rolling)
+
 
 if __name__=="__main__":
     unittest.main()

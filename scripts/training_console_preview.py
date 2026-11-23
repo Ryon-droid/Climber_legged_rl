@@ -75,7 +75,8 @@ def main():
         env = make_mujoco_env(xml, cfg)
         protocol_path = folder/'protocol.json'
         protocol = json.loads(protocol_path.read_text()) if protocol_path.exists() else {}
-        motor_envelope = apply_standing_motor_limit(env, protocol.get('standing_leg_torque_limit_Nm'))
+        motor_envelope = apply_standing_motor_limit(env, protocol.get('standing_leg_torque_limit_Nm'),
+                                                   protocol.get('standing_wheel_kv'))
         env.unwrapped.push.config = dict(env.unwrapped.push.config, episode_probability=float(args.force > 0),
                                         force_N=[args.force, args.force] if args.force else [2., 15.])
         env.unwrapped.push.config.pop('force_bands', None)
@@ -102,10 +103,14 @@ def main():
                     renderer.update_scene(env.data, camera=camera, scene_option=option)
                     frame = Image.fromarray(renderer.render().copy())
                     draw = ImageDraw.Draw(frame)
-                    draw.rectangle((0, 0, 640, 43), fill='#101b29')
+                    draw.rectangle((0, 0, 640, 59), fill='#101b29')
                     force = float(np.linalg.norm(info.get('push_force_world_N', [0., 0., 0.])))
                     draw.text((12, 6), f'CLIMBER | actual policy | {env.steps*env.dt:.2f}s | {args.mode} | {args.force:g}N test', fill='white')
                     draw.text((12, 24), f'Applied now: {force:.1f}N | 208mm stop | seed {args.seed}', fill='#aee8cd')
+                    displacement = float(info.get('planar_displacement_m', 0.))
+                    tilt = float(np.degrees(info.get('tilt_rad', 0.)))
+                    gain = motor_envelope['standing_wheel_kv']
+                    draw.text((12, 42), f'Distance: {displacement:.3f}m | Tilt: {tilt:.1f}deg | standing wheel kv: {gain:g}', fill='#ffdf91')
                     encoder.send(np.asarray(frame))
                     if frames == 0:
                         frame.save(output.with_suffix('.jpg'))

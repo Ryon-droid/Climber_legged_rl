@@ -12,6 +12,7 @@ control:
   leg_speed_limit_rad_s: 15.0
   leg_torque_limit_Nm: 40.0
   wheel_action_scale_rad_s: 10.0
+  wheel_action_sign: [1.0, -1.0]
   wheel_joints:
   - left_link 3_joint
   - right_link 3_joint

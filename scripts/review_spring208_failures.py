@@ -162,7 +162,7 @@ def simulate(slug,seed,title,reference,policy):
             action=policy.predict(obs,deterministic=True)[0]
             command=np.clip(action.astype(np.float32),-1.,1.)
             targets=task._leg_targets(command).copy()
-            wheel_targets=command[4:]*task.control['wheel_action_scale_rad_s']
+            wheel_targets=command[4:]*task.control['wheel_action_scale_rad_s']*task.wheel_action_sign
             torques.clear()
             obs,_,done,truncated,info=env.step(action)
             torque=np.asarray(torques)

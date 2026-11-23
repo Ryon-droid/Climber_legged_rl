@@ -45,7 +45,7 @@ def main():
                             displacement_mm=1000*info['planar_displacement_m'],
                             action=action.tolist(), torque_Nm=info['motor_torque_Nm'],
                             contacts=info['wheel_contacts'],
-                            wheel_targets_rad_s=(np.clip(action[4:], -1, 1)*raw.control['wheel_action_scale_rad_s']).tolist(),
+                            wheel_targets_rad_s=(np.clip(action[4:], -1, 1)*raw.control['wheel_action_scale_rad_s']*raw.wheel_action_sign).tolist(),
                             wheel_actual_rad_s=raw.data.qvel[raw.v_indices[4:]].tolist()))
                     if done or truncated:
                         break
