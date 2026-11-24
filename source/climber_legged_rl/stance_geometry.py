@@ -23,7 +23,14 @@ def _mesh_points_in_body(model, mesh_name, body_name):
 def motor_midpoints_in_base(model, physics):
     """Fit concentric CAD motor housing centers; never use driven joint origins."""
     from .chassis_frame import frame_from_mounting_plate
-    frame = frame_from_mounting_plate(model, physics['chassis_reference_mesh'])
+    ref_mesh = physics.get('chassis_reference_mesh')
+    if ref_mesh:
+        try:
+            frame = frame_from_mounting_plate(model, ref_mesh)
+        except ValueError:
+            frame = np.eye(3)
+    else:
+        frame = np.eye(3)
     midpoints = []
     evidence = {}
     for side in ('left', 'right'):

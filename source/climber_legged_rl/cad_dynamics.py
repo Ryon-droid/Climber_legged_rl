@@ -98,7 +98,7 @@ def geom_vertices(model, data, geom_id):
     return vertices @ data.geom_xmat[geom_id].reshape(3, 3).T + data.geom_xpos[geom_id]
 
 
-def solve_ground_pose(model, initial, config):
+def solve_ground_pose(model, initial, config, chassis_frame=None):
     """Seek a closed, symmetric pose with wheel bottoms below CAD body geometry."""
     data = mujoco.MjData(model)
     wheels = [model.body(s + '_link 3').id for s in ('left', 'right')]
@@ -119,7 +119,17 @@ def solve_ground_pose(model, initial, config):
         from .chassis_frame import frame_from_mounting_plate
         midpoint, _ = motor_midpoints_in_base(model, physics)
         wheel_centers = wheel_centers_in_wheel_bodies(model, physics)
-        frame = frame_from_mounting_plate(model, physics['chassis_reference_mesh'])
+        if chassis_frame is None:
+            ref_mesh = physics.get('chassis_reference_mesh')
+            if ref_mesh:
+                try:
+                    chassis_frame = frame_from_mounting_plate(model, ref_mesh)
+                except ValueError:
+                    pass
+            if chassis_frame is None:
+                # Identity frame: base axes are world axes (source CAD is already level).
+                chassis_frame = np.eye(3)
+        frame = chassis_frame
         requested = physics['rest_motor_midpoint_to_wheel_center_m']
     else:
         requested = physics['rest_height_hip_above_wheel_m']
@@ -181,26 +191,68 @@ def build_dynamics(config_path=DEFAULT_DYNAMICS_CONFIG):
     base_quaternion = np.array([0., 0., 0., 1.])
     chassis_frame = None
     reference_mesh = config['physics'].get('chassis_reference_mesh')
+    solver_quaternion = np.array([0., 0., 0., 1.])
     if reference_mesh:
         from .chassis_frame import horizontal_base_quaternion
-        base_quaternion, chassis_frame = horizontal_base_quaternion(fixed, reference_mesh)
-        fixed_base = root.find('./worldbody/body')
-        fixed_base.attrib.pop('euler', None)
-        fixed_base.set('quat', ' '.join(format(v, '.15g') for v in base_quaternion))
-        fixed = mujoco.MjModel.from_xml_string(ET.tostring(root, encoding='unicode'))
+        try:
+            solver_quaternion, chassis_frame = horizontal_base_quaternion(fixed, reference_mesh)
+        except ValueError as exc:
+            import warnings
+            warnings.warn(f'chassis_reference_mesh {reference_mesh!r} rejected: {exc}; '
+                          f'falling back to identity base quaternion for solver')
+            reference_mesh = None
+        else:
+            fixed_base = root.find('./worldbody/body')
+            fixed_base.attrib.pop('euler', None)
+            fixed_base.set('quat', ' '.join(format(v, '.15g') for v in solver_quaternion))
+            fixed = mujoco.MjModel.from_xml_string(ET.tostring(root, encoding='unicode'))
     original_masses = {fixed.body(i).name: float(fixed.body_mass[i]) for i in range(1, fixed.nbody)}
     qpos = fixed.key_qpos[0].copy()
-    qpos, attempts = solve_ground_pose(fixed, qpos, config)
+    qpos, attempts = solve_ground_pose(fixed, qpos, config, chassis_frame=chassis_frame)
+    # The solver may use a tilted chassis_reference_mesh to make body_clearance
+    # computable (the base body in cad_repaired holds all leg meshes too).  The
+    # solved leg angles are relative to the base local frame, so we can transfer
+    # them back onto a level (identity-quaternion) model for the final artefact.
+    final_root = ET.parse(source).getroot()
+    final_fixed_base = final_root.find('./worldbody/body')
+    final_fixed_base.attrib.pop('euler', None)
+    final_fixed_base.set('quat', '0 0 0 1')
+    fixed = mujoco.MjModel.from_xml_string(ET.tostring(final_root, encoding='unicode'))
     data = mujoco.MjData(fixed)
     data.qpos[:] = qpos
     mujoco.mj_forward(fixed, data)
     physics = config['physics']
     control = config['control']
     radius = physics['wheel_radius_m']
-    all_bottoms = [geom_vertices(fixed, data, g)[:, 2].min() for g in range(fixed.ngeom)]
-    z = -float(min(all_bottoms)) + physics['reset_clearance_m']
-    wheel_bottom = min(data.body(s + '_link 3').xpos[2]-radius for s in ('left','right'))
-    z = max(z, -float(wheel_bottom)+physics['reset_clearance_m'])
+    # The cad_repaired XML dumps every leg mesh into the base body too, so
+    # min(all_bottoms) would pick up a phantom leg-part vertex far below the
+    # actual chassis plate.  Instead, raise the base so the wheel bottoms
+    # just touch the ground; the original solver-quaternion path had to
+    # account for those duplicate meshes, but the level-quaternion artefact
+    # only cares that the real wheel contact lands at z=0.
+    # Find the largest (outer tire) geom in each wheel body FIRST, before
+    # computing z.  Using wheel body xpos - radius was wrong because the
+    # body frame origin is offset ~80mm from the actual tire contact surface.
+    # Use the collision geom's own position and size instead.
+    wheel_collision_ids = {}
+    for side in ('left', 'right'):
+        body_name = f"{side}_link 3"
+        body_geoms = [g for g in range(fixed.ngeom)
+                      if fixed.geom_bodyid[g] == mujoco.mj_name2id(fixed, mujoco.mjtObj.mjOBJ_BODY, body_name)]
+        if not body_geoms:
+            raise RuntimeError(f"No geoms in wheel body {body_name}")
+        # Pick the geom with the largest z-extent (outer tire).
+        largest = max(body_geoms, key=lambda g: float(np.ptp(geom_vertices(fixed, data, g), axis=0)[2]))
+        wheel_collision_ids[side] = largest
+    wheel_bottom_fixed = min(
+        data.geom_xpos[wheel_collision_ids[s]][2] - fixed.geom_size[wheel_collision_ids[s]][0]
+        for s in ('left', 'right')
+    )
+    z = -float(wheel_bottom_fixed) + physics['reset_clearance_m']
+    # Write the level-quaternion base into the working tree so later freejoint
+    # and option edits apply to the level model.
+    root = final_root
+    base_quaternion = np.array([0., 0., 0., 1.])
     base = root.find('./worldbody/body')
     base.set('pos', f'0 0 {z:.15g}')
     base.set('quat', ' '.join(format(v, '.15g') for v in base_quaternion))
@@ -231,6 +283,19 @@ def build_dynamics(config_path=DEFAULT_DYNAMICS_CONFIG):
         largest = max(geoms, key=lambda g: float(np.ptp(geom_vertices(fixed, data, fixed.geom(g.get('name')).id), axis=0)[2]))
         largest.set('name', side + '_wheel_collision')
         largest.set('friction',f"{physics['wheel_friction']} .005 .0001")
+    # Everything except the explicit wheel tire collides with nothing.  The
+    # cad_repaired XML piles every leg mesh into the base body too, so those
+    # phantom vertices sit far below the chassis plate in the level artefact.
+    # Set inactive geoms to (0, 0) so MuJoCo skips them entirely.  The active
+    # wheel tire keeps (2, 1) to match ground (1, 2):
+    #   ground.conaffinity(2) & wheel.contype(2) = 2  ✓
+    #   wheel.conaffinity(1)  & ground.contype(1) = 1  ✓
+    for geom in root.findall('.//body/geom'):
+        geom.set('contype', '0'); geom.set('conaffinity', '0')
+    for side in ('left', 'right'):
+        coll = root.find(f'.//body/geom[@name="{side}_wheel_collision"]')
+        if coll is not None:
+            coll.set('contype', '2'); coll.set('conaffinity', '1')
     # Env uses a set of all base mesh geoms; name one for legacy API compatibility.
     base.find('geom').set('name', 'base_collision')
     active = set(control['leg_joints'] + control['wheel_joints'])
@@ -238,9 +303,11 @@ def build_dynamics(config_path=DEFAULT_DYNAMICS_CONFIG):
         joint.set('damping', str(physics['joint_damping']))
         joint.set('armature', str(physics['active_armature'] if joint.get('name') in active else physics['passive_armature']))
     # Apply opt-in get-up ranges AFTER solving the unchanged standing keyframe.
-    # These replace CAD exporter branch guards only in the explicit combined task.
+    # They replace CAD exporter branch guards in the explicit get-up task and in the
+    # velocity stage that keeps the same 36-input standing action map.
     overrides = physics.get('joint_range_overrides_rad', {})
-    if overrides and not config.get('getup', {}).get('enabled'):
+    preserved_standing = config.get('task', {}).get('velocity_observation_layout') == 'getup_standing'
+    if overrides and not (config.get('getup', {}).get('enabled') or preserved_standing):
         raise ValueError('Joint range overrides require the explicit get-up task')
     for name, bounds in overrides.items():
         joint = root.find(f'.//body/joint[@name="{name}"]')
@@ -300,7 +367,8 @@ def build_dynamics(config_path=DEFAULT_DYNAMICS_CONFIG):
         from .stance_geometry import motor_midpoints_in_base, wheel_centers_in_wheel_bodies, virtual_leg_geometry
         midpoint, evidence = motor_midpoints_in_base(model,physics)
         wheel_centers = wheel_centers_in_wheel_bodies(model,physics)
-        geometry = virtual_leg_geometry(model,data,midpoint,wheel_centers,chassis_frame)
+        rep_frame = chassis_frame if chassis_frame is not None else np.eye(3)
+        geometry = virtual_leg_geometry(model,data,midpoint,wheel_centers,rep_frame)
         report['standing_geometry'] = {k:v.tolist() for k,v in geometry.items()}
         report['standing_geometry']['definition'] = physics['standing_distance_definition']
         report['standing_geometry']['target_distance_m'] = physics['rest_motor_midpoint_to_wheel_center_m']

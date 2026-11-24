@@ -66,7 +66,14 @@ def solve_positions(model, prescribed=None, height=None, initial=None, continuit
         from .chassis_frame import frame_from_mounting_plate
         midpoint,_=motor_midpoints_in_base(model,stance_physics)
         wheel_centers=wheel_centers_in_wheel_bodies(model,stance_physics)
-        frame=frame_from_mounting_plate(model,stance_physics['chassis_reference_mesh'])
+        ref_mesh = stance_physics.get('chassis_reference_mesh')
+        if ref_mesh:
+            try:
+                frame = frame_from_mounting_plate(model, ref_mesh)
+            except ValueError:
+                frame = np.eye(3)
+        else:
+            frame = np.eye(3)
     motor_names=['left_link1_joint','left_link_rear_1_joint','right_link1_joint','right_rear_link1_joint']
     wheels=['left_link 3_joint','right_link 3_joint']
     fixed={int(model.joint(n).qposadr[0]):0.0 for n in wheels}
@@ -264,7 +271,14 @@ def build_repaired(config_path=DEFAULT_REPAIR_CONFIG):
         from .chassis_frame import frame_from_mounting_plate
         midpoint,evidence=motor_midpoints_in_base(model,stance_physics)
         wheel_centers=wheel_centers_in_wheel_bodies(model,stance_physics)
-        frame=frame_from_mounting_plate(model,stance_physics['chassis_reference_mesh'])
+        ref_mesh = stance_physics.get('chassis_reference_mesh')
+        if ref_mesh:
+            try:
+                frame = frame_from_mounting_plate(model, ref_mesh)
+            except ValueError:
+                frame = np.eye(3)
+        else:
+            frame = np.eye(3)
         geometry=virtual_leg_geometry(model,stance,midpoint,wheel_centers,frame)
         stance_report['motor_midpoint_to_wheel_side_view_m']=geometry['side_view_distance_m'].tolist()
         stance_report['target_motor_midpoint_to_wheel_side_view_m']=stance_physics['rest_motor_midpoint_to_wheel_center_m']

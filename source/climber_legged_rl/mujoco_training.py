@@ -29,6 +29,8 @@ from .mujoco_model import ROOT, load_config
 def _factory(model_path,config_path,seed,monitor_path):
     def make():
         env=ClimberMujocoEnv(model_path,config_path)
+        if hasattr(env,'enable_training_curriculum'):
+            env.enable_training_curriculum()
         training = load_config(config_path)['training']
         hard = training.get('hard_standing_resets', {})
         if monitor_path is not None and hard.get('enabled'):
@@ -542,6 +544,42 @@ def full_policy_getup_transfer(previous_model, model_path, previous_config, conf
         raise ValueError('Full policy migration rejects XML changes beyond four leg motor limits')
 
 
+def wheel_control_transfer(previous_model, model_path, previous_config):
+    """Permit the validated wheel servo change plus chassis pose corrections."""
+    old, new = ET.parse(previous_model).getroot(), ET.parse(model_path).getroot()
+    for name in previous_config['control']['wheel_joints']:
+        a = old.find('./actuator/motor[@joint="' + name + '"]')
+        b = new.find('./actuator/motor[@joint="' + name + '"]')
+        if a is None or b is None:
+            raise ValueError('Wheel control migration requires both wheel motors')
+        if (a.get('ctrllimited') != 'true' or b.get('ctrllimited') != 'true'
+                or not np.array_equal(np.fromstring(a.get('ctrlrange', ''), sep=' '), [-2., 2.])
+                or not np.array_equal(np.fromstring(b.get('ctrlrange', ''), sep=' '), [-4., 4.])):
+            raise ValueError('Unexpected wheel motor limits')
+        a.set('ctrlrange', b.get('ctrlrange'))
+    # Copy wheel contact-layer edits: every geom's contype/conaffinity changed
+    # so only the tire collides with ground in the level-chassis artefact.
+    new_geoms = {g.get('name'): g for g in new.findall('.//body/geom')}
+    for og in old.findall('.//body/geom'):
+        ng = new_geoms.get(og.get('name'))
+        if ng is not None:
+            og.set('contype', ng.get('contype'))
+            og.set('conaffinity', ng.get('conaffinity'))
+    # Copy base pose and new keyframes.
+    old_base = old.find('./worldbody/body')
+    new_base = new.find('./worldbody/body')
+    old_base.set('pos', new_base.get('pos'))
+    old_base.set('quat', new_base.get('quat'))
+    old_keys = {k.get('name'): k for k in old.findall('.//keyframe/key')}
+    for nk in new.findall('.//keyframe/key'):
+        oname = nk.get('name')
+        if oname in old_keys:
+            old_keys[oname].set('qpos', nk.get('qpos'))
+    canonical = lambda root: ET.canonicalize(ET.tostring(root, encoding='unicode'), strip_text=True)
+    if canonical(old) != canonical(new):
+        raise ValueError('Wheel control migration rejects XML changes beyond wheel motor limits and base pose')
+
+
 def validate_policy_transfer(checkpoint, model_path, config, warm_start=False):
     """Strict transfer with explicit, narrowly checked spring-stop / CAD-guard migrations."""
     checkpoint=Path(checkpoint).resolve()
@@ -559,8 +597,14 @@ def validate_policy_transfer(checkpoint, model_path, config, warm_start=False):
             raise ValueError('Changing velocity estimation requires explicit warm-start migration')
     old_dynamic=previous_config.get('getup',{}).get('dynamic_control',{}).get('enabled',False)
     new_dynamic=config.get('getup',{}).get('dynamic_control',{}).get('enabled',False)
+    old_policy = previous_config.get('getup', {}).get('policy_control', {}).get('enabled', False)
+    new_policy = config.get('getup', {}).get('policy_control', {}).get('enabled', False)
+    velocity_standing = bool(warm_start and not config.get('getup', {}).get('enabled', False)
+                             and config.get('task', {}).get('velocity_tracking', False)
+                             and config['training'].get('allow_velocity_standing_warm_start', False)
+                             and old_policy and not new_policy)
     if warm_start and old_dynamic!=new_dynamic:
-        if not (new_dynamic and config['training'].get('allow_dynamic_getup_warm_start',False)):
+        if not (new_dynamic and config['training'].get('allow_dynamic_getup_warm_start',False)) and not velocity_standing:
             raise ValueError('Dynamic get-up changes the rising action map; explicit warm-start permission required')
     model_changed = previous_model.read_bytes()!=Path(model_path).read_bytes()
     old_support = previous_config.get('getup', {}).get('support_control', {}).get('enabled', False)
@@ -571,20 +615,37 @@ def validate_policy_transfer(checkpoint, model_path, config, warm_start=False):
         if not support_migration:
             raise ValueError('Supported get-up action map requires explicit warm-start permission')
         supported_getup_transfer(previous_model, model_path, previous_config, config)
-    old_policy = previous_config.get('getup', {}).get('policy_control', {}).get('enabled', False)
-    new_policy = config.get('getup', {}).get('policy_control', {}).get('enabled', False)
     policy_migration = bool(warm_start and not old_policy and new_policy and not old_support and not new_support
                             and config['training'].get('allow_policy_getup_warm_start', False))
     if warm_start and old_policy != new_policy:
-        if not policy_migration:
+        if not policy_migration and not velocity_standing:
             raise ValueError('Full policy get-up requires explicit warm-start permission')
-        full_policy_getup_transfer(previous_model, model_path, previous_config, config)
+        if policy_migration:
+            full_policy_getup_transfer(previous_model, model_path, previous_config, config)
     getup_migration = bool(warm_start and model_changed and config['training'].get('allow_getup_guard_warm_start', False))
     spring_migration = bool(warm_start and model_changed and (config['training'].get('allow_spring_limit_warm_start', False) or getup_migration))
+    wheel_control_migration = bool(
+        warm_start and config['training'].get('allow_wheel_control_warm_start', False)
+        and previous_config.get('control', {}).get('wheel_kv') == 0.2
+        and config.get('control', {}).get('wheel_kv') == 0.5
+        and previous_config.get('control', {}).get('wheel_torque_limit_Nm') == 2.
+        and config.get('control', {}).get('wheel_torque_limit_Nm') == 4.)
+    if wheel_control_migration:
+        old_control = dict(previous_config['control'])
+        new_control = dict(config['control'])
+        old_control.pop('wheel_kv')
+        new_control.pop('wheel_kv')
+        old_control.pop('wheel_torque_limit_Nm')
+        new_control.pop('wheel_torque_limit_Nm')
+        if old_control != new_control:
+            raise ValueError('Wheel control migration only permits wheel_kv and wheel torque limit')
     if model_changed and not (support_migration or policy_migration):
-        if not spring_migration:
+        if wheel_control_migration:
+            wheel_control_transfer(previous_model, model_path, previous_config)
+        elif spring_migration:
+            spring_limit_transfer(previous_model, model_path, previous_config, config, allow_getup_guards=getup_migration)
+        else:
             raise ValueError('Policy transfer requires an existing checkpoint and the identical derived model.')
-        spring_limit_transfer(previous_model, model_path, previous_config, config, allow_getup_guards=getup_migration)
     from .observation_history import history_frames
     if (warm_start and history_frames(previous_config) != history_frames(config)
             and not config['training'].get('history_standing_actor', False)):
@@ -593,7 +654,7 @@ def validate_policy_transfer(checkpoint, model_path, config, warm_start=False):
           ('mass','physics','control','spring','task','reward','push','getup',
            'observations','robustness','balance_recovery'))
     for key in keys:
-        if key == 'control' and (support_migration or policy_migration):
+        if key == 'control' and (support_migration or policy_migration or wheel_control_migration):
             continue
         if key == 'spring' and spring_migration:
             continue
@@ -696,10 +757,10 @@ def load_warm_start(checkpoint, vector, settings, device, seed):
             previous.policy.mlp_extractor.policy_net.standing_net.requires_grad_(not standing_frozen)
             previous.policy.mlp_extractor.policy_net.standing_head.requires_grad_(not standing_frozen)
             previous.policy_kwargs['freeze_rising_actor'] = frozen
-            fixed_std = settings.get('freeze_action_std', False)
-            if type(fixed_std) is not bool:
-                raise ValueError('freeze_action_std must be a boolean')
-            previous.policy.log_std.requires_grad_(not fixed_std)
+        fixed_std = settings.get('freeze_action_std', False)
+        if type(fixed_std) is not bool:
+            raise ValueError('freeze_action_std must be a boolean')
+        previous.policy.log_std.requires_grad_(not fixed_std)
         if (settings.get('allow_spring_limit_warm_start', False) or settings.get('allow_getup_guard_warm_start', False)
                 or settings.get('reset_optimizer_on_warm_start',False)):
             previous.policy.optimizer = previous.policy.optimizer_class(previous.policy.parameters(),
@@ -903,6 +964,17 @@ def train(config_path,total_steps=None,num_envs=None,device="cpu",run_name=None,
                 rising_action_map='current_joint_position_plus_action_times_incremental_scale',
                 standing_action_map='historical_nominal_plus_residual',
                 note='Initialization only; old get-up behavior is not preserved by the new rising controller')
+        if settings.get('allow_velocity_standing_warm_start', False):
+            metadata['velocity_standing_transfer'] = dict(
+                parent_control='policy_getup', standing_resets_only=True,
+                velocity_tracking=bool(config.get('task', {}).get('velocity_tracking')),
+                observation_layout=config.get('task', {}).get('velocity_observation_layout'),
+                note='Get-up resets suspended; the 36-input standing layout is preserved')
+        if settings.get('allow_wheel_control_warm_start', False):
+            metadata['wheel_control_transfer'] = dict(
+                parent_wheel_kv=0.2, wheel_kv=config['control']['wheel_kv'],
+                parent_wheel_torque_limit_Nm=2., wheel_torque_limit_Nm=config['control']['wheel_torque_limit_Nm'],
+                note='Stronger wheel servo and torque envelope; leg control unchanged')
         if settings.get('allow_spring_limit_warm_start', False) or settings.get('allow_getup_guard_warm_start', False):
             metadata['spring_limit_transfer'] = dict(
                 kind='gas_slider_limits_and_explicit_getup_branch_guards' if settings.get('allow_getup_guard_warm_start') else 'only_add_two_gas_slider_travel_limits',

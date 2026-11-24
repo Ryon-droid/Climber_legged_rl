@@ -2,6 +2,7 @@
 import numpy as np
 
 from .mujoco_env import ClimberMujocoEnv
+from .mujoco_model import load_config
 
 
 class ClimberVelocityEnv(ClimberMujocoEnv):
@@ -9,6 +10,14 @@ class ClimberVelocityEnv(ClimberMujocoEnv):
     extra_observation_dimensions = 6
 
     def __init__(self, model_path, config_path, render_mode=None):
+        layout = load_config(config_path).get('task', {}).get('velocity_observation_layout')
+        if layout not in (None, 'getup_standing'):
+            raise ValueError('Unknown velocity observation layout: ' + str(layout))
+        self.getup_standing_layout = layout == 'getup_standing'
+        if self.getup_standing_layout:
+            # Keep the 36-input single-actor layout used by the get-up policy:
+            # stationary feedback plus the standing branch's get-up context.
+            self.extra_observation_dimensions = 12
         super().__init__(model_path, config_path, render_mode)
         if self.stationary_hold or self.config.get('getup', {}).get('enabled'):
             raise ValueError('Velocity task requires standing resets with stationary_hold=false')
@@ -23,6 +32,33 @@ class ClimberVelocityEnv(ClimberMujocoEnv):
         if not 0 <= self.schedule.get('axis_probability',0.) <= 1:
             raise ValueError('Invalid single-axis command probability')
         self.idle_hold = True
+        self.training_curriculum = False
+        self.curriculum_steps = 0
+
+    def enable_training_curriculum(self):
+        """Enable training-only motion bootstrap; evaluation never calls this."""
+        self.training_curriculum = True
+
+    def _bootstrap_scale(self):
+        decay = float(self.config['task'].get('velocity_bootstrap', {}).get('decay_env_steps', 0))
+        if decay <= 0:
+            return 1.
+        return max(0., 1. - self.curriculum_steps / decay)
+
+    def _bootstrap_action(self, action):
+        bootstrap = self.config['task'].get('velocity_bootstrap', {})
+        if not self.training_curriculum or not bootstrap.get('enabled', False) or self.idle_hold:
+            return action
+        scale = self._bootstrap_scale()
+        seconds = float(bootstrap.get('seconds', 1.2))
+        age = self.steps * self.dt - self.command_changed_seconds
+        if scale <= 0 or age < 0 or age > seconds:
+            return action
+        fade = min(1., age / 0.15) * min(1., max(0., (seconds - age) / 0.3))
+        gain = float(bootstrap.get('action_per_m_s', 2.5)) * fade * scale
+        applied = action.copy()
+        applied[4:] -= gain * self.command_target[0]
+        return np.clip(applied, -1., 1.)
 
     def _extra_observation(self):
         _, linear, _ = self._kinematics()
@@ -32,7 +68,13 @@ class ClimberVelocityEnv(ClimberMujocoEnv):
             feedback = [* (local[:2] * 5.), np.sin(heading), np.cos(heading)-1.]
         else:
             feedback = [0., 0., 0., 0.]
-        return np.r_[feedback, linear[:2] * 2.]
+        extra = np.r_[feedback, linear[:2] * 2.]
+        if self.getup_standing_layout:
+            # Standing values of the get-up branch: zero joint reference offsets,
+            # hip-height error and a phase of one.
+            extra = np.r_[extra, np.zeros(4),
+                          (self.data.xpos[self.hip_ids, 2].mean() - self.target_hip_height) * 5., 1.]
+        return extra
 
     def _new_command(self, command):
         self.ramp_start = self.commands.copy()
@@ -94,7 +136,7 @@ class ClimberVelocityEnv(ClimberMujocoEnv):
         executed_command = self.commands.copy()
         executed_idle = self.idle_hold
         changed = self.command_changed_seconds
-        _, reward, done, truncated, info = super().step(action)
+        _, reward, done, truncated, info = super().step(self._bootstrap_action(action))
         angular, linear, _ = self._kinematics()
         task, weights = self.config['task'], self.config['reward']
         terms = info['reward_terms']
@@ -116,4 +158,5 @@ class ClimberVelocityEnv(ClimberMujocoEnv):
         if done or truncated:
             info['episode_metrics']['reward'] = self._total_reward
         self._update_commands()
+        self.curriculum_steps += 1
         return self._observation(), reward, done, truncated, info

@@ -55,7 +55,17 @@ class ClimberMujocoEnv(gym.Env):
         reference_mesh = self.config['physics'].get('chassis_reference_mesh')
         if reference_mesh:
             from .chassis_frame import frame_from_mounting_plate
-            self.chassis_axes = frame_from_mounting_plate(self.model, reference_mesh)
+            try:
+                self.chassis_axes = frame_from_mounting_plate(self.model, reference_mesh)
+            except ValueError:
+                self.chassis_axes = np.eye(3)
+            # If the base is already level (identity quaternion), don't apply
+            # an extra rotation -- frame_from_mounting_plate returns the
+            # mounting-plate mesh orientation in base-local frame, which is
+            # only needed to compensate for a tilted chassis_reference_mesh.
+            base_quat = self.model.key_qpos[0][3:7]
+            if np.allclose(base_quat, [0.0, 0.0, 0.0, 1.0], atol=0.01):
+                self.chassis_axes = np.eye(3)
         else:
             # Preserve the observation contract of historical checkpoints.
             self.chassis_axes = np.diag([-1.0, -1.0, 1.0])
@@ -200,8 +210,12 @@ class ClimberMujocoEnv(gym.Env):
         self._total_reward = 0.0
         mujoco.mj_forward(self.model, self.data)
         # Lift the entire reset slightly to avoid starting in ground penetration.
-        min_wheel_z = min(self.data.xpos[i, 2] for i in self.wheel_ids)
-        self.data.qpos[2] += max(0.0, self.config["physics"]["wheel_radius_m"] + 0.001 - min_wheel_z)
+        # Use the wheel collision geom's actual bottom, not wheel body xpos
+        # (the body frame origin is offset ~80mm from the tire contact surface).
+        min_wheel_geom_bottom = min(
+            self.data.geom_xpos[g][2] - self.model.geom_size[g][0] for g in self.wheel_geoms
+        )
+        self.data.qpos[2] += max(0.0, 0.001 - min_wheel_geom_bottom)
         mujoco.mj_forward(self.model, self.data)
         self._set_hold_reference()
         self._last_warning_counts = np.array(self.data.warning.number).copy()
