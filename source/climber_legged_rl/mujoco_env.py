@@ -12,6 +12,22 @@ import numpy as np
 from .mujoco_model import DEFAULT_CONFIG, load_config, closure_error
 
 
+def geom_lowest_z(model, data, geom_id):
+    """World-frame lowest point of a geom.
+
+    For mesh geoms geom_size holds AABB half-extents, not the shape radius, so
+    the lowest point has to come from the transformed mesh vertices.
+    """
+    mesh_id = int(model.geom_dataid[geom_id])
+    if model.geom_type[geom_id] == mujoco.mjtGeom.mjGEOM_MESH and mesh_id >= 0:
+        start = int(model.mesh_vertadr[mesh_id])
+        count = int(model.mesh_vertnum[mesh_id])
+        vertices = model.mesh_vert[start:start + count]
+        world = vertices @ data.geom_xmat[geom_id].reshape(3, 3).T + data.geom_xpos[geom_id]
+        return float(world[:, 2].min())
+    return float(data.geom_xpos[geom_id][2] - model.geom_size[geom_id][0])
+
+
 class ClimberMujocoEnv(gym.Env):
     extra_observation_dimensions = 0
     metadata = {"render_modes": ["rgb_array"], "render_fps": 100}
@@ -209,13 +225,15 @@ class ClimberMujocoEnv(gym.Env):
         self.steps = 0
         self._total_reward = 0.0
         mujoco.mj_forward(self.model, self.data)
-        # Lift the entire reset slightly to avoid starting in ground penetration.
-        # Use the wheel collision geom's actual bottom, not wheel body xpos
-        # (the body frame origin is offset ~80mm from the tire contact surface).
+        # Lift the entire reset to the configured clearance.  Mesh geoms store
+        # their AABB half-extents in geom_size, not a radius, so the true
+        # lowest point has to come from the world-frame mesh vertices.
         min_wheel_geom_bottom = min(
-            self.data.geom_xpos[g][2] - self.model.geom_size[g][0] for g in self.wheel_geoms
+            geom_lowest_z(self.model, self.data, g) for g in self.wheel_geoms
         )
-        self.data.qpos[2] += max(0.0, 0.001 - min_wheel_geom_bottom)
+        self.data.qpos[2] += max(
+            0.0, self.config['physics']['reset_clearance_m'] - min_wheel_geom_bottom
+        )
         mujoco.mj_forward(self.model, self.data)
         self._set_hold_reference()
         self._last_warning_counts = np.array(self.data.warning.number).copy()
