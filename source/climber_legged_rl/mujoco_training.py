@@ -936,6 +936,22 @@ def train(config_path,total_steps=None,num_envs=None,device="cpu",run_name=None,
             # Old distribution moments do not describe the explicitly reset std.
             model.policy.optimizer.state.pop(model.policy.log_std,None)
             metadata['warm_start_action_std_reset']=action_std
+        if (config.get('task',{}).get('wheel_command_layout')=='v_yaw'
+                and settings.get('remap_wheel_channels_warm_start',False)):
+            # Exact reparameterization of the parent (left, right) output rows into
+            # (v, yaw): v = (left + right) / 2 and yaw = (right - left) / 2. With the
+            # v_yaw mixing the initial wheel commands and observations reproduce the
+            # parent policy exactly, so forward/backward do not regress.
+            with torch.no_grad():
+                weight = model.policy.action_net.weight
+                bias = model.policy.action_net.bias
+                w_left, w_right = weight[4].clone(), weight[5].clone()
+                b_left, b_right = bias[4].clone(), bias[5].clone()
+                weight[4] = 0.5 * (w_left + w_right)
+                bias[4] = 0.5 * (b_left + b_right)
+                weight[5] = 0.5 * (w_right - w_left)
+                bias[5] = 0.5 * (b_right - b_left)
+            metadata['wheel_channel_warm_start']='left/right output rows remapped to v/yaw'
         metadata['warm_start_checkpoint']=str(warm_start)
         metadata['parent_timesteps']=parent_steps
         metadata['warm_start_checkpoint_sha256']=hashlib.sha256(warm_start.read_bytes()).hexdigest()

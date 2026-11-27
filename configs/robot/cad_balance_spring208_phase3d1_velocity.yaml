@@ -46,6 +46,104 @@ experiment:
     2 to 4 Nm; leg gains, geometry, mass and spring stay unchanged. Standing resets only,
     same 36-input layout, forward/backward commands +/-0.12 m/s, yaw zero. Simulation
     targets only."
+  - "S4d-3 tracking bandwidth: linear_tracking_sigma_m_s falls 0.3 to 0.08. At 0.3 the
+    0.12 m/s commands were only 0.4 sigma, so standing still kept 85 percent of the
+    tracking reward and every lineage stalled at zero speed. Simulation target only."
+  - "S4d-4 motion bootstrap: the policy learns a constant light brake and never starts
+    rolling, so the training-only velocity_bootstrap feed-forward (2.5 action per m/s for
+    1.2 s after a command change) kick-starts motion. Evaluation never applies it."
+  - "S4d-5: bootstrap sign fixed (+= now drives forward) and linear_tracking weight
+    rises 12 to 30. Standing still under a forward command kept upright and hold
+    rewards, so the policy never explored sustained motion; a larger tracking margin
+    makes moving clearly better than standing. Simulation target only."
+  - "S4d-6: learning_rate rises 3e-5 to 1e-4. Prior stages moved the wheel action only
+    0.026 per 250k steps, too slow to escape the idle-stance local optimum. Simulation only."
+  - "S4d-7: forward command rises +/-0.12 to +/-0.3. A hand-tuned wheel/pitch reference
+    controller only sustains upright forward motion above ~0.37 m/s; at 0.12 the wheels
+    and COM cannot stay balanced, so 0.12 was below the stable-motion floor. At 0.3,
+    standing still yields near-zero tracking reward, sharpening the motion gradient."
+  - "S5b-1: after the corrected mounting-plate pose, a standing stage (idle_v3, 2M steps,
+    21/21 episodes at 20 s) became the warm start. Velocity fine-tuning at 250k steps
+    left the wheel action unchanged, so exploration settings are widened: clip_range
+    0.05 to 0.2, target_kl 0.01 to 0.03, learning_rate 1e-4 to 3e-4, ent_coef 0 to
+    0.005, total 1M. Physics, control and rewards unchanged. Simulation only."
+  - "S5b-2: at 200k steps the policy still stood still: policy_gradient_loss ~1e-4 and
+    value_loss 3.4e7 showed the critic never fit, so advantages carried critic error
+    rather than action quality. vf_coef rises 0.001 to 0.5 and gamma falls 0.999 to
+    0.99 (return scale from tens of thousands to thousands; tracking reward is
+    immediate). clip/entropy/target_kl settings unchanged. Simulation only."
+  - "S5b-3: 5M steps from scratch reached 21/21 episodes at 20 s with 6.7 deg tilt and
+    13 mm stop displacement, but forward/backward RMSE stayed at 0.267/0.261 versus the
+    0.300 of a motionless policy, so the robot moved only ~0.03 m/s. linear_tracking
+    sigma_m_s widens 0.08 to 0.20 so the tracking reward is no longer flat between
+    0.03 and 0.3 m/s; the optimum stays at the commanded speed. Simulation only."
+  - "S5b-4: widening sigma to 0.20 only lifted mean speed from 0.033 to 0.048 m/s,
+    because creeping already earned 46 percent of the tracking reward. sigma returns to
+    0.08 and a linear progress term (0.5 x speed along the command / command magnitude)
+    pays continuously for approaching the commanded speed. Simulation only."
+  - "S5b-5: s5v9 held 150 mm virtual leg length versus the 135 mm target while moving
+    forward (leg RMSE 12.1 mm, the only failing item on forward), versus 2.4 mm on
+    backward. The 2.0 virtual_leg_length weight was negligible against 30.0
+    linear_tracking, so extending the leg to trade for speed was free. Weight rises
+    2.0 to 20.0 with sigma held at 0.01. Simulation only."
+  - "S5b-6 enable yaw tracking: command_yaw_rad_s opens 0 to +/-0.3 rad/s so the
+    'left' and 'right' evaluation cases are no longer idle. yaw_tracking_sigma_rad_s
+    narrows 0.4 to 0.15 to match the acceptance criterion; a 0.15 rad/s RMSE now gets
+    exp(-1)=0.375 of the tracking reward instead of the previous 0.85, which creates
+    real gradient to drive differential-wheel turning. Warm start from s5v10 which
+    is already at the forward/backward optimum so yaw is learned without touching
+    the linear controller. Simulation only."
+  - "S5b-7 fix lethal observation noise: s5v11 (yaw + DR with gravity noise 0.5 on the
+    unit gravity vector, i.e. ~30 deg attitude error) scored 0/21; ablation with the
+    s5v10 policy showed observation noise was the only component that made it fall at
+    ~6 s under a forward command, and gravity alone was responsible. Noise is now
+    gravity 0.02, angular_velocity 0.05, joint_velocity 0.1, leg_position 0.01, while
+    friction 0.6-1.4, motor 0.85-1.15 and action delay 0-2 steps stay at full range.
+    Simulation only."
+  - "S5b-8 yaw action shaping: s5v12 reached idle/forward/backward 1.0 under full DR with
+    zero falls, but yaw RMSE stayed at the command magnitude 0.30 rad/s. Differential
+    injection proved turning is physically easy (a 0.2 action offset gives 0.15-0.22 rad/s
+    at <4 deg tilt), and a sustained external teacher did rotate the robot, but both an
+    external kick and an external teacher leave the policy's own wheel actions irrelevant
+    to the reward, so PPO converges to zero differential. s5v13 confirmed that: forward
+    regressed to 0-0.33 and left/right stayed 0.00 for 750k steps. The teacher is removed
+    and replaced by action shaping that rewards the policy's own differential
+    (right-left)/2 towards 0.7 * yaw command with sigma 0.08 rad/s, weight 10. Warm start
+    from s5v12. Simulation only."
+  - "S5b-9 yaw bootstrap kick: s5v14 ran 550k steps with yaw_action_shaping (weight 10,
+    sigma 0.08) and still emitted zero wheel differential on left/right commands (yaw
+    RMSE = 0.30 = the command, i.e. no turn across all 22 evals). At zero differential the
+    shaping gradient is exp(-(0.21/0.08)^2)*10 ~ 0.66, negligible against the ~30/step
+    upright reward, so PPO sits in the no-turn local optimum -- the same stagnation S4d
+    broke for forward motion with the velocity_bootstrap feed-forward kick. Add a yaw
+    equivalent: a 1.2 s decaying differential kick (left -= 0.7*yaw_cmd, right += 0.7*yaw_cmd,
+    training-only, eval never sees it) that physically initiates the turn so yaw_tracking
+    has a gradient, and strenghten yaw_action_shaping to weight 25 / sigma 0.20 so the
+    policy's own differential earns ~25/step at the target versus ~8 at rest, a ~130x
+    stronger gradient at zero differential. Warm start from s5v12. Simulation only."
+  - "S5b-10 structured wheel command channels: s5v15 through s5v23 (990k steps with
+    shaping, bootstrap and a yaw-only curriculum) never turned; s5v23 finished 1.8M steps
+    at 9/21 with left/right/forward_left/backward_right all 0.00 and yaw RMSE equal to the
+    0.30 rad/s command. Reward shaping cannot create the mapping, so the action space
+    changes instead: task.wheel_command_layout=v_yaw makes action[4] a forward channel
+    and action[5] a differential channel, mixed to left=v+yaw and right=v-yaw before the
+    wheel scale and sign. Positive yaw still drives positive yaw rate. The yaw bootstrap,
+    action shaping and evaluation are all restated on that channel, the bootstrap decay
+    shortens to 40k per-env steps and the yaw-only curriculum to 60k per-env steps.
+    Warm start from s5v23. Simulation only."
+  - "S5b-11 yaw channel sign fix: s5v24 finished 1.8M steps at 1/21 with idle only.
+    Measurement on its policy showed a +0.227 yaw channel producing -0.48 rad/s, so the
+    v_yaw mixing had the wrong sign; s5v23's right-wheel output also carried over as a
+    nonzero yaw channel, which made forward commands spin at 0.5 rad/s. Because
+    yaw_tracking sigma is 0.15, the tracking reward at that error is exp(-10) ~ 0, so the
+    policy had no gradient to correct it. The mix is now left=v-yaw, right=v+yaw, and
+    zeroing the warm-start yaw row proved unsafe: the observation carries the previous
+    wheel actions, so the parent policy fell in 8 s on forward. The warm start instead
+    remaps the two output rows exactly (v=(left+right)/2, yaw=(right-left)/2) and the
+    observation keeps the applied (left, right) wheel actions, so the initial closed
+    loop equals s5v23; shaping target falls to 0.6 channel per rad/s with sigma 0.25.
+    Simulation only."
+  backend: mujoco
   backend: mujoco
   model_route: cad_dynamics
   output_directory: outputs/cad_balance_spring208_phase3d1_velocity
@@ -120,11 +218,13 @@ reward:
   fall_penalty: 20.0
   heading_hold: 1.5
   joint_speed: 0.0001
-  linear_tracking: 12.0
+  linear_tracking: 30.0
   normalized_effort: 0.01
   position_hold: 2.0
+  progress: 0.5
   upright: 6.0
-  virtual_leg_length: 2.0
+  virtual_leg_length: 20.0
+  yaw_action_shaping: 10.0
   yaw_tracking: 8.0
 spring:
   eye_center_limits_m:
@@ -139,14 +239,14 @@ spring:
   physical_curve_verified: false
 task:
   command_forward_m_s:
-  - -0.12
-  - 0.12
+  - -0.3
+  - 0.3
   command_yaw_rad_s:
-  - 0.0
-  - 0.0
+  - -0.3
+  - 0.3
   episode_seconds: 20.0
   heading_sigma_rad: 0.08726646259971647
-  linear_tracking_sigma_m_s: 0.3
+  linear_tracking_sigma_m_s: 0.08
   position_sigma_m: 0.05
   reset_tilt_std_rad: 0.008
   reset_velocity_std: 0.005
@@ -157,12 +257,24 @@ task:
   terminate_max_closure_error_m: 0.01
   terminate_tilt_rad: 0.8
   upright_sigma_rad: 0.17453292519943295
+  velocity_bootstrap:
+    action_per_m_s: 2.5
+    decay_env_steps: 0
+    enabled: true
+    seconds: 1.2
+  yaw_bootstrap:
+    action_per_rad_s: 0.5
+    decay_env_steps: 40000
+    enabled: true
+    seconds: 1.2
   velocity_commands:
     axis_probability: 0.85
     idle_probability: 0.15
     initial_stand_seconds: 1.0
     ramp_seconds: 2.0
     resample_seconds: 6.0
+    yaw_curriculum_steps: 60000
+    yaw_curriculum_mix: 0.75
   velocity_evaluation:
     forward_rmse_m_s: 0.05
     idle_max_displacement_m: 0.05
@@ -175,7 +287,10 @@ task:
   velocity_observation_layout: getup_standing
   velocity_tracking: true
   virtual_leg_length_sigma_m: 0.01
-  yaw_tracking_sigma_rad_s: 0.4
+  yaw_tracking_sigma_rad_s: 0.15
+  yaw_action_per_rad_s: 0.8
+  yaw_action_sigma: 0.30
+  wheel_command_layout: v_yaw
 training:
   action_std:
   - 0.03
@@ -192,18 +307,18 @@ training:
   allow_wheel_control_warm_start: true
   batch_size: 256
   checkpoint_steps: 25000
-  clip_range: 0.05
+  clip_range: 0.2
   critic_hidden_dims:
   - 256
   - 128
   - 64
-  ent_coef: 0.0
+  ent_coef: 0.005
   evaluate_initial_policy: true
   evaluation_steps: 25000
   freeze_action_std: false
   gae_lambda: 0.995
-  gamma: 0.999
-  learning_rate: 3.0e-05
+  gamma: 0.99
+  learning_rate: 3.0e-04
   max_grad_norm: 5.0
   n_epochs: 3
   n_steps: 512
@@ -211,12 +326,33 @@ training:
   reset_optimizer_on_warm_start: true
   seed: 202644
   separate_actor_critic_gradient_clipping: true
-  target_kl: 0.01
-  total_timesteps: 250000
-  vf_coef: 0.001
+  target_kl: 0.03
+  total_timesteps: 1800000
+  vf_coef: 0.5
+  remap_wheel_channels_warm_start: true
 push:
   enabled: false
 getup:
   enabled: false
 observations:
   history_frames: 1
+robustness:
+  # Per-episode domain randomization so sim→real gap is covered before first deployment.
+  # Scales are physical-unit half-widths; the wrapper multiplies by built-in per-block scales.
+  observation_noise:
+    angular_velocity: 0.05
+    gravity: 0.02
+    joint_velocity: 0.1
+    leg_position: 0.01
+  # 50 Hz control → range [0, 2] covers 0-40 ms network/actuator latency.
+  action_delay_steps:
+  - 0
+  - 2
+  # Friction ranges to cover wet/dry asphalt, concrete, and slightly loose dirt.
+  wheel_friction_multiplier:
+  - 0.6
+  - 1.4
+  # Motor torque spread from manufacturing tolerance + LiPo voltage droop.
+  motor_strength:
+  - 0.85
+  - 1.15

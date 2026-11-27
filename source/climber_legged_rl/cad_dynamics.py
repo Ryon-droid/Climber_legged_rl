@@ -135,10 +135,14 @@ def solve_ground_pose(model, initial, config, chassis_frame=None):
     attempts = []
     best = None
     base_id = model.body('base').id
+    # Positive com_forward_offset_m places the standing COM ahead of the wheel axle
+    # (chassis fore-aft), trading some static balance for forward-acceleration margin.
+    com_offset = float(physics.get('com_forward_offset_m', 0.0))
+    fore_aft_axes = np.eye(3) if chassis_frame is None else chassis_frame
 
     def fore_aft_error():
         """COM offset ahead of the wheel axle, measured in the chassis frame."""
-        rotation = data.xmat[base_id].reshape(3, 3)
+        rotation = data.xmat[base_id].reshape(3, 3) @ fore_aft_axes
         com = rotation.T @ (data.subtree_com[base_id] - data.xpos[base_id])
         wheel = rotation.T @ ((data.xpos[wheels] - data.xpos[base_id]).mean(axis=0))
         return float(wheel[0] - com[0])
@@ -150,16 +154,17 @@ def solve_ground_pose(model, initial, config, chassis_frame=None):
             data.qpos[indices] = values
             mujoco.mj_forward(model, data)
             heights = data.xpos[hips, 2] - data.xpos[wheels, 2]
+            forward_offset = np.zeros(2)
             if use_midpoint:
-                heights = virtual_leg_geometry(model,data,midpoint,wheel_centers,frame)['side_view_distance_m']
+                geometry = virtual_leg_geometry(model,data,midpoint,wheel_centers,frame)
+                heights = geometry['side_view_distance_m']
+                forward_offset = geometry['forward_offset_m']
             q = data.qpos[leg_q]
-            # The wheel axle must sit under the COM along the chassis fore-aft
-            # axis, otherwise gravity applies a static pitch torque the wheel
-            # motors cannot hold (the earlier world-x term was evaluated in the
-            # tilted solver frame and left ~100 mm of imbalance).
+            # Constrain both COM balance and the physical leg geometry in the
+            # mounting-plate frame; distance alone also admits reversed stances.
             return np.r_[closure_vectors(model, data).ravel() * 2000,
                          (heights - height) * 20,
-                         fore_aft_error() * 200,
+                         (fore_aft_error() + com_offset) * 5,
                          (q[:2] - q[2:]) * 2, values * 1e-6]
         fit = least_squares(residual, np.clip(initial[indices], lows+1e-9, highs-1e-9),
                             bounds=(lows, highs), max_nfev=1400,
@@ -167,21 +172,27 @@ def solve_ground_pose(model, initial, config, chassis_frame=None):
         residual(fit.x)
         closure = float(np.linalg.norm(closure_vectors(model, data), axis=1).max())
         actual = data.xpos[hips, 2] - data.xpos[wheels, 2]
+        forward_offset = np.zeros(2)
         if use_midpoint:
-            actual = virtual_leg_geometry(model,data,midpoint,wheel_centers,frame)['side_view_distance_m']
+            geometry = virtual_leg_geometry(model,data,midpoint,wheel_centers,frame)
+            actual = geometry['side_view_distance_m']
+            forward_offset = geometry['forward_offset_m']
         base_bottom = min(geom_vertices(model, data, g)[:, 2].min() for g in base_geoms)
         body_clearance = float(base_bottom - data.xpos[wheels, 2].mean() + radius)
         com_error = fore_aft_error()
         record = {'requested_hip_wheel_m': height, 'actual_hip_wheel_m': actual.tolist(),
                   'closure_error_m': closure, 'base_bottom_clearance_m': body_clearance,
-                  'com_wheel_x_error_m': com_error}
+                  'com_wheel_x_error_m': com_error,
+                  'motor_midpoint_wheel_forward_offset_m': forward_offset.tolist()}
         attempts.append(record)
         if use_midpoint:
             record['distance_definition'] = physics['standing_distance_definition']
             record['requested_motor_midpoint_to_wheel_center_m'] = height
             record['actual_motor_midpoint_to_wheel_center_m'] = actual.tolist()
             del record['requested_hip_wheel_m'], record['actual_hip_wheel_m']
-        if closure < 1e-4 and max(abs(actual-height)) < .003 and abs(com_error) < .005:
+        height_tolerance = 1e-6 if use_midpoint else .003
+        if (closure < 1e-4 and max(abs(actual-height)) < height_tolerance
+                and max(abs(forward_offset)) < .01 and abs(com_error + com_offset) < .005):
             best = data.qpos.copy()
             break
         initial = data.qpos.copy()
@@ -222,15 +233,13 @@ def build_dynamics(config_path=DEFAULT_DYNAMICS_CONFIG):
     original_masses = {fixed.body(i).name: float(fixed.body_mass[i]) for i in range(1, fixed.nbody)}
     qpos = fixed.key_qpos[0].copy()
     qpos, attempts = solve_ground_pose(fixed, qpos, config, chassis_frame=chassis_frame)
-    # The solver may use a tilted chassis_reference_mesh to make body_clearance
-    # computable (the base body in cad_repaired holds all leg meshes too).  The
-    # solved leg angles are relative to the base local frame, so we can transfer
-    # them back onto a level (identity-quaternion) model for the final artefact.
-    final_root = ET.parse(source).getroot()
+    # Joint angles and the base quaternion form one pose: preserve the exact
+    # CAD-root orientation used by the solver so the mounting plate stays level.
+    base_quaternion = fixed.body_quat[fixed.body('base').id].copy()
+    final_root = root
     final_fixed_base = final_root.find('./worldbody/body')
     final_fixed_base.attrib.pop('euler', None)
-    final_fixed_base.set('quat', '0 0 0 1')
-    fixed = mujoco.MjModel.from_xml_string(ET.tostring(final_root, encoding='unicode'))
+    final_fixed_base.set('quat', ' '.join(format(v, '.15g') for v in base_quaternion))
     data = mujoco.MjData(fixed)
     data.qpos[:] = qpos
     mujoco.mj_forward(fixed, data)
@@ -262,26 +271,25 @@ def build_dynamics(config_path=DEFAULT_DYNAMICS_CONFIG):
         for s in ('left', 'right')
     )
     z = -wheel_lowest + physics['reset_clearance_m']
-    # The pose was solved on the mounting-plate frame but is written back level.
-    # Leg angles are base-local, so the fore-aft balance must survive the
-    # transfer; refuse to emit an artefact the wheels cannot hold.
+    # Recheck COM balance in the physical mounting-plate frame before adding
+    # the free joint; refuse to emit a stance the wheels cannot hold.
     level_base = fixed.body('base').id
-    level_rotation = data.xmat[level_base].reshape(3, 3)
+    level_axes = np.eye(3) if chassis_frame is None else chassis_frame
+    level_rotation = data.xmat[level_base].reshape(3, 3) @ level_axes
     level_origin = data.xpos[level_base]
     level_com = level_rotation.T @ (data.subtree_com[level_base] - level_origin)
     level_wheels = level_rotation.T @ (
         (data.xpos[[fixed.body(s + '_link 3').id for s in ('left', 'right')]] - level_origin).mean(axis=0)
     )
     level_com_error = float(level_wheels[0] - level_com[0])
-    if abs(level_com_error) > 0.005:
+    com_offset = float(physics.get('com_forward_offset_m', 0.0))
+    if abs(level_com_error + com_offset) > 0.005:
         raise RuntimeError(
             f'Level standing pose leaves the COM {level_com_error * 1000:.1f} mm off the wheel axle'
         )
-    # Write the level-quaternion base into the working tree so later freejoint
-    # and option edits apply to the level model.
     root = final_root
-    base_quaternion = np.array([0., 0., 0., 1.])
     base = root.find('./worldbody/body')
+    base.attrib.pop('euler', None)
     base.set('pos', f'0 0 {z:.15g}')
     base.set('quat', ' '.join(format(v, '.15g') for v in base_quaternion))
     base.insert(0, ET.Element('freejoint', name='floating_base'))
@@ -385,13 +393,14 @@ def build_dynamics(config_path=DEFAULT_DYNAMICS_CONFIG):
             f'expected {physics["reset_clearance_m"] * 1000:.1f} mm above the ground'
         )
     keyframe_com = model.body('base').id
-    keyframe_rotation = data.xmat[keyframe_com].reshape(3, 3)
+    keyframe_axes = np.eye(3) if chassis_frame is None else chassis_frame
+    keyframe_rotation = data.xmat[keyframe_com].reshape(3, 3) @ keyframe_axes
     keyframe_com_local = keyframe_rotation.T @ (data.subtree_com[keyframe_com] - data.xpos[keyframe_com])
     keyframe_wheels = keyframe_rotation.T @ (
         (data.xpos[[model.body(s + '_link 3').id for s in ('left', 'right')]] - data.xpos[keyframe_com]).mean(axis=0)
     )
     keyframe_com_error = float(keyframe_wheels[0] - keyframe_com_local[0])
-    if abs(keyframe_com_error) > 0.005:
+    if abs(keyframe_com_error + com_offset) > 0.005:
         raise RuntimeError(f'Standing keyframe COM is {keyframe_com_error * 1000:.1f} mm off the wheel axle')
     hip_height = float(np.mean([data.body(s+'_link1').xpos[2]-data.body(s+'_link 3').xpos[2] for s in ('left','right')]))
     report = {'simulation_only':True,'model_route':'cad_dynamics','generated_model':str(path),
@@ -418,6 +427,11 @@ def build_dynamics(config_path=DEFAULT_DYNAMICS_CONFIG):
         wheel_centers = wheel_centers_in_wheel_bodies(model,physics)
         rep_frame = chassis_frame if chassis_frame is not None else np.eye(3)
         geometry = virtual_leg_geometry(model,data,midpoint,wheel_centers,rep_frame)
+        target_distance = physics['rest_motor_midpoint_to_wheel_center_m']
+        if max(abs(geometry['side_view_distance_m'] - target_distance)) >= 1e-6:
+            raise RuntimeError('Standing keyframe does not preserve the requested physical leg distance')
+        if max(abs(geometry['forward_offset_m'])) >= .01:
+            raise RuntimeError('Standing keyframe has excessive motor-midpoint/wheel-center forward offset')
         report['standing_geometry'] = {k:v.tolist() for k,v in geometry.items()}
         report['standing_geometry']['definition'] = physics['standing_distance_definition']
         report['standing_geometry']['target_distance_m'] = physics['rest_motor_midpoint_to_wheel_center_m']

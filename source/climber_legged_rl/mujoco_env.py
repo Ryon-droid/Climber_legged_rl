@@ -56,6 +56,13 @@ class ClimberMujocoEnv(gym.Env):
         self.wheel_action_sign = np.asarray(self.control.get("wheel_action_sign", [1.0, -1.0]), dtype=np.float64)
         if self.wheel_action_sign.shape != (2,) or not np.isin(self.wheel_action_sign, (-1.0, 1.0)).all():
             raise ValueError("wheel_action_sign must be two entries, each +1 or -1")
+        # 'left_right' keeps the historical per-wheel action channels. 'v_yaw' makes the
+        # policy emit a forward channel and a differential channel, mixed into wheel
+        # commands here, so a yaw command has a direct action path instead of relying on
+        # reward shaping to discover the split.
+        self.wheel_command_layout = self.config.get('task', {}).get('wheel_command_layout', 'left_right')
+        if self.wheel_command_layout not in ('left_right', 'v_yaw'):
+            raise ValueError('Unknown wheel command layout: ' + str(self.wheel_command_layout))
         names = self.control["leg_joints"] + self.control["wheel_joints"]
         if self.model.nu != 6 or any(self.model.actuator(i).trnid[0] != self.model.joint(n).id for i, n in enumerate(names)):
             raise ValueError("Model motor ordering must match four leg joints and two wheels")
@@ -75,13 +82,8 @@ class ClimberMujocoEnv(gym.Env):
                 self.chassis_axes = frame_from_mounting_plate(self.model, reference_mesh)
             except ValueError:
                 self.chassis_axes = np.eye(3)
-            # If the base is already level (identity quaternion), don't apply
-            # an extra rotation -- frame_from_mounting_plate returns the
-            # mounting-plate mesh orientation in base-local frame, which is
-            # only needed to compensate for a tilted chassis_reference_mesh.
-            base_quat = self.model.key_qpos[0][3:7]
-            if np.allclose(base_quat, [0.0, 0.0, 0.0, 1.0], atol=0.01):
-                self.chassis_axes = np.eye(3)
+            # Always use the physical mounting plate, even when the CAD root
+            # quaternion is identity; root z is not necessarily the plate normal.
         else:
             # Preserve the observation contract of historical checkpoints.
             self.chassis_axes = np.diag([-1.0, -1.0, 1.0])
@@ -121,6 +123,10 @@ class ClimberMujocoEnv(gym.Env):
         self.leg_low = np.array([self.model.joint(n).range[0] for n in names[:4]])
         self.leg_high = np.array([self.model.joint(n).range[1] for n in names[:4]])
         self.action = np.zeros(6, dtype=np.float64)
+        # Wheel commands as actually applied. The v_yaw layout keeps the observation
+        # in the historical (left, right) form so a warm start from a left_right policy
+        # sees the same feedback it was trained with.
+        self.observed_wheel_actions = np.zeros(2, dtype=np.float64)
         self.commands = np.zeros(2)
         self.steps = 0
         self._total_reward = 0.0
@@ -196,7 +202,8 @@ class ClimberMujocoEnv(gym.Env):
         angular, linear, gravity = self._kinematics()
         obs = np.concatenate((angular * 0.25, gravity, self.commands * [2.0, 0.25],
                               self.data.qpos[self.q_indices[:4]] - self.nominal_legs,
-                              self.data.qvel[self.v_indices] * 0.05, self.action))
+                              self.data.qvel[self.v_indices] * 0.05,
+                              self.action[:4], self.observed_wheel_actions))
         if self.stationary_hold:
             displacement, heading_error = self._hold_errors()
             local_displacement = self._rotation().T @ np.r_[displacement, 0.]
@@ -220,6 +227,7 @@ class ClimberMujocoEnv(gym.Env):
         self.data.qpos[3:7] = quat
         self.data.qvel[:6] = self.np_random.normal(0, self.config["task"]["reset_velocity_std"], 6)
         self.action[:] = 0.0
+        self.observed_wheel_actions[:] = 0.0
         self.commands[:] = [self.np_random.uniform(*self.config["task"]["command_forward_m_s"]),
                             self.np_random.uniform(*self.config["task"]["command_yaw_rad_s"])]
         self.steps = 0
@@ -272,7 +280,15 @@ class ClimberMujocoEnv(gym.Env):
         previous = self.action.copy()
         self.action[:] = action
         target_legs = self._leg_targets(action)
-        target_wheels = action[4:] * self.control["wheel_action_scale_rad_s"] * self.wheel_action_sign
+        if self.wheel_command_layout == 'v_yaw':
+            # Measured on this model: a positive yaw channel must slow the left wheel
+            # and speed the right wheel to produce positive yaw rate
+            # (+0.227 channel gave -0.48 rad/s with the opposite mixing).
+            wheel_actions = np.clip([action[4] - action[5], action[4] + action[5]], -1., 1.)
+        else:
+            wheel_actions = action[4:]
+        self.observed_wheel_actions[:] = wheel_actions
+        target_wheels = wheel_actions * self.control["wheel_action_scale_rad_s"] * self.wheel_action_sign
         if self.push.enabled:
             self.data.xfrc_applied[self.base_id, :] = 0.
             self.data.xfrc_applied[self.base_id, :3] = self._push_force()

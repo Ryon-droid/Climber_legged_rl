@@ -45,6 +45,12 @@ class ClimberVelocityEnv(ClimberMujocoEnv):
             return 1.
         return max(0., 1. - self.curriculum_steps / decay)
 
+    def _yaw_bootstrap_scale(self):
+        decay = float(self.config['task'].get('yaw_bootstrap', {}).get('decay_env_steps', 0))
+        if decay <= 0:
+            return 1.
+        return max(0., 1. - self.curriculum_steps / decay)
+
     def _bootstrap_action(self, action):
         bootstrap = self.config['task'].get('velocity_bootstrap', {})
         if not self.training_curriculum or not bootstrap.get('enabled', False) or self.idle_hold:
@@ -57,7 +63,28 @@ class ClimberVelocityEnv(ClimberMujocoEnv):
         fade = min(1., age / 0.15) * min(1., max(0., (seconds - age) / 0.3))
         gain = float(bootstrap.get('action_per_m_s', 2.5)) * fade * scale
         applied = action.copy()
-        applied[4:] -= gain * self.command_target[0]
+        # Positive wheel action drives the robot forward (verified by constant-action
+        # rollout), so a forward command must ADD a positive feed-forward term.
+        if self.wheel_command_layout == 'v_yaw':
+            applied[4] += gain * self.command_target[0]
+        else:
+            applied[4:] += gain * self.command_target[0]
+        # Yaw differential feed-forward: a decaying kick that physically initiates the
+        # turn so yaw_tracking has a gradient (mirrors the forward kick). Empirically,
+        # L=+0.1 R=-0.1 gives +0.103 rad/s positive yaw, while L=-0.1 R=+0.1 gives
+        # -0.148 rad/s negative yaw. Positive yaw (right turn) requires a4 - a5 > 0,
+        # so we ADD to the left wheel action and SUBTRACT from the right. Training only;
+        # evaluation never calls this, so the policy must emit the split itself.
+        yaw_bootstrap = self.config['task'].get('yaw_bootstrap', {})
+        if yaw_bootstrap.get('enabled', False) and abs(self.command_target[1]) > 1e-6:
+            yaw_scale = self._yaw_bootstrap_scale()
+            if yaw_scale > 0:
+                yaw_gain = float(yaw_bootstrap.get('action_per_rad_s', 0.3)) * fade * yaw_scale
+                if self.wheel_command_layout == 'v_yaw':
+                    applied[5] += yaw_gain * self.command_target[1]
+                else:
+                    applied[4] += yaw_gain * self.command_target[1]
+                    applied[5] -= yaw_gain * self.command_target[1]
         return np.clip(applied, -1., 1.)
 
     def _extra_observation(self):
@@ -93,12 +120,25 @@ class ClimberVelocityEnv(ClimberMujocoEnv):
                     self.next_command_seconds = float('inf')
             else:
                 task = self.config['task']
-                target = np.zeros(2) if self.np_random.random() < self.schedule['idle_probability'] else np.array([
-                    self.np_random.uniform(*task['command_forward_m_s']),
-                    self.np_random.uniform(*task['command_yaw_rad_s'])])
-                axis_probability=self.schedule.get('axis_probability',0.)
-                if np.any(target) and axis_probability and self.np_random.random()<axis_probability:
-                    target[int(self.np_random.integers(2))]=0.
+                yaw_phase = (self.training_curriculum and
+                             self.curriculum_steps < float(self.schedule.get('yaw_curriculum_steps', 0)))
+                if self.np_random.random() < self.schedule['idle_probability']:
+                    target = np.zeros(2)
+                elif yaw_phase and self.np_random.random() < float(self.schedule.get('yaw_curriculum_mix', 0.7)):
+                    # Yaw curriculum: isolate turning (no forward command) so the
+                    # yaw command signal is the only command input and the policy
+                    # must learn to map it to a wheel split. Warm-started policies
+                    # otherwise keep near-zero weights on the yaw channel and never
+                    # turn. A fraction of full commands is retained to avoid
+                    # forgetting forward tracking.
+                    target = np.array([0.0, self.np_random.uniform(*task['command_yaw_rad_s'])])
+                else:
+                    target = np.array([
+                        self.np_random.uniform(*task['command_forward_m_s']),
+                        self.np_random.uniform(*task['command_yaw_rad_s'])])
+                    axis_probability=self.schedule.get('axis_probability',0.)
+                    if np.any(target) and axis_probability and self.np_random.random()<axis_probability:
+                        target[int(self.np_random.integers(2))]=0.
                 self.next_command_seconds = seconds + self.schedule['resample_seconds']
             self._new_command(target)
         fraction = np.clip((seconds-self.command_changed_seconds)/self.schedule['ramp_seconds'], 0., 1.)
@@ -143,8 +183,22 @@ class ClimberVelocityEnv(ClimberMujocoEnv):
         previous_sum = sum(terms.values())
         terms['linear_tracking'] = float(np.exp(-((linear[0]-executed_command[0])**2+linear[1]**2)
             / task['linear_tracking_sigma_m_s']**2)) * weights['linear_tracking']
+        command_forward = float(executed_command[0])
+        if abs(command_forward) > 1e-6:
+            progress = float(linear[0]) * np.sign(command_forward)
+            terms['progress'] = float(np.clip(progress, 0.0, abs(command_forward))
+                / abs(command_forward)) * weights.get('progress', 0.0)
         terms['yaw_tracking'] = float(np.exp(-((angular[2]-executed_command[1])
             / task['yaw_tracking_sigma_rad_s'])**2)) * weights['yaw_tracking']
+        # Action-space shaping for turning. With the v_yaw layout the yaw channel is
+        # action[5] itself; with the historical layout the split a4 - a5 is the
+        # differential. Positive differential produces positive yaw (left turn).
+        if abs(executed_command[1]) > 1e-6 and weights.get('yaw_action_shaping', 0.0) > 0:
+            wheel_split = (float(action[5]) if self.wheel_command_layout == 'v_yaw'
+                           else float(action[4]) - float(action[5]))
+            target_split = float(task.get('yaw_action_per_rad_s', 0.7)) * float(executed_command[1])
+            terms['yaw_action_shaping'] = float(np.exp(-((wheel_split - target_split)
+                / task.get('yaw_action_sigma', 0.20))**2)) * weights['yaw_action_shaping']
         if executed_idle:
             displacement, heading = self._hold_errors()
             terms['position_hold'] = float(np.exp(-np.sum(displacement**2)/task['position_sigma_m']**2)) * weights['position_hold']

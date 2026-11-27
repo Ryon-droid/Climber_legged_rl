@@ -62,8 +62,8 @@ def main() -> None:
     if args.viewer and args.video:
         parser.error('Choose --viewer or --video')
     fixed_command=args.command_forward is not None or args.command_yaw is not None
-    if (fixed_command or args.stop_after_seconds is not None) and not args.viewer:
-        parser.error('Command overrides require --viewer')
+    if (fixed_command or args.stop_after_seconds is not None) and not (args.viewer or args.video):
+        parser.error('Command overrides require --viewer or --video')
     if args.stop_after_seconds is not None and not fixed_command:
         parser.error('--stop-after-seconds requires a fixed movement command')
     os.environ.setdefault("MUJOCO_GL",'glfw' if args.viewer else 'egl')
@@ -137,11 +137,14 @@ def main() -> None:
             import numpy as np
             env.max_steps=int(np.ceil(args.horizon_seconds/env.dt))
         policy=PPO.load(str(args.checkpoint),device="cpu")
+        reset_options={'velocity_command':[args.command_forward or 0.,args.command_yaw or 0.]} if fixed_command else None
+        if args.stop_after_seconds is not None:
+            reset_options['stop_after_seconds']=args.stop_after_seconds
         args.video.parent.mkdir(parents=True,exist_ok=True)
         try:
             with imageio.get_writer(str(args.video),fps=50) as writer:
                 for episode in range(min(args.episodes,3)):
-                    obs,_=env.reset(seed=args.seed+episode)
+                    obs,_=env.reset(seed=args.seed+episode,options=reset_options)
                     writer.append_data(env.render())
                     while True:
                         action,_=policy.predict(obs,deterministic=True)
